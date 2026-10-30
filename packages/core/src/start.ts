@@ -67,12 +67,13 @@ function* fibers(ctx: Context): Generator<Fiber> {
 }
 
 /**
- * Wait until no plugin is loading or unloading. Plugins waiting for a
- * service nobody provides stay pending; they do not block.
+ * Wait until no plugin is loading or unloading, including the modules the
+ * loader is still importing. Plugins waiting for a service nobody provides
+ * stay pending; they do not block.
  */
 export async function idle(ctx: Context) {
   while (true) {
-    const tasks: Promise<unknown>[] = []
+    const tasks: Promise<unknown>[] = [...ctx.get('loader')?.getTasks() ?? []]
     for (const fiber of fibers(ctx)) {
       if (fiber.inertia) tasks.push(fiber.inertia)
     }
@@ -83,12 +84,7 @@ export async function idle(ctx: Context) {
 
 /** Wait until the plugin tree has loaded; throws if a plugin failed. */
 export async function settle(ctx: Context) {
-  while (true) {
-    const tasks = ctx.loader.getTasks()
-    await idle(ctx)
-    if (!tasks.length && !ctx.loader.getTasks().length) break
-    await Promise.allSettled(tasks)
-  }
+  await idle(ctx)
   const failed = [...fibers(ctx)].filter(fiber => fiber.state === FAILED)
   if (failed.length) {
     throw new Error(`failed to load ${failed.map(fiber => fiber.name).join(', ')}, see the errors above`)

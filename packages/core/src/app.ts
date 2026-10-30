@@ -3,6 +3,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { Context, Service } from 'cordis'
 import { Awaitable } from 'cosmokit'
+import { idle } from './start.ts'
 import { Refresher, winPath } from './utils/index.ts'
 
 declare module 'cordis' {
@@ -50,7 +51,8 @@ async function writeIfChanged(path: string, content: string) {
  * `ctx.console.addEntry()`), global imports with `import()`, generated modules
  * with `file()` and server bundle modules with `server()`. The generated
  * directory (`src/.cormi`) is rewritten whenever a contribution is added or
- * disposed; files nobody registers anymore are removed.
+ * disposed, once the plugins being loaded have settled; files nobody
+ * registers anymore are removed.
  */
 export class App extends Service {
   /** browser plugins, mounted in registration order */
@@ -84,26 +86,27 @@ export class App extends Service {
     return winPath(join(this.dir, 'server.tsx'))
   }
 
-  async* [Service.init]() {
+  * [Service.init]() {
     // files left by a previous run are removed by the first generation
     this._written = new Set(listFiles(this.dir))
-    this.refresh()
-    await this.flush()
     yield () => this._refresher.dispose()
   }
 
   /**
-   * Mount a browser plugin. `file` default-exports `(ctx, config) => void`
+   * Mount a browser plugin. The module default-exports `(ctx, config) => void`
    * (or a cordis plugin object); `config` must be serializable to JSON.
+   *
+   * Packages should pass their own specifier (`@scope/plugin-foo/client`)
+   * rather than a file path, so the app and the entry import the same module.
    */
-  entry(file: string, config?: any) {
-    const entry: App.Entry = { file: winPath(file), config }
+  entry(module: string, config?: any) {
+    const entry: App.Entry = { file: winPath(module), config }
     return this._register(this.entries, entry, `ctx.app.entry(${JSON.stringify(entry.file)})`)
   }
 
-  /** Import a module for its side effects (a stylesheet, a polyfill) before the app starts. */
+  /** Import a module (an absolute path or a specifier) for its side effects before the app starts. */
   import(source: string) {
-    return this._register(this.imports, { source }, `ctx.app.import(${JSON.stringify(source)})`)
+    return this._register(this.imports, { source: winPath(source) }, `ctx.app.import(${JSON.stringify(source)})`)
   }
 
   /**
@@ -160,6 +163,8 @@ export class App extends Service {
   }
 
   private async _generate() {
+    // plugins loading right now are about to register: generate once for all of them
+    await idle(this.ctx)
     const written = new Set<string>()
     for (const [path, content] of this._files) {
       try {
@@ -185,7 +190,7 @@ export class App extends Service {
 
 export namespace App {
   export interface Entry {
-    /** absolute path of the browser plugin module */
+    /** absolute path or package specifier of the browser plugin module */
     file: string
     /** config passed to the browser plugin */
     config?: any
