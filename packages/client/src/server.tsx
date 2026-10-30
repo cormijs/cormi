@@ -1,6 +1,6 @@
 import React, { Fragment, type ReactNode } from 'react'
 import { renderToReadableStream, renderToStaticMarkup } from 'react-dom/server'
-import { createStaticHandler, createStaticRouter, isRouteErrorResponse, StaticRouterProvider } from 'react-router'
+import { createStaticHandler, createStaticRouter, isRouteErrorResponse, type StaticHandlerContext, StaticRouterProvider } from 'react-router'
 import { Root } from './app.tsx'
 import type { Context } from './context.ts'
 import { ServerInsertedHTMLContext } from './inserted.tsx'
@@ -8,10 +8,12 @@ import { REDIRECT_HEADER } from './constants.ts'
 
 export interface RenderResult {
   status: number
-  /** markup of the app, including the hydration data */
+  /** markup of the app */
   content: string
   /** markup inserted with `useServerInsertedHTML()` */
   head: string
+  /** the hydration data, rendered after the mount element */
+  body: string
 }
 
 export interface RequestHandler {
@@ -19,6 +21,35 @@ export interface RequestHandler {
   loader(request: Request, routeId: string): Promise<Response>
   /** Render a page; a `Response` is returned for redirects. */
   render(request: Request): Promise<Response | RenderResult>
+}
+
+const ESCAPED: Record<string, string> = { '&': '\\u0026', '>': '\\u003e', '<': '\\u003c', '\u2028': '\\u2028', '\u2029': '\\u2029' }
+
+/** Errors as react-router's client deserializes them. */
+function serializeErrors(errors: StaticHandlerContext['errors']) {
+  if (!errors) return null
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(errors)) {
+    if (isRouteErrorResponse(value)) {
+      result[key] = { ...value, __type: 'RouteErrorResponse' }
+    } else if (value instanceof Error) {
+      result[key] = { message: value.message, __type: 'Error', ...value.name !== 'Error' ? { __subType: value.name } : {} }
+    } else {
+      result[key] = value
+    }
+  }
+  return result
+}
+
+/**
+ * The hydration data is written outside of the React tree, so wrappers that
+ * render elements around the router do not make the markup differ from the
+ * client's.
+ */
+function renderHydrationData(context: StaticHandlerContext) {
+  const data = { loaderData: context.loaderData, actionData: context.actionData, errors: serializeErrors(context.errors) }
+  const json = JSON.stringify(JSON.stringify(data)).replace(/[&><\u2028\u2029]/g, char => ESCAPED[char])
+  return `<script>window.__staticRouterHydrationData = JSON.parse(${json});</script>`
 }
 
 function toLoaderResponse(response: Response) {
@@ -59,7 +90,7 @@ export function createRequestHandler(ctx: Context): RequestHandler {
       const stream = await renderToReadableStream(
         <ServerInsertedHTMLContext.Provider value={callback => inserted.push(callback)}>
           <Root ctx={ctx}>
-            <StaticRouterProvider router={router} context={context} />
+            <StaticRouterProvider router={router} context={context} hydrate={false} />
           </Root>
         </ServerInsertedHTMLContext.Provider>,
         { onError: error => console.error(error) },
@@ -67,7 +98,7 @@ export function createRequestHandler(ctx: Context): RequestHandler {
       await stream.allReady
       const content = await new Response(stream).text()
       const head = renderToStaticMarkup(<>{inserted.map((callback, index) => <Fragment key={index}>{callback()}</Fragment>)}</>)
-      return { status: context.statusCode, content, head }
+      return { status: context.statusCode, content, head, body: renderHydrationData(context) }
     },
   }
 }

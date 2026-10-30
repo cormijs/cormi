@@ -51,6 +51,8 @@ export async function render(ctx: Context, options: RenderOptions) {
   const element = <Root ctx={ctx}><RouterProvider router={router} /></Root>
   const root = hydrationData ? hydrateRoot(container, element) : createRoot(container)
   if (!hydrationData) root.render(element)
+  // stylesheets linked by the dev server; the modules have injected the same styles by now
+  for (const link of document.querySelectorAll('link[data-cormi-dev]')) link.remove()
   ctx.emit('app/mount')
 
   return () => {
