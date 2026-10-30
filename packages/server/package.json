@@ -31,6 +31,7 @@
     "@cormi/vite": "workspace:*",
     "chokidar": "^4.0.3",
     "cordis": "4.0.0-rc.12",
-    "path-to-regexp": "^8.3.0"
+    "path-to-regexp": "^8.3.0",
+    "vite": "^7.3.7"
   }
 }
