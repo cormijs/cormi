@@ -1,0 +1,33 @@
+{
+  "name": "@cormi/plugin-request",
+  "description": "HTTP requests for Cormi apps: fetch-based request() and useRequest(), intercepted through events",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src", "client"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "request", "fetch", "useRequest"],
+  "peerDependencies": {
+    "cormi": "workspace:*",
+    "react": ">=19"
+  },
+  "dependencies": {
+    "ahooks": "^3.11.0",
+    "cordis": "4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "cormi": "workspace:*",
+    "react": "^19.3.1"
+  }
+}
