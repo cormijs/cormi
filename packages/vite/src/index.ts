@@ -116,7 +116,8 @@ export class Vite extends Service {
         outDir,
         manifest: true,
         emptyOutDir: false,
-        rollupOptions: { input: { cormi: app.clientEntry } },
+        // the entry exports the lifecycles of the app, for hosts that mount it
+        rollupOptions: { input: { cormi: app.clientEntry }, preserveEntrySignatures: 'exports-only' },
       },
     } satisfies InlineConfig))
     const manifestPath = join(outDir, '.vite/manifest.json')
