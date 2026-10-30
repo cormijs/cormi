@@ -1,4 +1,4 @@
-import type { IRoute } from '../types.ts'
+import type { Route as IRoute } from '../types.ts'
 
 /**
  * Insert `target` as the parent of a route (`id`) or of every top-level route

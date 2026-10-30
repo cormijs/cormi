@@ -1,4 +1,4 @@
-import type { IRoute } from '../types.ts'
+import type { Route as IRoute } from '../types.ts'
 import { assert } from '../utils/index.ts'
 
 interface Memo {
@@ -30,7 +30,7 @@ function transformRoute(opts: { route: any; parentId: string | undefined; memo: 
   let absPath = opts.route.path
   if (absPath?.charAt(0) !== '/') {
     const parentAbsPath = opts.parentId
-      ? opts.memo.ret[opts.parentId].absPath.replace(/\/+$/, '/')
+      ? (opts.memo.ret[opts.parentId].absPath ?? '/').replace(/\/+$/, '/')
       : '/'
     absPath = endsWithStar(parentAbsPath) ? parentAbsPath : ensureWithSlash(parentAbsPath, absPath)
   }

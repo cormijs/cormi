@@ -3,7 +3,8 @@ import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { resolve as esmResolve } from 'import-meta-resolve'
-import { RESOLVE_EXTENSIONS } from '../constants.ts'
+
+export const RESOLVE_EXTENSIONS = ['.tsx', '.ts', '.mts', '.mjs', '.jsx', '.js', '.cjs']
 
 export function winPath(path: string) {
   const isExtendedLengthPath = /^\\\\\?\\/.test(path)

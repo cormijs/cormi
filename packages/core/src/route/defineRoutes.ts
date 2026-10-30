@@ -1,4 +1,4 @@
-import type { IRoute } from '../types.ts'
+import type { Route as IRoute } from '../types.ts'
 import { createRouteId } from './utils.ts'
 
 export interface DefineRouteOptions {
