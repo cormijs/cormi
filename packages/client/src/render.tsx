@@ -8,6 +8,17 @@ import type { Context } from './context.ts'
 export interface RenderOptions {
   /** id of the element the app is mounted into */
   mountElementId: string
+  /**
+   * Render into this element instead, without hydrating: the app is mounted
+   * by a host, e.g. a micro-frontend framework.
+   */
+  container?: Element
+  /** basename of the router, when the host mounts the app below a path */
+  basename?: string
+  /** origin of the app's own server, when the app runs in a foreign page */
+  origin?: string
+  /** props of the host, read with `useHostProps()` */
+  props?: Record<string, any>
 }
 
 const createRouter = {
@@ -31,11 +42,15 @@ async function resolveLazyRoutes(routes: RouteObject[], pathname: string, base: 
  * Returns a function that unmounts the app.
  */
 export async function render(ctx: Context, options: RenderOptions) {
-  const { $router } = ctx
+  const { $app, $router } = ctx
+  $router.basename = options.basename ?? $router.base
+  $router.origin = options.origin ?? ''
+  if (options.props) $app.setProps(options.props)
   const routes = $router.createRoutes('client')
-  const hydrationData = window.__staticRouterHydrationData
-  if (hydrationData) await resolveLazyRoutes(routes, window.location.pathname, $router.base)
-  const router = createRouter[$router.options.history ?? 'browser'](routes, { basename: $router.base, hydrationData })
+  // server-rendered markup only belongs to the app's own document
+  const hydrationData = options.container ? undefined : window.__staticRouterHydrationData
+  if (hydrationData) await resolveLazyRoutes(routes, window.location.pathname, $router.basename)
+  const router = createRouter[$router.options.history ?? 'browser'](routes, { basename: $router.basename, hydrationData })
   $router.router = router
 
   let location = router.state.location
@@ -46,7 +61,7 @@ export async function render(ctx: Context, options: RenderOptions) {
     ctx.emit('router/change', location, state.historyAction)
   })
 
-  const container = document.getElementById(options.mountElementId)
+  const container = options.container ?? document.getElementById(options.mountElementId)
   if (!container) throw new Error(`cannot find the mount element #${options.mountElementId}`)
   const element = <Root ctx={ctx}><RouterProvider router={router} /></Root>
   const root = hydrationData ? hydrateRoot(container, element) : createRoot(container)

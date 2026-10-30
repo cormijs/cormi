@@ -36,13 +36,19 @@ export interface RouterOptions {
 export class RouterService extends Service {
   /** the react-router instance, once rendered */
   router: DataRouter | undefined
+  /** basename of the router; differs from `base` when a host mounts the app below a path */
+  basename: string
+  /** origin of the app's server, when the app runs in a foreign page; requests of server loaders go there */
+  origin = ''
 
   private _modules = new Map<string, Promise<RouteModule>>()
 
   constructor(ctx: CordisContext, public options: RouterOptions) {
     super(ctx, '$router')
+    this.basename = this.base
   }
 
+  /** basename of the app on its own server */
   get base() {
     return this.options.base ?? '/'
   }
@@ -63,9 +69,9 @@ export class RouterService extends Service {
     return task
   }
 
-  /** Import the modules of the routes matching `to`, e.g. when a link is hovered. */
+  /** Import the modules of the routes matching `to` (a path below the basename), e.g. when a link is hovered. */
   async preload(to: string) {
-    const matches = matchRoutes(this.createRoutes('client'), to, this.base) ?? []
+    const matches = matchRoutes(this.createRoutes('client'), to) ?? []
     await Promise.all(matches.map(match => this.load(match.route.id!)))
   }
 
@@ -113,7 +119,7 @@ export class RouterService extends Service {
       if (!route.hasLoader) return
       return async args => (await this.load(route.id)).loader!(args)
     }
-    const serverLoader = (request: Request) => fetchLoader(this.base, route.id, request)
+    const serverLoader = (request: Request) => fetchLoader(this.origin + this.base, route.id, request, this.basename)
     if (route.hasClientLoader) {
       return async (args) => {
         const module = await this.load(route.id)
@@ -124,10 +130,16 @@ export class RouterService extends Service {
   }
 }
 
-/** Fetch the data of a server `loader` from the loader endpoint. */
-export async function fetchLoader(base: string, id: string, request: Request) {
+/**
+ * Fetch the data of a server `loader` from the loader endpoint below `base`.
+ * The page URL is rewritten from `basename` (where the router runs) to `base`.
+ */
+export async function fetchLoader(base: string, id: string, request: Request, basename = base) {
   const url = new URL(request.url)
-  const endpoint = `${base.replace(/\/$/, '')}/${LOADER_ENDPOINT}?route=${encodeURIComponent(id)}&url=${encodeURIComponent(url.pathname + url.search)}`
+  let path = url.pathname + url.search
+  const prefix = new URL(base, 'http://localhost').pathname
+  if (basename !== prefix && path.startsWith(basename)) path = prefix.replace(/\/$/, '') + '/' + path.slice(basename.length).replace(/^\//, '')
+  const endpoint = `${base.replace(/\/$/, '')}/${LOADER_ENDPOINT}?route=${encodeURIComponent(id)}&url=${encodeURIComponent(path)}`
   const response = await fetch(endpoint, { signal: request.signal, headers: { accept: 'application/json' } })
   const location = response.headers.get(REDIRECT_HEADER)
   if (location) throw redirect(location)

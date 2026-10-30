@@ -1,5 +1,5 @@
 export * from 'react-router'
-export { AppService, Root, useContext, useCordis, type Wrapper } from './app.tsx'
+export { AppService, Root, useContext, useCordis, useHostProps, type Wrapper } from './app.tsx'
 export { Context } from './context.ts'
 export { ServerInsertedHTMLContext, useServerInsertedHTML } from './inserted.tsx'
 export { Link, type LinkProps, type PrefetchMode } from './link.tsx'

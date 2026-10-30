@@ -5,10 +5,23 @@ import type { Context } from './context.ts'
 declare module 'cordis' {
   interface Events {
     /**
-     * The app was rendered into the page for the first time. Browser only.
+     * The browser entry is about to mount the app. A listener returning `true`
+     * takes over: the app is mounted when the host calls the `mount()` export
+     * of the entry, e.g. a micro-frontend framework. Browser only.
+     * @mode bail
+     */
+    'app/bootstrap'(): boolean | void
+    /**
+     * The app was rendered into the page. Browser only.
      * @mode emit
      */
     'app/mount'(): void
+    /**
+     * The host updated the props of the app.
+     * @mode emit
+     * @param props the new props
+     */
+    'app/props'(props: Record<string, any>): void
   }
 }
 
@@ -59,6 +72,26 @@ export class AppService extends Service {
 
   getWrappers = () => this._snapshot
 
+  /** Props given by the host that mounted the app, e.g. a qiankun master; empty when the app runs by itself. */
+  props: Record<string, any> = {}
+
+  setProps(props: Record<string, any>) {
+    this.props = props
+    this.ctx.emit('app/props', props)
+    for (const listener of this._propsListeners) listener()
+  }
+
+  private _propsListeners = new Set<() => void>()
+
+  subscribeProps = (listener: () => void) => {
+    this._propsListeners.add(listener)
+    return () => {
+      this._propsListeners.delete(listener)
+    }
+  }
+
+  getProps = () => this.props
+
   private _update() {
     this._snapshot = this._entries.map(entry => entry.component)
     for (const listener of this._listeners) listener()
@@ -84,6 +117,12 @@ export function useContext(): Context {
     void fiber.dispose()
   }, [fiber])
   return fiber.ctx as Context
+}
+
+/** The props given by the host that mounted the app (see `AppService.props`). */
+export function useHostProps<T extends Record<string, any> = Record<string, any>>(): T {
+  const { $app } = useCordis()
+  return useSyncExternalStore($app.subscribeProps, $app.getProps, $app.getProps) as T
 }
 
 /** Renders `children` inside the wrappers registered with `ctx.wrap()`. */
