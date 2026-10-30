@@ -1,6 +1,6 @@
 {
-  "name": "@cormi/bundler-vite",
-  "description": "Vite bundler of Cormi",
+  "name": "@cormi/vite",
+  "description": "The Vite service of Cormi: dev server on ctx.server, client and server bundles",
   "version": "0.1.0",
   "type": "module",
   "main": "lib/index.js",
@@ -20,13 +20,16 @@
   "license": "MIT",
   "keywords": [
     "cormi",
+    "cordis",
     "vite",
-    "bundler"
+    "plugin"
   ],
   "dependencies": {
+    "@cordisjs/plugin-loader": "1.0.0-rc.9",
+    "@cordisjs/plugin-server": "^1.7.0",
     "@cormi/core": "workspace:*",
-    "@vitejs/plugin-react": "^5.2.0",
-    "es-module-lexer": "^1.7.0",
+    "cordis": "4.0.0-rc.12",
+    "cosmokit": "^1.8.1",
     "vite": "^7.3.7"
   }
 }
