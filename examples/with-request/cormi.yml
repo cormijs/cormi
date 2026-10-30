@@ -1,0 +1,13 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · request
+- name: '@cormi/plugin-request'
+  config:
+    timeout: 3000
+    dataField: data
+    headers:
+      x-app: cormi
+- name: '@cormi/plugin-mock'
+  config:
+    delay: 100
+    preview: true

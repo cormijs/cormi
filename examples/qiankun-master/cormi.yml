@@ -1,0 +1,15 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · qiankun master
+    port: 8000
+- name: '@cormi/plugin-qiankun/master'
+  config:
+    apps:
+      - name: app1
+        # the e2e checks start the micro app on another port
+        entry: !!js process.env.SLAVE_ENTRY ?? '//localhost:8001'
+        props:
+          from: master
+    routes:
+      - path: /app1/*
+        app: app1
