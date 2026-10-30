@@ -18,6 +18,21 @@
     },
     {
       "path": "./packages/cormi"
+    },
+    {
+      "path": "./plugins/plugin-mock"
+    },
+    {
+      "path": "./plugins/plugin-tailwindcss"
+    },
+    {
+      "path": "./plugins/plugin-antd"
+    },
+    {
+      "path": "./plugins/plugin-model"
+    },
+    {
+      "path": "./plugins/plugin-initial-state"
     }
   ]
 }
