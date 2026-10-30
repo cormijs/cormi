@@ -5,11 +5,21 @@
     "outDir": "lib",
     "tsBuildInfoFile": "lib/.tsbuildinfo"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../core" },
-    { "path": "../preset-react" },
-    { "path": "../server" },
-    { "path": "../renderer-react" }
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../client"
+    },
+    {
+      "path": "../server"
+    },
+    {
+      "path": "../vite"
+    }
   ]
 }

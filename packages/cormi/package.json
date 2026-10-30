@@ -1,37 +1,40 @@
 {
   "name": "cormi",
-  "description": "A React full-stack framework with Cordis as plugin host and the developer experience of Umi 4",
+  "description": "A React full-stack framework built on Cordis: the CLI, the node API for plugins and the browser API (cormi/client)",
   "version": "0.1.0",
   "type": "module",
   "main": "lib/index.js",
-  "types": "index.d.ts",
+  "types": "lib/index.d.ts",
   "bin": {
     "cormi": "bin/cormi.js"
   },
   "exports": {
     ".": {
-      "types": "./index.d.ts",
       "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
       "default": "./lib/index.js"
     },
-    "./plugin-utils": {
-      "types": "./lib/pluginUtils.d.ts",
-      "source": "./src/pluginUtils.ts",
-      "default": "./lib/pluginUtils.js"
+    "./client": {
+      "source": "./src/client.ts",
+      "types": "./lib/client.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./client/server": {
+      "source": "./src/client-server.ts",
+      "types": "./lib/client-server.d.ts",
+      "default": "./lib/client-server.js"
     },
     "./package.json": "./package.json"
   },
   "files": [
     "bin",
     "lib",
-    "src",
-    "index.d.ts"
+    "src"
   ],
   "license": "MIT",
   "keywords": [
     "cormi",
     "cordis",
-    "umi",
     "react",
     "framework",
     "ssr"
@@ -49,12 +52,14 @@
     "node": ">=22.12.0"
   },
   "dependencies": {
+    "@cordisjs/plugin-loader": "1.0.0-rc.9",
+    "@cordisjs/plugin-server": "^1.7.0",
+    "@cormi/client": "workspace:*",
     "@cormi/core": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/renderer-react": "workspace:*",
     "@cormi/server": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "cordis": "4.0.0-rc.12",
-    "picocolors": "^1.1.1",
+    "tsx": "^4.23.15",
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
