@@ -1,0 +1,38 @@
+{
+  "name": "@cormi/plugin-tailwindcss",
+  "description": "Tailwind CSS v4 for Cormi apps",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "tailwindcss"
+  ],
+  "peerDependencies": {
+    "cormi": "workspace:*"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "vite": "^7.3.7"
+  },
+  "devDependencies": {
+    "cormi": "workspace:*"
+  }
+}
