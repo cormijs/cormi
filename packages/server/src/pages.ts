@@ -28,9 +28,11 @@ async function getAssets(ctx: Context): Promise<Assets> {
   return { scripts: js, styles: css, preloads: preload }
 }
 
+/** Pages are the fallback of GET requests accepting HTML, including `fetch()` defaults (`*\/*`), e.g. a qiankun master. */
 function isPageRequest(req: ServerRequest) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return false
-  return !!req.headers.get('accept')?.includes('text/html')
+  const accept = req.headers.get('accept')
+  return !accept || accept.includes('text/html') || accept.includes('*/*')
 }
 
 const CSS_RE = /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)$/
