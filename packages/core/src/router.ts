@@ -130,7 +130,9 @@ export class Router extends Service {
       : this._getConventionRoutes()
 
     for (const route of this._routes) {
-      routes[route.id] = { ...route, file: route.file && this.resolveFile(route.file, this.ctx.cormi.cwd) }
+      // an absolute file may be generated after the route is registered
+      const file = route.file && (isAbsolute(route.file) ? winPath(route.file) : this.resolveFile(route.file, this.ctx.cormi.cwd))
+      routes[route.id] = { ...route, file }
     }
 
     const layouts = [...this._layouts]
