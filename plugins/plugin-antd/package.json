@@ -1,0 +1,43 @@
+{
+  "name": "@cormi/plugin-antd",
+  "description": "Ant Design for Cormi apps: theme, locale, and server-rendered styles",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.tsx",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "antd",
+    "ant-design"
+  ],
+  "peerDependencies": {
+    "@ant-design/cssinjs": "^2.1.2",
+    "antd": ">=6",
+    "cormi": "workspace:*",
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@ant-design/cssinjs": "^2.1.2",
+    "@types/react": "^19.3.0",
+    "antd": "^6.6.8",
+    "cormi": "workspace:*",
+    "react": "^19.3.1"
+  }
+}
