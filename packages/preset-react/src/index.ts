@@ -46,7 +46,10 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(Pages, config)
   ctx.plugin(ApiRoutes)
   if (mode === 'dev' || mode === 'preview') {
-    ctx.plugin(Server, { host: config.host, port: config.port, maxPort: config.port + 99 })
+    // `cormi dev --port` and `--host` win over the config
+    const host = process.env.CORMI_HOST || config.host
+    const port = Number(process.env.CORMI_PORT) || config.port
+    ctx.plugin(Server, { host, port, maxPort: port + 99 })
     if (mode === 'preview') ctx.plugin(Static)
   }
 }
