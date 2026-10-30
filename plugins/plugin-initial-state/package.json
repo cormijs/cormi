@@ -1,0 +1,41 @@
+{
+  "name": "@cormi/plugin-initial-state",
+  "description": "The initial state of Cormi apps, provided by runtime plugins through an event",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.tsx",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "initial-state"
+  ],
+  "peerDependencies": {
+    "cormi": "workspace:*",
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "cormi": "workspace:*",
+    "react": "^19.3.1"
+  },
+  "dependencies": {
+    "cordis": "4.0.0-rc.12"
+  }
+}
