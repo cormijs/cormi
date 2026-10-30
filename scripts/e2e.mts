@@ -14,13 +14,32 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const cli = `${root}packages/cormi/bin/cormi.js`
 const dev = process.argv.includes('--dev')
 
-type Check = (page: Page, base: string, browser: Browser) => Promise<void>
+/** `bases` are the URLs of `servers`; `base` is the first one. */
+type Check = (page: Page, base: string, browser: Browser, bases: string[]) => Promise<void>
+
+interface Example {
+  check: Check
+  /** the example directories to serve (default: the example itself), with their environment */
+  servers?: { dir: string; env?: (bases: string[]) => Record<string, string> }[]
+  /** console errors the check causes on purpose */
+  ignore?: RegExp[]
+}
 
 async function text(page: Page, selector: string) {
   return (await page.textContent(selector))?.trim()
 }
 
-const examples: Record<string, Check> = {
+/** Click until the element reads `expected`: server-rendered markup ignores clicks until it hydrates. */
+async function clickUntil(page: Page, selector: string, expected: string) {
+  for (let i = 0; i < 50; i++) {
+    await page.click(selector)
+    if (await text(page, selector) === expected) return
+    await page.waitForTimeout(200)
+  }
+  assert.equal(await text(page, selector), expected)
+}
+
+const checks: Record<string, Check> = {
   async basic(page, base, browser) {
     // server-rendered, complete without JavaScript
     const noJs = await (await browser.newContext({ javaScriptEnabled: false })).newPage()
@@ -98,6 +117,64 @@ const examples: Record<string, Check> = {
   },
 }
 
+const examples: Record<string, Example> = {
+  ...Object.fromEntries(Object.entries(checks).map(([name, check]) => [name, { check }])),
+
+  'with-request': {
+    ignore: [/status of 500/],
+    async check(page, base) {
+      await page.goto(`${base}/`)
+      await page.waitForFunction(() => document.querySelectorAll('#users li').length === 5)
+      assert.equal(await text(page, '#users li'), 'User 1')
+      assert.equal(await text(page, '#headers'), 'headers seen by the server: x-app=cormi, authorization=Bearer demo-token')
+      await page.click('text=next')
+      await page.waitForFunction(() => document.querySelector('#users li')?.textContent === 'User 6')
+      assert.equal(await text(page, '#page'), '2 / 3')
+      // request/error is reported by src/app.tsx, and the error reaches useRequest() too
+      await page.click('#broken')
+      await page.waitForSelector('#toast')
+      assert.equal(await text(page, '#toast'), 'the server is on fire')
+      assert.equal(await text(page, '#error'), 'request to /api/broken failed with status 500')
+    },
+  },
+
+  qiankun: {
+    servers: [
+      { dir: 'qiankun-slave' },
+      { dir: 'qiankun-master', env: ([slave]) => ({ SLAVE_ENTRY: slave.replace(/^http:/, '') }) },
+    ],
+    async check(page, base, browser, [slave, master]) {
+      // the micro app also runs by itself, server-rendered and hydrated
+      await page.goto(`${slave}/`)
+      await clickUntil(page, '#slave-count', 'clicked 1')
+      assert.equal(await text(page, '#where'), 'by itself')
+      assert.equal(await text(page, '#from'), 'props from: nobody')
+
+      await page.goto(`${master}/`)
+      await page.click('nav >> text="App 1"')
+      // the template of the micro app holds its own server-rendered markup until it mounts
+      await page.waitForFunction(() => document.querySelector('[data-micro-app=app1] #where')?.textContent === 'inside the master')
+      assert.equal(await text(page, '#from'), 'props from: master')
+      await page.click('#slave-count')
+      assert.equal(await text(page, '#slave-count'), 'clicked 1')
+
+      // the micro app's router runs below /app1
+      await page.click('#slave >> text=About')
+      await page.waitForSelector('#slave-about')
+      assert.equal(new URL(page.url()).pathname, '/app1/about')
+
+      // leaving the route unmounts the micro app
+      await page.click('nav >> text=Home >> nth=0')
+      await page.waitForSelector('#master-title')
+      assert.equal(await page.$('#slave'), null)
+
+      // a micro app route loads directly
+      await page.goto(`${master}/app1/about`)
+      await page.waitForSelector('[data-micro-app=app1] #slave-about')
+    },
+  },
+}
+
 async function waitForServer(base: string, server: ChildProcess) {
   for (let i = 0; i < 120; i++) {
     if (server.exitCode !== null) throw new Error(`the server exited with code ${server.exitCode}`)
@@ -113,35 +190,43 @@ const names = selected.length ? selected : Object.keys(examples)
 const browser = await launch()
 let failed = 0
 for (const [index, name] of names.entries()) {
-  const cwd = `${root}examples/${name}`
-  const port = 8300 + index
-  const base = `http://localhost:${port}`
-  if (!dev) execFileSync(process.execPath, [cli, 'build'], { cwd, stdio: 'ignore' })
-  // in dev mode, run the worker directly instead of the daemon
-  const server = spawn(process.execPath, [cli, dev ? 'dev' : 'preview', '--port', String(port)], {
-    cwd,
-    env: { ...process.env, CORMI_WORKER: dev ? '1' : '' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  })
+  const example = examples[name]
+  const servers = example.servers ?? [{ dir: name }]
+  const bases = servers.map((_, offset) => `http://localhost:${8300 + index * 10 + offset}`)
+  const processes: ChildProcess[] = []
   let output = ''
-  server.stdout!.on('data', data => output += data)
-  server.stderr!.on('data', data => output += data)
   const page = await browser.newPage()
   const errors: string[] = []
   page.on('console', message => message.type() === 'error' && errors.push(message.text()))
   page.on('pageerror', error => errors.push(error.message))
   try {
-    await waitForServer(base, server)
-    await examples[name](page, base, browser)
-    assert.deepEqual(errors, [], 'no errors in the browser')
+    for (const [offset, server] of servers.entries()) {
+      const cwd = `${root}examples/${server.dir}`
+      const env = { ...process.env, ...server.env?.(bases) }
+      if (!dev) execFileSync(process.execPath, [cli, 'build'], { cwd, env, stdio: 'ignore' })
+      // in dev mode, run the worker directly instead of the daemon
+      const child = spawn(process.execPath, [cli, dev ? 'dev' : 'preview', '--port', bases[offset].split(':')[2]], {
+        cwd,
+        env: { ...env, CORMI_WORKER: dev ? '1' : '' },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+      child.stdout!.on('data', data => output += data)
+      child.stderr!.on('data', data => output += data)
+      processes.push(child)
+      await waitForServer(bases[offset], child)
+    }
+    await example.check(page, bases[0], browser, bases)
+    assert.deepEqual(errors.filter(error => !example.ignore?.some(pattern => pattern.test(error))), [], 'no errors in the browser')
     console.log(`✓ ${name}`)
   } catch (error) {
     failed++
-    console.log(`✗ ${name}\n${(error as Error).stack ?? error}\n--- server output ---\n${output}`)
+    console.log(`✗ ${name}\n${(error as Error).stack ?? error}\n--- browser errors ---\n${errors.join('\n')}\n--- server output ---\n${output}`)
   } finally {
     await page.close()
-    server.kill('SIGTERM')
-    await new Promise(resolve => server.once('exit', resolve))
+    for (const child of processes) {
+      child.kill('SIGTERM')
+      await new Promise(resolve => child.exitCode === null ? child.once('exit', resolve) : resolve(undefined))
+    }
   }
 }
 await browser.close()

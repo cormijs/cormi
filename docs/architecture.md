@@ -89,8 +89,9 @@ export default (ctx: Context, config: Config) => {
 }
 ```
 
+- 入口导出 `bootstrap`、`mount(options)`、`update(options)`、`unmount` 生命周期。入口会等运行时插件应用完毕后再挂载；某个插件在 `app/bootstrap`（bail）中返回 `true`，就表示由它接管挂载，例如 qiankun 子应用由加载脚本调用 `mount({ container, basename, origin, props })`。宿主传入的 props 用 `useHostProps()` 读取。
 - 核心服务在 root 上提供，任何运行时插件无需 inject：`ctx.$app`（根组件包装器，常用方法以 mixin 暴露为 `ctx.wrap(component, order?)`）、`ctx.$router`（React Router 7 数据路由）。名字带 `$`，与同一应用的 Node 端服务（`ctx.app`、`ctx.router`）在类型上互不冲突——koishi 的客户端也是这样做的。
-- 事件：`router/change(location, action)`、`app/mount()`。
+- 事件：`router/change(location, action)`（emit）、`app/bootstrap()`（bail）、`app/mount()`（emit）、`app/props(props)`（emit）。
 - `src/app.(ts|tsx)` 的默认导出会自动作为运行时插件挂载。
 - React 钩子：`useCordis()`（应用的 ctx）、`useContext()`（派生一个随组件卸载而销毁的 fiber，同 koishi）。
 - `useServerInsertedHTML()` 让 CSS-in-JS 库在 SSR 时向 `<head>` 插入样式。
@@ -128,6 +129,17 @@ Node 部分以**包名**注册浏览器入口：`ctx.app.entry('@scope/plugin-fo
 | `@cormi/plugin-antd` | Ant Design：`ConfigProvider` 主题与语言、SSR 样式抽取（应用需依赖 `@ant-design/cssinjs`） |
 | `@cormi/plugin-model` | `src/models/*` 中的 hook 作为全局模型，`useModel(namespace, selector?)`，类型自动生成 |
 | `@cormi/plugin-initial-state` | 运行时插件监听 `initialState/load`（serial）提供初始状态，组件用 `useInitialState()` 读取 |
+| `@cormi/plugin-request` | 基于 fetch 的 `request()` 与基于 ahooks 的 `useRequest()`（可用 `dataField` 解包）；拦截用 `request/fetch`（waterfall），全局错误处理用 `request/error`（bail，返回 `true` 表示已处理） |
+| `@cormi/plugin-qiankun/master` | qiankun 主应用：`<MicroApp name>` 组件，以及挂载子应用的路由；把主应用 props 和子应用的 basename 传给子应用 |
+| `@cormi/plugin-qiankun/slave` | 由 Vite 构建的 qiankun 子应用：文档中的模块脚本会被替换为 qiankun 能执行的加载脚本，由它在主应用容器里（或独立运行时在页面里）挂载应用；同时提供 CORS、资源 URL 处理和 `useMasterProps()` |
+
+qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，不在 qiankun 的 JS 沙箱里；Vite 注入到 `document.head` 的样式不受样式隔离约束。这一点与 vite-plugin-qiankun 相同。
+
+## 与 umi 的覆盖情况
+
+已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、HTML 配置（title、metas、links、scripts、styles、favicons）、`base`、`publicPath`、`history`、`alias`、`define`、路由预加载（`<Link prefetch>`）、dev/build/preview/setup 命令，以及 antd、tailwindcss、model、initial-state、request、qiankun 插件。
+
+尚未覆盖：`src/global.(css|ts)`、`overrides.css`、`loading.tsx` 等约定；一等公民的 `proxy` 配置（目前通过 `vite.server.proxy`）；`exportStatic`、MPA、`targets`/legacy；`generate`、`config`、`lint` 等命令；access、locale、layout、dva、react-query、valtio、styled-components、unocss、analytics、mf 插件。webpack、mako、mfsu 这类与打包器绑定的功能有意不做。
 
 ## umi 能力对照
 

@@ -33,6 +33,12 @@
     },
     {
       "path": "./plugins/plugin-initial-state"
+    },
+    {
+      "path": "./plugins/plugin-qiankun"
+    },
+    {
+      "path": "./plugins/plugin-request"
     }
   ]
 }
