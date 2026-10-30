@@ -9,6 +9,7 @@
     "setup": "cormi setup"
   },
   "dependencies": {
+    "@cormi/preset-react": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

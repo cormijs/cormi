@@ -1,8 +1,8 @@
-import type { CormiApiRequest, CormiApiResponse } from 'cormi'
+import type { ApiHandler } from 'cormi'
 import { users } from './index.ts'
 
-export default function handler(req: CormiApiRequest, res: CormiApiResponse) {
-  const user = users.find(user => String(user.id) === req.params.id)
-  if (!user) return res.status(404).json({ error: 'not found' })
-  res.json(user)
+export const GET: ApiHandler = (request, { params }) => {
+  const user = users.find(user => String(user.id) === params.id)
+  if (!user) return Response.json({ error: 'not found' }, { status: 404 })
+  return user
 }

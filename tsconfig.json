@@ -5,13 +5,13 @@
       "path": "./packages/core"
     },
     {
-      "path": "./packages/renderer-react"
+      "path": "./packages/client"
+    },
+    {
+      "path": "./packages/vite"
     },
     {
       "path": "./packages/server"
-    },
-    {
-      "path": "./packages/bundler-vite"
     },
     {
       "path": "./packages/preset-react"

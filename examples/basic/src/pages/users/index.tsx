@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'cormi'
+import { Link } from 'cormi/client'
 
 export default function Users() {
   const [users, setUsers] = useState<{ id: number; name: string }[]>([])

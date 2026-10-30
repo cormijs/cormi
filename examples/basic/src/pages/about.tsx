@@ -1,16 +1,17 @@
-import { useLoaderData } from 'cormi'
+import { useLoaderData } from 'cormi/client'
 
-export async function serverLoader() {
+/** Runs on the server only; it is removed from the client bundle. */
+export async function loader() {
   const { platform } = await import('node:os')
   return { platform: platform(), time: new Date().toISOString().slice(0, 10) }
 }
 
 export default function About() {
-  const { data } = useLoaderData<{ platform: string; time: string }>()
+  const data = useLoaderData<typeof loader>()
   return (
     <div>
       <h1>About</h1>
-      <p id="loader">{data?.platform ? `served by ${data.platform}` : 'loading...'}</p>
+      <p id="loader">served by {data.platform} on {data.time}</p>
     </div>
   )
 }
