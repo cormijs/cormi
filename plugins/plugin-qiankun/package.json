@@ -1,0 +1,43 @@
+{
+  "name": "@cormi/plugin-qiankun",
+  "description": "qiankun micro frontends for Cormi apps: the master (MicroApp) and Vite-built micro apps",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./master": {
+      "source": "./src/master.ts",
+      "types": "./lib/master.d.ts",
+      "default": "./lib/master.js"
+    },
+    "./master/client": "./client/master.tsx",
+    "./slave": {
+      "source": "./src/slave.ts",
+      "types": "./lib/slave.d.ts",
+      "default": "./lib/slave.js"
+    },
+    "./slave/client": "./client/slave.tsx",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src", "client"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "qiankun", "micro-frontends"],
+  "peerDependencies": {
+    "cormi": "workspace:*",
+    "react": ">=19"
+  },
+  "dependencies": {
+    "qiankun": "^2.10.16"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "cormi": "workspace:*",
+    "react": "^19.3.1"
+  }
+}
