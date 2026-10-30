@@ -17,8 +17,8 @@ Commands:
   setup     write the generated files (src/.cormi) only
 
 Options:
-  --port <port>   port of the dev and preview server (env PORT)
-  --host <host>   host of the dev and preview server (env HOST)
+  --port <port>   port of the dev and preview server, over cormi.yml
+  --host <host>   host of the dev and preview server, over cormi.yml
   -v, --version
   -h, --help`
 
@@ -112,8 +112,9 @@ export async function run(argv = process.argv.slice(2)) {
   if (args.version) return console.log(getVersion())
   const command = String(args._[0] ?? 'help')
   if (args.help || command === 'help') return console.log(HELP)
-  if (args.port) process.env.PORT = args.port
-  if (args.host) process.env.HOST = args.host
+  // the options of the command line win over cormi.yml
+  if (args.port) process.env.CORMI_PORT = args.port
+  if (args.host) process.env.CORMI_HOST = args.host
 
   const cwd = process.cwd()
   switch (command) {
