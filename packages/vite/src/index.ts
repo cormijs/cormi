@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs'
 import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import type {} from '@cordisjs/plugin-loader'
 import type {} from '@cordisjs/plugin-server'
 import { idle, Refresher, Schema, winPath } from '@cormi/core'
 import { Context, Service } from 'cordis'
@@ -64,8 +63,7 @@ export class Vite extends Service {
 
   [Service.init]() {
     if (this.ctx.cormi.mode !== 'dev') return
-    // start once the plugin tree has loaded, so plugins can register first
-    this.ctx.inject({ server: null, loader: { await: true } }, ctx => this._serve(ctx))
+    this.ctx.inject(['server'], ctx => this._serve(ctx))
   }
 
   /** Add a Vite plugin. A function is called for every server or build, to get fresh plugin instances. */
@@ -100,7 +98,7 @@ export class Vite extends Service {
   /** The server entry of the app: from the dev server in dev mode, from the build output otherwise. */
   loadServerEntry(): Promise<any> {
     if (this.ctx.cormi.mode === 'dev') return this.ssrLoadModule(this.ctx.app.serverEntry)
-    return this._serverEntry ??= import(pathToFileURL(join(this.outDir, 'server/server.mjs')).href)
+    return this._serverEntry ??= import(/* @vite-ignore */ pathToFileURL(join(this.outDir, 'server/server.mjs')).href)
   }
 
   /** Write the client bundle and, if the app generates a server entry, the server bundle. */
@@ -185,8 +183,13 @@ export class Vite extends Service {
         dedupe: ['react', 'react-dom'],
       },
       css: { devSourcemap: true },
-      optimizeDeps: { entries: [app.clientEntry] },
+      optimizeDeps: {
+        entries: [app.clientEntry],
+        include: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom', 'react-dom/client'],
+      },
       server: { fs: { strict: false } },
+      // one instance of the framework, shared by the server entry, the pages and the runtime plugins
+      ssr: { external: ['cormi'] },
       build: {
         assetsDir: 'static',
         sourcemap: this.config.sourcemap,
@@ -204,6 +207,8 @@ export class Vite extends Service {
       this.devServer = undefined
       // plugins loading right now may still register Vite plugins
       await idle(ctx)
+      // the entry must exist when Vite scans it for dependencies
+      await ctx.app.flush()
       // the config below includes every registration so far
       this._restart?.dispose()
       const config = await this.resolveConfig({ command: 'serve' })
