@@ -1,0 +1,29 @@
+{
+  "name": "@cormi/plugin-mock",
+  "description": "Mocked API routes for Cormi apps in dev mode",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "mock"],
+  "peerDependencies": {
+    "cormi": "workspace:*"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "path-to-regexp": "^8.3.0"
+  },
+  "devDependencies": {
+    "cormi": "workspace:*"
+  }
+}
