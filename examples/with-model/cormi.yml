@@ -1,0 +1,9 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · Models
+- name: '@cormi/plugin-model'
+- name: '@cormi/plugin-initial-state'
+- name: '@cormi/plugin-mock'
+  config:
+    delay: 200
+    preview: true

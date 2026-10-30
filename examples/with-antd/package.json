@@ -1,0 +1,25 @@
+{
+  "name": "@cormi/example-with-antd",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cormi dev",
+    "build": "cormi build",
+    "preview": "cormi preview",
+    "setup": "cormi setup"
+  },
+  "dependencies": {
+    "@ant-design/cssinjs": "^2.1.2",
+    "@ant-design/icons": "^6.3.4",
+    "@cormi/plugin-antd": "workspace:*",
+    "@cormi/preset-react": "workspace:*",
+    "antd": "^6.6.8",
+    "cormi": "workspace:*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
+  }
+}

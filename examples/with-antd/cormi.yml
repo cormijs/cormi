@@ -1,0 +1,11 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · Ant Design
+    ssr: true
+- name: '@cormi/plugin-antd'
+  config:
+    locale: zh_CN
+    theme:
+      token:
+        colorPrimary: '#6366f1'
+        borderRadius: 8

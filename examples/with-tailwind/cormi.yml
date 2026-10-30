@@ -1,0 +1,4 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · Tailwind CSS
+- name: '@cormi/plugin-tailwindcss'
