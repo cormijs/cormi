@@ -5,7 +5,7 @@ import { expandExtensions, Schema, tryPaths } from '@cormi/core'
 import type {} from '@cormi/vite'
 import { Context } from 'cordis'
 import { routeExportsPlugin } from './route-exports.ts'
-import { renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
+import { getPackageName, renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
 
 const APP_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js']
 
@@ -26,6 +26,15 @@ export function Renderer(ctx: Context, config: Renderer.Config) {
 
   ctx.vite.plugin(() => react())
   ctx.vite.plugin(() => routeExportsPlugin({ isRouteFile: file => routeFiles.has(file) }))
+  // runtime plugins of packages may ship TypeScript sources: bundle them into the server entry
+  ctx.vite.configure((config) => {
+    const packages = [...ctx.app.entries].map(entry => getPackageName(entry.file)).filter(Boolean) as string[]
+    if (!packages.length) return
+    const noExternal = config.ssr?.noExternal
+    if (noExternal === true) return
+    config.ssr = { ...config.ssr, noExternal: [...[noExternal ?? []].flat(), ...packages] }
+    return config
+  })
 
   ctx.app.file('tsconfig.json', renderTsconfig())
   ctx.app.file('typings.d.ts', TYPINGS)

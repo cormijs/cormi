@@ -1,14 +1,22 @@
-import { relative } from 'node:path'
+import { isAbsolute, relative } from 'node:path'
 import type { App, Route } from '@cormi/core'
 import { winPath } from '@cormi/core'
 import type { Dict } from 'cosmokit'
 
 const json = (value: unknown) => JSON.stringify(value ?? null)
 
-/** A specifier for `file`, relative to the generated directory. */
+/** A specifier for a module: files become relative to the generated directory, package specifiers are kept. */
 export function toSpecifier(dir: string, file: string) {
+  if (!isAbsolute(file)) return file
   const path = winPath(relative(dir, file))
   return path.startsWith('.') ? path : `./${path}`
+}
+
+/** `@scope/name/client` -> `@scope/name`; `undefined` for files. */
+export function getPackageName(specifier: string) {
+  if (isAbsolute(specifier) || specifier.startsWith('.')) return
+  const parts = specifier.split('/')
+  return specifier.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0]
 }
 
 export function renderRoutes(dir: string, routes: Dict<Route>) {
@@ -54,7 +62,7 @@ function renderEntries(dir: string, entries: Iterable<App.Entry>) {
 export function renderEntry(app: App, options: ContextOptions & { mountElementId: string }) {
   const entries = renderEntries(app.dir, app.entries)
   return [
-    ...[...app.imports].map(({ source }) => `import ${json(source)}`),
+    ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
     `import { Context, render, unwrapExports } from 'cormi/client'`,
     `import { routeModules, routes } from './routes'`,
     ...entries.imports,
@@ -83,6 +91,8 @@ export function renderServer(app: App, options: ContextOptions) {
   const entries = renderEntries(app.dir, app.entries)
   const servers = [...app.servers]
   return [
+    // global stylesheets and polyfills are part of what the server renders
+    ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
     `import { Context, unwrapExports } from 'cormi/client'`,
     `import { createRequestHandler } from 'cormi/client/server'`,
     `import { routeModules, routes } from './routes'`,
