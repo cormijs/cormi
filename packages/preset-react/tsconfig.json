@@ -5,11 +5,18 @@
     "outDir": "lib",
     "tsBuildInfoFile": "lib/.tsbuildinfo"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../core" },
-    { "path": "../renderer-react" },
-    { "path": "../server" },
-    { "path": "../bundler-vite" }
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../server"
+    },
+    {
+      "path": "../vite"
+    }
   ]
 }

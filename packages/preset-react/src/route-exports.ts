@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs'
 import { generate } from '@babel/generator'
 import { parse } from '@babel/parser'
 import * as babelTraverse from '@babel/traverse'
@@ -10,9 +9,8 @@ import type { Plugin } from 'vite'
 // `@babel/traverse` is CommonJS: its default export may be wrapped once more
 const traverse = ((babelTraverse as any).default?.default ?? (babelTraverse as any).default) as (ast: t.Node, visitor: Visitor) => void
 
-export const SERVER_ONLY_EXPORTS = ['serverLoader', 'metadataLoader']
-
-export const ROUTE_PROPS_QUERY = 'cormi-route-props'
+/** Exports of route modules that only run on the server. */
+export const SERVER_ONLY_EXPORTS = ['loader']
 
 function exportedNames(path: NodePath<t.ExportNamedDeclaration>): string[] {
   const { declaration, specifiers } = path.node
@@ -95,27 +93,15 @@ export function transformExports(code: string, opts: { remove?: string[]; keep?:
   return generate(ast, { sourceMaps: true, sourceFileName: opts.filename }, code)
 }
 
-/**
- * - client builds: strip `serverLoader` / `metadataLoader` from route modules,
- *   so that server code never reaches the browser
- * - `<route>?cormi-route-props`: a module with only the `routeProps` export
- */
+/** Strip the server-only exports of route modules from the client bundle, like Remix's route module splitting. */
 export function routeExportsPlugin(opts: { isRouteFile: (file: string) => boolean }): Plugin {
   return {
     name: 'cormi:route-exports',
     enforce: 'pre',
-    load(id) {
-      const [file, query] = id.split('?')
-      if (!query?.split('&').includes(ROUTE_PROPS_QUERY)) return
-      const code = readFileSync(file, 'utf8')
-      const result = transformExports(code, { keep: ['routeProps'], filename: file })
-      return result ? { code: result.code, map: result.map as any } : code
-    },
     transform(code, id, options) {
       if (options?.ssr) return
-      const [file, query] = id.split('?')
-      if (query?.includes(ROUTE_PROPS_QUERY)) return
-      if (!/\.[jt]sx?$/.test(file) || !opts.isRouteFile(file)) return
+      const [file] = id.split('?')
+      if (!/\.[cm]?[jt]sx?$/.test(file) || !opts.isRouteFile(file)) return
       if (!SERVER_ONLY_EXPORTS.some(name => code.includes(name))) return
       const result = transformExports(code, { remove: SERVER_ONLY_EXPORTS, filename: file })
       if (result) return { code: result.code, map: result.map as any }
