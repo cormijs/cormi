@@ -10,4 +10,5 @@ coverage/
 .cormi-test/
 .cordis/
 .mf/
+docs/.vitepress/cache/
 .env.local

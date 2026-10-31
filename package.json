@@ -11,7 +11,10 @@
     "typecheck": "tsc -b",
     "typecheck:client": "node scripts/typecheck-client.mjs",
     "e2e": "node --import tsx scripts/e2e.mts",
-    "e2e:dev": "node --import tsx scripts/e2e.mts --dev"
+    "e2e:dev": "node --import tsx scripts/e2e.mts --dev",
+    "docs:dev": "pnpm --filter @cormi/docs dev",
+    "docs:build": "pnpm --filter @cormi/docs build",
+    "docs:preview": "pnpm --filter @cormi/docs preview"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -26,7 +29,8 @@
   },
   "pnpm": {
     "overrides": {
-      "vite": "^7.3.7"
+      "vite": "^7.3.7",
+      "vitepress>vite": "^5.4.14"
     }
   }
 }

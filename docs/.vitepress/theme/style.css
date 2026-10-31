@@ -1,0 +1,378 @@
+/*
+ * Cormi: sage paper, green-black ink, and the pink of the cords that tie
+ * plugins to what they register (cordis: "of the heart").
+ * Recursive carries every Latin glyph: Linear Sans for text, Mono for code,
+ * and Casual only for the wordmark and display words. Chinese uses the
+ * system's CJK faces.
+ */
+:root {
+  --c-paper: #f2f5f2;
+  --c-panel: #fbfcfb;
+  --c-ink: #14211c;
+  --c-ink-2: #55635d;
+  --c-ink-3: #85928c;
+  --c-rule: #d2dbd5;
+  --c-cord: #d7336d;
+  --c-cord-text: #c42a61;
+  --c-cord-soft: rgba(215, 51, 109, 0.1);
+  --c-leaf: #1e8a5a;
+  --c-amber: #c48510;
+  --c-code: rgba(20, 33, 28, 0.065);
+
+  --font-sans: 'Recursive Variable', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'Recursive Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --vp-font-family-base: var(--font-sans);
+  --vp-font-family-mono: var(--font-mono);
+
+  --vp-c-brand-1: var(--c-cord-text);
+  --vp-c-brand-2: #a8234f;
+  --vp-c-brand-3: var(--c-cord);
+  --vp-c-brand-soft: var(--c-cord-soft);
+
+  --vp-c-bg: var(--c-paper);
+  --vp-c-bg-alt: #e9eeea;
+  --vp-c-bg-elv: var(--c-panel);
+  --vp-c-bg-soft: #e5ebe7;
+  --vp-c-text-1: var(--c-ink);
+  --vp-c-text-2: var(--c-ink-2);
+  --vp-c-text-3: var(--c-ink-3);
+  --vp-c-divider: var(--c-rule);
+  --vp-c-border: #c2cdc6;
+  --vp-c-gutter: #dfe6e1;
+
+  --vp-c-tip-1: var(--c-leaf);
+  --vp-c-tip-2: #16714a;
+  --vp-c-tip-3: var(--c-leaf);
+  --vp-c-tip-soft: rgba(30, 138, 90, 0.1);
+
+  --vp-code-font-size: 0.86em;
+  --vp-code-block-bg: var(--c-panel);
+  --vp-button-brand-bg: #d7336d;
+  --vp-button-brand-hover-bg: #c02a5f;
+  --vp-button-brand-active-bg: #a8234f;
+  --vp-home-hero-name-color: var(--c-ink);
+}
+
+.dark {
+  --c-paper: #101815;
+  --c-panel: #151f1b;
+  --c-ink: #e4ece7;
+  --c-ink-2: #9aaba3;
+  --c-ink-3: #6b7b74;
+  --c-rule: #25312c;
+  --c-cord: #f0679a;
+  --c-cord-text: #f0679a;
+  --c-cord-soft: rgba(240, 103, 154, 0.14);
+  --c-leaf: #45c08a;
+  --c-amber: #e2b14a;
+  --c-code: rgba(228, 236, 231, 0.08);
+
+  --vp-c-brand-1: var(--c-cord-text);
+  --vp-c-brand-2: #f58ab0;
+  --vp-c-brand-3: #d7336d;
+
+  --vp-c-bg: var(--c-paper);
+  --vp-c-bg-alt: #0c1310;
+  --vp-c-bg-elv: var(--c-panel);
+  --vp-c-bg-soft: #18231f;
+  --vp-c-divider: var(--c-rule);
+  --vp-c-border: #2e3c36;
+  --vp-c-gutter: #0b110e;
+
+  --vp-c-tip-1: var(--c-leaf);
+  --vp-c-tip-2: #6fd3a6;
+  --vp-c-tip-soft: rgba(69, 192, 138, 0.12);
+}
+
+/* Recursive is one variable family: text is its Linear Sans, code its Mono */
+:root {
+  font-variation-settings: 'MONO' 0, 'CASL' 0;
+}
+
+code,
+kbd,
+samp,
+pre,
+.vp-code,
+.vp-doc div[class*='language-'] {
+  font-variation-settings: 'MONO' 1, 'CASL' 0;
+}
+
+::selection {
+  background: var(--c-cord-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-cord);
+  outline-offset: 2px;
+}
+
+/* the wordmark */
+.VPNavBarTitle .title {
+  gap: 8px;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'MONO' 0, 'CASL' 1;
+}
+
+.VPNavBarTitle .logo {
+  height: 26px;
+}
+
+/* documents */
+.vp-doc h1 {
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.vp-doc h2 {
+  font-weight: 700;
+}
+
+.vp-doc a {
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--c-cord) 45%, transparent);
+}
+
+.vp-doc a:hover {
+  text-decoration-color: var(--c-cord);
+}
+
+.vp-doc :not(pre) > code {
+  color: var(--c-ink);
+  background: var(--c-code);
+}
+
+.vp-doc a > code {
+  color: var(--vp-c-brand-1);
+}
+
+.vp-doc div[class*='language-'] {
+  border: 1px solid var(--c-rule);
+}
+
+.vp-doc table {
+  font-size: 0.92em;
+}
+
+.vp-doc th {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+/* the home page */
+.cm-home {
+  padding-bottom: 96px;
+}
+
+.cm-section {
+  max-width: 1152px;
+  margin: 112px auto 0;
+  padding: 0 24px;
+}
+
+/* the sections that are components bring their own padding */
+.cm-home > div.cm-section {
+  padding: 0;
+}
+
+.cm-head {
+  max-width: 680px;
+  margin-bottom: 32px;
+}
+
+.cm-head h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.cm-head p {
+  margin: 12px 0 0;
+  color: var(--c-ink-2);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.cm-head code,
+.cm-notes code,
+.cm-steps p code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--vp-c-bg-soft);
+  color: var(--c-ink);
+  font-size: 0.88em;
+}
+
+.cm-annotated {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.cm-filename {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0 0 8px 2px;
+  font-size: 13px;
+  color: var(--c-ink-3);
+}
+
+.cm-filename > code {
+  color: var(--c-ink);
+  font-weight: 650;
+}
+
+.cm-filename span code {
+  font-size: 12px;
+  color: var(--c-ink-2);
+}
+
+.cm-code div[class*='language-'] + .cm-filename {
+  margin-top: 28px;
+}
+
+.cm-code.vp-doc div[class*='language-'] {
+  margin: 0;
+  border-radius: 12px;
+}
+
+.cm-code.vp-doc div[class*='language-'] .highlighted {
+  background-color: var(--c-cord-soft);
+}
+
+.cm-notes {
+  margin: 30px 0 0;
+}
+
+.cm-notes dt {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.cm-notes dt:not(:first-child) {
+  margin-top: 22px;
+}
+
+.cm-notes dt code {
+  background: var(--c-cord-soft);
+  color: var(--c-cord-text);
+}
+
+.cm-notes dd {
+  margin: 6px 0 0;
+  color: var(--c-ink-2);
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+
+.cm-table.vp-doc table {
+  margin: 0;
+}
+
+@media (min-width: 761px) {
+  .cm-table.vp-doc table {
+    display: table;
+    width: 100%;
+  }
+}
+
+.cm-table.vp-doc tr {
+  background: transparent;
+}
+
+.cm-more {
+  margin: 18px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cm-more a {
+  color: var(--c-cord-text);
+}
+
+.cm-more a::after {
+  content: ' →';
+}
+
+.cm-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  border-top: 1px solid var(--c-rule);
+}
+
+.cm-steps li {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--c-rule);
+  counter-increment: step;
+}
+
+.cm-steps h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* the steps are an actual order: clone before running */
+.cm-steps h3::before {
+  content: counter(step);
+  min-width: 14px;
+  color: var(--c-cord);
+  font-weight: 900;
+  font-size: 22px;
+  font-variation-settings: 'MONO' 0, 'CASL' 1;
+}
+
+.cm-steps .vp-doc div[class*='language-'] {
+  margin: 0;
+  border-radius: 10px;
+}
+
+.cm-steps p {
+  margin: 0;
+  max-width: 620px;
+  color: var(--c-ink-2);
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+
+@media (max-width: 960px) {
+  .cm-annotated,
+  .cm-steps li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cm-steps li {
+    gap: 12px;
+  }
+
+  .cm-notes {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .cm-section {
+    margin-top: 80px;
+  }
+
+  .cm-head h2 {
+    font-size: 25px;
+  }
+}

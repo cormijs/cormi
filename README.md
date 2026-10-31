@@ -6,7 +6,7 @@
 + 覆盖 umi 的应用能力（约定式路由、SSR、loader、API 路由、mock……），但 API 以服务和事件的形式提供，而非 umi 的插件 API
 + 浏览器端同样是一个 cordis Context，插件可以同时拥有 Node 端和浏览器端
 
-设计见 [docs/architecture.md](docs/architecture.md)。
+文档与官网在 [docs/](docs/)（VitePress）：`pnpm docs:dev` 本地预览，`pnpm docs:build` 构建。设计说明见 [docs/architecture.md](docs/architecture.md)。
 
 > `references` 下有 umi 和 cordis，以及基于 cordis 的 koishi / satori 等框架的源码可以进行参考。
 
@@ -60,4 +60,5 @@ cormi preview   # 运行构建产物
 | `packages/preset-react` | 组合以上服务的 preset 与 React 渲染器 |
 | `packages/cormi` | CLI，Node 端 API（`cormi`）与浏览器端 API（`cormi/client`） |
 | `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
+| `docs` | 官网兼文档站（VitePress） |
 | `examples/*` | basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave |
