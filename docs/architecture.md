@@ -51,10 +51,11 @@ cormi dev | build | preview | setup
 | 服务 | 提供方 | 注册方法（均为 effect） |
 |---|---|---|
 | `ctx.cormi` | `@cormi/core`（root） | — |
+| `ctx.cli` | `@cormi/core`（root） | `command(name, command)`、`generator(type, generator)` |
 | `ctx.router` | `@cormi/core` | `route(route)`、`layout(file, options?)`、`patch(fn)` |
 | `ctx.html` | `@cormi/core` | `head(tag)`、`body(tag)`、`transform(fn)` |
 | `ctx.app` | `@cormi/core` | `entry(module, config?)`、`import(source)`、`file(path, content)`、`server(key, file)` |
-| `ctx.vite` | `@cormi/vite` | `plugin(plugin)`、`configure(config \| fn)` |
+| `ctx.vite` | `@cormi/vite` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
 | `ctx.server` | `@cordisjs/plugin-server` | `get/post/all(path, mw)`、`use(mw)`、`ws(path)` |
 
 `@cormi/preset-react` 是一个普通插件，组合 router、html、app、vite 服务，React 渲染器（`Renderer`），页面与 API 路由（`Pages`、`ApiRoutes`），以及 dev/preview 下的 HTTP 服务（`@cordisjs/plugin-server`）与静态资源（`Static`）。preset 的配置是扁平的，各部分读取各自的字段。
@@ -67,6 +68,24 @@ cormi dev | build | preview | setup
 | `app/generate()` | emit | `src/.cormi` 写入之后 |
 | `build/before()` | parallel | Vite 构建开始之前 |
 | `build/after(result)` | parallel | 客户端与服务端 bundle 写入之后 |
+
+preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 preview 下生效，排在 mock 之后）、`targets`（umi 的浏览器版本写法或 esbuild 目标）、`crossorigin`。
+
+## 文件约定
+
+由 preset 中的 `Conventions` 插件处理。每条约定都是一份贡献，文件存在时生效，删除文件即撤回：
+
+| 文件 | 作用 |
+|---|---|
+| `src/app.(ts\|tsx)` | 应用自己的运行时插件 |
+| `src/global.(css\|less\|scss…)`、`src/global.(ts\|tsx)` | 在应用启动前导入（服务端渲染时也会执行） |
+| `src/overrides.(css\|less\|scss…)` | 导入时给选择器加 `body` 前缀，用于覆盖其他样式 |
+| `src/loading.(tsx\|jsx)` | 纯客户端渲染时，首屏路由加载期间显示 |
+| `public/favicon.(ico\|png\|svg)` | 未配置 `favicons` 时作为页面图标 |
+
+## 命令
+
+`dev`、`build`、`preview`、`setup` 由 CLI 内置；其他命令由插件通过 `ctx.cli.command()` 注册，执行时以 `setup` 模式加载插件树后运行。core 内置两个：`generate`（别名 `g`），分发给插件注册的生成器（preset 提供 page、component、api，plugin-mock 提供 mock）；`config`，列出插件树，或打印匹配插件解析后的配置。`cormi help` 会列出插件注册的命令。
 
 ## 生成文件（`src/.cormi`）
 
@@ -132,14 +151,26 @@ Node 部分以**包名**注册浏览器入口：`ctx.app.entry('@scope/plugin-fo
 | `@cormi/plugin-request` | 基于 fetch 的 `request()` 与基于 ahooks 的 `useRequest()`（可用 `dataField` 解包）；拦截用 `request/fetch`（waterfall），全局错误处理用 `request/error`（bail，返回 `true` 表示已处理） |
 | `@cormi/plugin-qiankun/master` | qiankun 主应用：`<MicroApp name>` 组件，以及挂载子应用的路由；把主应用 props 和子应用的 basename 传给子应用 |
 | `@cormi/plugin-qiankun/slave` | 由 Vite 构建的 qiankun 子应用：文档中的模块脚本会被替换为 qiankun 能执行的加载脚本，由它在主应用容器里（或独立运行时在页面里）挂载应用；同时提供 CORS、资源 URL 处理和 `useMasterProps()` |
+| `@cormi/plugin-export-static` | 构建后用服务端 bundle 预渲染静态路由（及 `extraRoutePaths`）为 HTML，供静态托管，页面会 hydrate |
+| `@cormi/plugin-lint` | `cormi lint [files] [--fix]`：使用应用自己的 `eslint.config.*`，没有时使用 TypeScript 与 React hooks 的默认配置 |
+| `@cormi/plugin-layout` | 基于 antd 的布局：由路由生成菜单与面包屑；配置式路由提供 `name`、`icon`、`hideInMenu`，只打包用到的图标 |
+| `@cormi/plugin-react-query` | 每个渲染的应用一个 `QueryClient`（创建时触发 `reactQuery/client`），dev 下 hydrate 后显示 devtools |
+| `@cormi/plugin-dva` | dva-core + dva-loading（可选 immer），模型来自 `src/models`（与 plugin-model 共用目录，各取所需）；`dva/create` 事件 |
+| `@cormi/plugin-valtio` | valtio 再导出，`defineStore()` 在 dev 下接入 Redux DevTools |
+| `@cormi/plugin-styled-components` | `ThemeProvider` 与 SSR 样式抽取 |
+| `@cormi/plugin-unocss` | UnoCSS：没有 `uno.config.*` 时使用默认预设 |
+| `@cormi/plugin-analytics` | Google Analytics 4 与百度统计；客户端导航通过 `router/change` 上报 |
+| `@cormi/plugin-legacy` | `@vitejs/plugin-legacy` 构建旧浏览器 bundle，并按 manifest 把 nomodule 等标签注入应用的文档 |
+| `@cormi/plugin-mpa` | 多页应用：`src/pages/<name>/index.tsx` 各自成为 `<name>.html`，不带路由，运行时插件同样生效 |
+| `@cormi/plugin-mf` | 模块联邦（`@module-federation/vite`），host 在入口中初始化；服务端渲染时 remote 模块渲染为空 |
 
 qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，不在 qiankun 的 JS 沙箱里；Vite 注入到 `document.head` 的样式不受样式隔离约束。这一点与 vite-plugin-qiankun 相同。
 
 ## 与 umi 的覆盖情况
 
-已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、HTML 配置（title、metas、links、scripts、styles、favicons）、`base`、`publicPath`、`history`、`alias`、`define`、路由预加载（`<Link prefetch>`）、dev/build/preview/setup 命令，以及 antd、tailwindcss、model、initial-state、request、qiankun 插件。
+已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置（title、metas、links、scripts、styles、favicons、crossorigin）；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载（`<Link prefetch>`）；exportStatic、MPA、legacy；dev、build、preview、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件。
 
-尚未覆盖：`src/global.(css|ts)`、`overrides.css`、`loading.tsx` 等约定；一等公民的 `proxy` 配置（目前通过 `vite.server.proxy`）；`exportStatic`、MPA、`targets`/legacy；`generate`、`config`、`lint` 等命令；access、locale、layout、dva、react-query、valtio、styled-components、unocss、analytics、mf 插件。webpack、mako、mfsu 这类与打包器绑定的功能有意不做。
+尚未覆盖：access、locale 插件（按计划暂缓）。webpack、mako、mfsu 这类与打包器绑定的功能有意不做。
 
 ## umi 能力对照
 
