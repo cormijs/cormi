@@ -1,0 +1,35 @@
+{
+  "name": "@cormi/plugin-layout",
+  "description": "A layout with a menu built from the routes, for Cormi apps, with Ant Design",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.tsx",
+    "./icons": "./client/icons.ts",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src", "client"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "layout", "antd", "menu"],
+  "peerDependencies": {
+    "antd": ">=6",
+    "cormi": "workspace:*",
+    "react": ">=19"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.3.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "antd": "^6.6.8",
+    "cormi": "workspace:*",
+    "react": "^19.3.1"
+  }
+}
