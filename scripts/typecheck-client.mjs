@@ -4,8 +4,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 
 const tsc = createRequire(import.meta.url).resolve('typescript/bin/tsc')
-const projects = readdirSync('plugins')
-  .map(name => `plugins/${name}/client/tsconfig.json`)
+const projects = ['packages/console/client/tsconfig.json', ...readdirSync('plugins').map(name => `plugins/${name}/client/tsconfig.json`)]
   .filter(existsSync)
 let failed = false
 for (const project of projects) {

@@ -86,6 +86,11 @@ export class App extends Service {
     return winPath(join(this.dir, 'server.tsx'))
   }
 
+  /** paths of the registered generated files, relative to `dir` */
+  get files() {
+    return [...this._files.keys()]
+  }
+
   * [Service.init]() {
     // files left by a previous run are removed by the first generation
     this._written = new Set(listFiles(this.dir))
