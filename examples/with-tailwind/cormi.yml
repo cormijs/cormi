@@ -3,3 +3,4 @@
     title: Cormi · Tailwind CSS
     crossorigin: anonymous
 - name: '@cormi/plugin-tailwindcss'
+- name: '@cormi/plugin-legacy'

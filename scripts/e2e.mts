@@ -111,7 +111,7 @@ const checks: Record<string, Check> = {
     }
   },
 
-  async 'with-tailwind'(page, base) {
+  async 'with-tailwind'(page, base, browser) {
     const html = await fetch(base, { headers: { accept: 'text/html' } }).then(res => res.text())
     assert.match(html, /<script type="module" src="[^"]+" crossorigin="anonymous">/)
     await page.goto(`${base}/`)
@@ -121,6 +121,22 @@ const checks: Record<string, Check> = {
     assert.notEqual(background, 'rgba(0, 0, 0, 0)', 'utility classes are applied')
     await page.click('text=About')
     await page.waitForSelector('text=Tailwind scans')
+
+    // @cormi/plugin-legacy: without module scripts, the legacy bundle renders the app
+    if (dev) return
+    assert.match(html, /<script nomodule [^>]*id="vite-legacy-entry"/)
+    const legacy = await (await browser.newContext()).newPage()
+    await legacy.route(`${base}/`, async (route) => {
+      const response = await route.fetch()
+      const body = (await response.text())
+        .replace(/<script type="module"[^>]*>[\s\S]*?<\/script>/g, '')
+        .replace(/ nomodule/g, '')
+      await route.fulfill({ response, body })
+    })
+    await legacy.goto(`${base}/`)
+    await clickUntil(legacy, 'button', 'clicked 1')
+    assert.ok(await legacy.evaluate(() => 'System' in window), 'the legacy bundle runs with SystemJS')
+    await legacy.context().close()
   },
 
   async 'with-antd'(page, base, browser) {
