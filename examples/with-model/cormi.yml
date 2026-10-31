@@ -7,3 +7,5 @@
   config:
     delay: 200
     preview: true
+# cormi lint
+- name: '@cormi/plugin-lint'
