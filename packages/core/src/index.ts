@@ -2,6 +2,7 @@ import './compat.ts'
 
 export { default as Schema } from 'schemastery'
 export * from './app.ts'
+export * from './cli.ts'
 export * from './cormi.ts'
 export * from './env.ts'
 export * from './html.ts'

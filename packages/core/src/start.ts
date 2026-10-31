@@ -5,6 +5,7 @@ import Loader from '@cordisjs/plugin-loader'
 import Logger from '@cordisjs/plugin-logger-console'
 import Timer from '@cordisjs/plugin-timer'
 import { Context, Fiber } from 'cordis'
+import { Cli } from './cli.ts'
 import { Cormi } from './cormi.ts'
 import { loadEnv } from './env.ts'
 
@@ -26,7 +27,7 @@ export interface StartOptions extends Cormi.Options {
  * ```
  * root Context
  * ├─ logger-console, timer
- * ├─ ctx.cormi                    (provided on the root context)
+ * ├─ ctx.cormi, ctx.cli          (provided on the root context)
  * ├─ hmr                          (with `hmr: true`)
  * └─ loader
  *    └─ include → cormi.yml       (the plugin tree)
@@ -45,6 +46,8 @@ export async function start(options: StartOptions) {
   await ctx.plugin(Timer)
   // eslint-disable-next-line no-new
   new Cormi(ctx, { cwd, mode: options.mode })
+  // eslint-disable-next-line no-new
+  new Cli(ctx)
   await ctx.plugin(Loader)
   // the app does not depend on the include plugin, so it is a builtin of the loader
   ctx.loader.builtins.include = Include
