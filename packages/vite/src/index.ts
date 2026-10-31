@@ -48,6 +48,8 @@ export class Vite extends Service {
 
   private _devTask: Promise<ViteDevServer | undefined> | undefined
   private _serverEntry: Promise<any> | undefined
+  /** inputs of client builds besides the app's entry, by name */
+  inputs = new Map<string, string>()
   private _plugins = new Set<Vite.PluginInput>()
   private _configs = new Set<Vite.ConfigInput>()
   private _restart: Refresher | undefined
@@ -69,6 +71,19 @@ export class Vite extends Service {
   /** Add a Vite plugin. A function is called for every server or build, to get fresh plugin instances. */
   plugin(plugin: Vite.PluginInput) {
     return this._register(this._plugins, plugin, 'ctx.vite.plugin()')
+  }
+
+  /** Add an input to client builds (e.g. a page of a multi-page app); its assets are in `BuildResult.inputs`. */
+  input(name: string, file: string) {
+    return this.ctx.effect(() => {
+      if (this.inputs.has(name)) throw new Error(`input ${name} is registered twice`)
+      this.inputs.set(name, winPath(file))
+      this._restart?.schedule()
+      return () => {
+        this.inputs.delete(name)
+        this._restart?.schedule()
+      }
+    }, `ctx.vite.input(${JSON.stringify(name)})`)
   }
 
   /** Merge an object into the Vite config, or edit it with a function. */
@@ -117,12 +132,15 @@ export class Vite extends Service {
         manifest: true,
         emptyOutDir: false,
         // the entry exports the lifecycles of the app, for hosts that mount it
-        rollupOptions: { input: { cormi: app.clientEntry }, preserveEntrySignatures: 'exports-only' },
+        rollupOptions: { input: { cormi: app.clientEntry, ...Object.fromEntries(this.inputs) }, preserveEntrySignatures: 'exports-only' },
       },
     } satisfies InlineConfig))
     const manifestPath = join(outDir, '.vite/manifest.json')
     const manifest: Manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
     const assets = getEntryAssets(manifest, winPath(relative(cwd, app.clientEntry)), this.config.publicPath)
+    const inputs = Object.fromEntries([...this.inputs].map(([name, file]) => {
+      return [name, getEntryAssets(manifest, winPath(relative(cwd, file)), this.config.publicPath)]
+    }))
 
     let server: string | undefined
     if (existsSync(app.serverEntry)) {
@@ -144,7 +162,7 @@ export class Vite extends Service {
       server = join(outDir, 'server/server.mjs')
     }
 
-    const result: Vite.BuildResult = { outDir, assets, server }
+    const result: Vite.BuildResult = { outDir, assets, inputs, server }
     await this.ctx.parallel('build/after', result)
     return result
   }
@@ -185,7 +203,7 @@ export class Vite extends Service {
       },
       css: { devSourcemap: true },
       optimizeDeps: {
-        entries: [app.clientEntry],
+        entries: [app.clientEntry, ...this.inputs.values()],
         include: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom', 'react-dom/client'],
       },
       server: { fs: { strict: false } },
@@ -288,6 +306,8 @@ export namespace Vite {
     outDir: string
     /** assets of the client entry, with `publicPath` */
     assets: EntryAssets
+    /** assets of the inputs added with `input()`, by name */
+    inputs: Record<string, EntryAssets>
     /** the server bundle, if the app has a server entry */
     server?: string
   }
