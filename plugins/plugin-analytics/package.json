@@ -1,0 +1,26 @@
+{
+  "name": "@cormi/plugin-analytics",
+  "description": "Google Analytics 4 and Baidu Tongji for Cormi apps, including client navigations",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src", "client"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "analytics", "google-analytics", "baidu"],
+  "peerDependencies": {
+    "cormi": "workspace:*"
+  },
+  "devDependencies": {
+    "cormi": "workspace:*"
+  }
+}
