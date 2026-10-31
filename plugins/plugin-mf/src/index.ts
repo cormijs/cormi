@@ -11,6 +11,15 @@ export interface Remote {
   name?: string
 }
 
+export interface Shared {
+  /** one instance for the page: the first loaded wins */
+  singleton?: boolean
+  /** semver range this app accepts, from its package.json by default */
+  requiredVersion?: string
+  /** bundled into the entry, instead of loaded on demand */
+  eager?: boolean
+}
+
 export interface Config {
   /** name of this app as a federated container */
   name: string
@@ -18,18 +27,28 @@ export interface Config {
   remotes: Record<string, string | Remote>
   /** modules this app exposes: `{ './Button': './src/components/Button.tsx' }` */
   exposes: Record<string, string>
-  /** dependencies shared with the other apps, e.g. react */
-  shared: string[]
+  /** dependencies shared with the other apps, e.g. react; with options by name */
+  shared: string[] | Record<string, Shared>
   /** file name of this app's remote entry */
   filename: string
+  /** generate the types of exposed modules, and download those of remotes */
+  dts: boolean
 }
 
 export const Config: Schema<Config> = Schema.object({
   name: Schema.string().required().description('name of this app as a federated container'),
   remotes: Schema.dict(Schema.union([String, Schema.object({ entry: Schema.string().required(), name: Schema.string() })])).default({}),
   exposes: Schema.dict(String).default({}).description('modules this app exposes'),
-  shared: Schema.array(String).default(['react', 'react-dom']),
+  shared: Schema.union([
+    Schema.array(String),
+    Schema.dict(Schema.object({
+      singleton: Schema.boolean(),
+      requiredVersion: Schema.string(),
+      eager: Schema.boolean(),
+    })),
+  ]).default(['react', 'react-dom']),
   filename: Schema.string().default('remoteEntry.js'),
+  dts: Schema.boolean().default(true).description('generate and download the types of exposed modules'),
 })
 
 /**
@@ -64,6 +83,7 @@ export function apply(ctx: Context, config: Config) {
     remotes,
     exposes: config.exposes,
     shared: config.shared,
+    dts: config.dts,
     hostInitInjectLocation: 'entry',
   }) as any)
 
