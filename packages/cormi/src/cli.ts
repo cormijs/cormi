@@ -1,20 +1,30 @@
 import { type ChildProcess, fork } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type {} from '@cordisjs/plugin-loader'
-import { type Mode, settle, start, stop } from '@cormi/core'
+import { CommandError, idle, type Mode, settle, start, stop } from '@cormi/core'
 import type {} from '@cormi/vite'
 import type { Context } from 'cordis'
 import parse from 'yargs-parser'
 import { MIN_NODE_VERSION, RESTART_EXIT_CODE } from './constants.ts'
 
+const BUILTIN_COMMANDS: [string, string][] = [
+  ['dev', 'serve the app with the dev server'],
+  ['build', 'write the client and server bundles'],
+  ['preview', 'serve the build output'],
+  ['setup', 'write the generated files (src/.cormi) only'],
+]
+
+function formatCommands(commands: [string, string][]) {
+  return commands.map(([name, description]) => `  ${name.padEnd(14)}${description}`).join('\n')
+}
+
+const COMMANDS = `Commands:\n${formatCommands(BUILTIN_COMMANDS)}`
+
 const HELP = `Usage: cormi <command> [options]
 
-Commands:
-  dev       serve the app with the dev server
-  build     write the client and server bundles
-  preview   serve the build output
-  setup     write the generated files (src/.cormi) only
+${COMMANDS}
 
 Options:
   --port <port>   port of the dev and preview server, over cormi.yml
@@ -34,20 +44,36 @@ async function registerTypeScript() {
 
 function getService<K extends 'vite' | 'app'>(ctx: Context, name: K): Context[K] {
   const service = ctx.get(name)
-  if (!service) throw new Error(`service ${name} is not available, is @cormi/preset-react in cormi.yml?`)
+  if (!service) throw new CommandError(`service ${name} is not available, is @cormi/preset-react in cormi.yml?`)
   return service
 }
 
-/** Load the app, run `task` once every plugin has loaded, then dispose the app. */
-async function once(cwd: string, mode: Mode, task: (ctx: Context) => Promise<unknown>) {
+/**
+ * Load the app, run `task` once every plugin has loaded, then dispose the app.
+ * Without `strict`, a plugin failing to load does not stop the task.
+ */
+async function once(cwd: string, mode: Mode, task: (ctx: Context) => Promise<unknown>, { strict = true, logger = true } = {}) {
   await registerTypeScript()
-  const ctx = await start({ cwd, mode })
+  const ctx = await start({ cwd, mode, logger })
   try {
-    await settle(ctx)
+    await (strict ? settle(ctx) : idle(ctx))
     await task(ctx)
   } finally {
     await stop(ctx)
   }
+}
+
+/** The commands registered by the plugins of the app, for `cormi help`. */
+async function getPluginCommands(cwd: string) {
+  if (!existsSync(join(cwd, 'cormi.yml'))) return ''
+  let commands: [string, string][] = []
+  await once(cwd, 'setup', async (ctx) => {
+    commands = [...ctx.cli.commands].map(([name, command]) => {
+      const aliases = command.aliases?.length ? ` (${command.aliases.join(', ')})` : ''
+      return [name + aliases, command.description]
+    })
+  }, { strict: false, logger: false })
+  return formatCommands(commands)
 }
 
 /** Load the app and keep it running until the process is interrupted. */
@@ -102,7 +128,7 @@ function daemon(argv: string[]) {
 
 export async function run(argv = process.argv.slice(2)) {
   if (Number(process.versions.node.split('.')[0]) < MIN_NODE_VERSION) {
-    throw new Error(`Cormi requires node >= ${MIN_NODE_VERSION}, current is ${process.versions.node}`)
+    throw new CommandError(`Cormi requires node >= ${MIN_NODE_VERSION}, current is ${process.versions.node}`)
   }
   const args = parse(argv, {
     alias: { version: ['v'], help: ['h'] },
@@ -111,7 +137,10 @@ export async function run(argv = process.argv.slice(2)) {
   })
   if (args.version) return console.log(getVersion())
   const command = String(args._[0] ?? 'help')
-  if (args.help || command === 'help') return console.log(HELP)
+  if (args.help || command === 'help') {
+    const plugins = await getPluginCommands(process.cwd())
+    return console.log(plugins ? HELP.replace(COMMANDS, `${COMMANDS}\n${plugins}`) : HELP)
+  }
   // the options of the command line win over cormi.yml
   if (args.port) process.env.CORMI_PORT = args.port
   if (args.host) process.env.CORMI_HOST = args.host
@@ -128,7 +157,14 @@ export async function run(argv = process.argv.slice(2)) {
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())
     default:
-      console.log(HELP)
-      throw new Error(`unknown command ${command}`)
+      // commands of plugins, e.g. generate and config
+      return once(cwd, 'setup', async (ctx) => {
+        const target = ctx.cli.resolve(command)
+        if (!target) {
+          console.log(HELP)
+          throw new CommandError(`unknown command ${command}`)
+        }
+        await target.action({ ...args, _: args._.slice(1) })
+      }, { strict: false })
   }
 }
