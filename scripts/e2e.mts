@@ -208,6 +208,32 @@ const examples: Record<string, Example> = {
     },
   },
 
+  'with-layout': {
+    async check(page, base, browser) {
+      // the analytics script is answered locally; gtag queues its calls in dataLayer
+      await page.route('https://www.googletagmanager.com/**', route => route.fulfill({ contentType: 'text/javascript', body: '' }))
+
+      // the menu, built from the configured routes, is server-rendered with antd's styles
+      const noJs = await (await browser.newContext({ javaScriptEnabled: false })).newPage()
+      await noJs.route('https://www.googletagmanager.com/**', route => route.fulfill({ contentType: 'text/javascript', body: '' }))
+      await noJs.goto(`${base}/`)
+      assert.deepEqual(await noJs.$$eval('.ant-menu-root > li', items => items.map(item => item.textContent)), ['Dashboard', 'Users', 'Settings'])
+      assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('.ant-layout-sider')!).backgroundColor), 'rgb(0, 21, 41)')
+
+      await page.goto(`${base}/`)
+      await page.waitForSelector('.ant-menu-item-selected >> text=Dashboard')
+      await clickUntil(page, '.ant-menu-root > li:nth-child(2) .ant-menu-submenu-title', 'Users')
+      await page.click('.ant-menu >> text=List')
+      await page.click('#users >> text=Bob')
+      await page.waitForSelector('#user >> text=User 2')
+      assert.equal(await text(page, '.ant-breadcrumb'), 'Users/Detail')
+      // client navigations are reported to Google Analytics (not in dev mode)
+      if (dev) return
+      const views = await page.evaluate(() => (window as any).dataLayer.filter((args: any) => args[1] === 'page_view').map((args: any) => args[2].page_path))
+      assert.deepEqual(views, ['/users', '/users/2'])
+    },
+  },
+
   qiankun: {
     servers: [
       { dir: 'qiankun-slave' },

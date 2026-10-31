@@ -1,0 +1,33 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · layout
+    ssr: true
+    # configured routes carry the name and the icon of their menu item
+    routes:
+      - path: /
+        component: index
+        name: Dashboard
+        icon: DashboardOutlined
+      - path: /users
+        name: Users
+        icon: TeamOutlined
+        routes:
+          - path: /users
+            component: users/index
+            name: List
+          - path: /users/:id
+            component: users/detail
+            name: Detail
+            hideInMenu: true
+      - path: /settings
+        component: settings
+        name: Settings
+        icon: SettingOutlined
+- name: '@cormi/plugin-antd'
+- name: '@cormi/plugin-layout'
+  config:
+    title: Cormi Admin
+    footer: Built with Cormi
+- name: '@cormi/plugin-analytics'
+  config:
+    ga: G-CORMI00000
