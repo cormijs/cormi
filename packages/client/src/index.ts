@@ -3,7 +3,7 @@ export { AppService, Root, useContext, useCordis, useHostProps, type Wrapper } f
 export { Context } from './context.ts'
 export { ServerInsertedHTMLContext, useServerInsertedHTML } from './inserted.tsx'
 export { Link, type LinkProps, type PrefetchMode } from './link.tsx'
-export { render, type RenderOptions } from './render.tsx'
+export { render, renderPage, type RenderOptions } from './render.tsx'
 export { LOADER_ENDPOINT, REDIRECT_HEADER } from './constants.ts'
 export { fetchLoader, type HistoryType, RouterService, type RouterOptions } from './router.ts'
 export type * from './types.ts'

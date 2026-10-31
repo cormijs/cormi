@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { type ComponentType } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { createBrowserRouter, createHashRouter, createMemoryRouter, matchRoutes, type RouteObject } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
@@ -76,4 +76,18 @@ export async function render(ctx: Context, options: RenderOptions) {
     router.dispose()
     $router.router = undefined
   }
+}
+
+/**
+ * Render a single page, without a router (a page of a multi-page app). The
+ * wrappers of the runtime plugins apply; returns a function that unmounts it.
+ */
+export function renderPage(ctx: Context, Page: ComponentType, options: RenderOptions) {
+  const container = options.container ?? document.getElementById(options.mountElementId)
+  if (!container) throw new Error(`cannot find the mount element #${options.mountElementId}`)
+  if (options.props) ctx.$app.setProps(options.props)
+  const root = createRoot(container)
+  root.render(<Root ctx={ctx}><Page /></Root>)
+  ctx.emit('app/mount')
+  return () => root.unmount()
 }
