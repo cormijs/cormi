@@ -1,6 +1,6 @@
 import { isAbsolute, relative } from 'node:path'
-import type { App, Route } from '@cormi/core'
-import { winPath } from '@cormi/core'
+import type { App, Route, Workspace } from '@cormi/core'
+import { resolveExport, winPath } from '@cormi/core'
 import type { Dict } from 'cosmokit'
 
 const json = (value: unknown) => JSON.stringify(value ?? null)
@@ -142,7 +142,18 @@ export function renderServer(app: App, options: ContextOptions) {
   ].join('\n')
 }
 
-export function renderTsconfig() {
+/** Paths of the workspace packages, relative to the generated directory: their sources are typed like the app's. */
+export function getWorkspacePaths(dir: string, packages: Dict<Workspace.Package>) {
+  const paths: Dict<string[]> = {}
+  for (const pkg of Object.values(packages)) {
+    const main = resolveExport(pkg, '.', ['import'])
+    if (main) paths[pkg.name] = [winPath(relative(dir, main))]
+    paths[`${pkg.name}/*`] = [winPath(relative(dir, pkg.dir)) + '/*']
+  }
+  return paths
+}
+
+export function renderTsconfig(paths: Dict<string[]> = {}) {
   return JSON.stringify({
     compilerOptions: {
       target: 'ES2022',
@@ -160,6 +171,7 @@ export function renderTsconfig() {
       paths: {
         '@/*': ['../*'],
         '@@/*': ['./*'],
+        ...paths,
       },
     },
     include: ['../**/*'],

@@ -5,7 +5,7 @@ import type {} from '@cormi/vite'
 import { Context } from 'cordis'
 import { SCRIPT_EXTENSIONS } from './conventions.ts'
 import { routeExportsPlugin } from './route-exports.ts'
-import { getPackageName, renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
+import { getPackageName, getWorkspacePaths, renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
 
 /**
  * The React renderer. It generates the browser entry (`entry.tsx`) and the
@@ -31,7 +31,8 @@ export function Renderer(ctx: Context, config: Renderer.Config) {
     return config
   })
 
-  ctx.app.file('tsconfig.json', renderTsconfig())
+  ctx.app.file('tsconfig.json', () => renderTsconfig(getWorkspacePaths(ctx.app.dir, ctx.get('workspace')?.packages ?? {})))
+  ctx.on('workspace/update', () => ctx.app.refresh())
   ctx.app.file('typings.d.ts', TYPINGS)
   ctx.app.file('routes.ts', () => renderRoutes(ctx.app.dir, ctx.router.routes))
   ctx.app.file('entry.tsx', () => renderEntry(ctx.app, {

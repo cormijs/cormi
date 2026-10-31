@@ -8,6 +8,7 @@ import { Context, Fiber } from 'cordis'
 import { Cli } from './cli.ts'
 import { Cormi } from './cormi.ts'
 import { loadEnv } from './env.ts'
+import { Workspace } from './workspace.ts'
 
 // `FiberState` is a const enum in cordis' typings
 const FAILED = 3
@@ -28,6 +29,7 @@ export interface StartOptions extends Cormi.Options {
  * root Context
  * ├─ logger-console, timer
  * ├─ ctx.cormi, ctx.cli          (provided on the root context)
+ * ├─ ctx.workspace               (plugins/*, resolved before the plugin tree loads)
  * ├─ hmr                          (with `hmr: true`)
  * └─ loader
  *    └─ include → cormi.yml       (the plugin tree)
@@ -48,6 +50,7 @@ export async function start(options: StartOptions) {
   new Cormi(ctx, { cwd, mode: options.mode })
   // eslint-disable-next-line no-new
   new Cli(ctx)
+  await ctx.plugin(Workspace)
   await ctx.plugin(Loader)
   // the app does not depend on the include plugin, so it is a builtin of the loader
   ctx.loader.builtins.include = Include

@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {} from '@cordisjs/plugin-server'
-import { idle, Refresher, Schema, winPath } from '@cormi/core'
+import { idle, Refresher, Schema, winPath, type Workspace } from '@cormi/core'
 import { Context, Service } from 'cordis'
 import { Awaitable, Dict } from 'cosmokit'
 import { build, createServer, type InlineConfig, type Manifest, mergeConfig, type PluginOption, type ViteDevServer } from 'vite'
@@ -207,6 +207,7 @@ export class Vite extends Service {
         include: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom', 'react-dom/client'],
       },
       server: { fs: { strict: false } },
+      plugins: [workspacePlugin(this.ctx.get('workspace'))],
       // one instance of the framework, shared by the server entry, the pages and the runtime plugins
       ssr: { external: ['cormi'] },
       build: {
@@ -281,6 +282,21 @@ export class Vite extends Service {
       if (protocol === 'vite-hmr' || protocol === 'vite-ping') return Promise.resolve()
       return next()
     })
+  }
+}
+
+/**
+ * Packages of the app's workspace (`plugins/*`) resolve to their sources,
+ * in the browser and on the server, as they do in Node.
+ */
+function workspacePlugin(workspace: Workspace | undefined): PluginOption {
+  return {
+    name: 'cormi:workspace',
+    enforce: 'pre',
+    resolveId(id, _importer, options) {
+      if (!workspace || !Object.keys(workspace.packages).length) return
+      return workspace.resolve(id, options?.ssr ? ['node', 'import'] : ['browser', 'import', 'module'])
+    },
   }
 }
 
