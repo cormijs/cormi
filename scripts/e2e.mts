@@ -6,7 +6,7 @@
 // with `--dev`, it is served by the dev server.
 import assert from 'node:assert/strict'
 import { type ChildProcess, execFileSync, spawn } from 'node:child_process'
-import { readFile, stat } from 'node:fs/promises'
+import { readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -46,6 +46,14 @@ async function serveStatic(dir: string, port: number) {
   })
   await new Promise<void>(resolve => server.listen(port, resolve))
   return server
+}
+
+async function waitFor(condition: () => boolean | Promise<boolean>, timeout = 10000) {
+  const start = Date.now()
+  while (!await condition()) {
+    if (Date.now() - start > timeout) throw new Error('timed out waiting for a condition')
+    await new Promise(resolve => setTimeout(resolve, 100))
+  }
 }
 
 /** Click until the element reads `expected`: server-rendered markup ignores clicks until it hydrates. */
@@ -275,6 +283,77 @@ const examples: Record<string, Example> = {
       await page.goto(`${host}/`)
       await page.waitForSelector('#greeting >> text=Hello host, from the remote app.')
       await clickUntil(page, '#remote-count', 'clicked 1')
+    },
+  },
+
+  'with-console': {
+    async check(page, base) {
+      // a workspace plugin, loaded from its sources by package name
+      const greetings: string[] = []
+      page.on('console', message => message.type() === 'info' && greetings.push(message.text()))
+      await page.goto(`${base}/`)
+      await page.waitForSelector('#title')
+      await page.waitForFunction(() => document.title === 'Cormi · console')
+      await waitFor(() => greetings.includes('Hello from cormi-plugin-hello'))
+      if (!dev) {
+        const html = await fetch(`${base}/__cormi/`, { headers: { accept: 'text/html' } }).then(res => res.text())
+        assert.ok(!html.includes('cormi-console'), 'the console only runs in dev mode')
+        return
+      }
+
+      const dir = `${root}examples/with-console`
+      const config = await readFile(`${dir}/cormi.yml`, 'utf8')
+      try {
+        await page.goto(`${base}/__cormi/`)
+        await page.waitForSelector('.cc-status >> text=已连接')
+        await page.waitForSelector('.cc-stat >> text=插件已加载')
+
+        // edit the config of a plugin through its form: cormi.yml is written, the plugin reloads
+        await page.click('.cc-nav-item >> text=插件')
+        await page.click('.cc-entry-main >> text=cormi-plugin-hello')
+        await page.fill('.cc-row:has(code:text-is("greeting")) input', 'Hi from the console')
+        await page.click('.cc-config button:text-is("保存")')
+        await page.waitForSelector('.cc-saved >> text=已保存')
+        assert.match(await readFile(`${dir}/cormi.yml`, 'utf8'), /greeting: Hi from the console/)
+        await page.click('.cc-nav-item >> text=日志')
+        await page.waitForSelector('.cc-log >> text=loaded, greeting: Hi from the console')
+
+        // the registrations of the plugin, withdrawn when it is disabled
+        await page.click('.cc-nav-item >> text=插件')
+        await page.click('.cc-entry-main >> text=cormi-plugin-hello')
+        await page.click('.cc-tab >> text=注册')
+        await page.waitForSelector('.cc-codeline >> text=ctx.app.entry("cormi-plugin-hello/client")')
+        await page.click('.cc-detail-head button:text-is("停用")')
+        await page.waitForSelector('.cc-detail-head >> text=已停用')
+        assert.match(await readFile(`${dir}/cormi.yml`, 'utf8'), /disabled: true/)
+        await waitFor(async () => !(await readFile(`${dir}/src/.cormi/entry.tsx`, 'utf8')).includes('cormi-plugin-hello'))
+        await page.click('.cc-detail-head button:text-is("启用")')
+        await page.waitForSelector('.cc-detail-head >> text=运行中')
+        // the console pages of the plugin come back: the console reloads with its new entry
+        await page.waitForSelector('.cc-nav-item >> text=Hello')
+
+        // a new workspace plugin, created and enabled from the console
+        await page.click('.cc-nav-item >> text=工作区')
+        await page.fill('.cc-create input.cc-input', 'e2e')
+        await page.click('.cc-create button:text-is("新建")')
+        await page.waitForSelector('.cc-saved >> text=已创建 cormi-plugin-e2e')
+        await page.waitForSelector('.cc-package:has-text("cormi-plugin-e2e") >> text=已启用')
+        await page.click('.cc-nav-item >> text=插件')
+        await page.waitForSelector('.cc-entry[data-state=active] >> text=cormi-plugin-e2e')
+
+        // a page the workspace plugin adds to the console, with its own data
+        await page.click('.cc-nav-item >> text=Hello')
+        await page.waitForSelector('#hello-greeting >> text=Hi from the console')
+
+        // the internals of the app
+        await page.click('.cc-nav-item >> text=服务')
+        await page.waitForSelector('.cc-table >> text=ctx.router')
+        await page.click('.cc-nav-item >> text=应用')
+        await page.waitForSelector('.cc-codeline >> text=cormi-plugin-hello/client')
+      } finally {
+        await writeFile(`${dir}/cormi.yml`, config)
+        await rm(`${dir}/plugins/e2e`, { recursive: true, force: true })
+      }
     },
   },
 

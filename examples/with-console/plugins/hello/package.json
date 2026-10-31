@@ -1,0 +1,27 @@
+{
+  "name": "cormi-plugin-hello",
+  "description": "The hello plugin of the app",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.tsx",
+    "./console": "./console/index.tsx"
+  },
+  "files": [
+    "lib",
+    "src",
+    "client",
+    "console"
+  ],
+  "keywords": [
+    "cormi",
+    "cormi-plugin"
+  ],
+  "peerDependencies": {
+    "cormi": "*"
+  }
+}

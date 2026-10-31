@@ -1,0 +1,5 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · console
+    port: 8020
+- name: cormi-plugin-hello
