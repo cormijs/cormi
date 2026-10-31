@@ -1,0 +1,9 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · mf remote
+    port: 8002
+- name: '@cormi/plugin-mf'
+  config:
+    name: remote
+    exposes:
+      ./Greeting: ./src/components/Greeting.tsx

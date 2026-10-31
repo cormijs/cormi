@@ -266,6 +266,18 @@ const examples: Record<string, Example> = {
     },
   },
 
+  mf: {
+    servers: [
+      { dir: 'mf-remote' },
+      { dir: 'mf-host', env: ([remote]) => ({ REMOTE_ORIGIN: remote }) },
+    ],
+    async check(page, base, browser, [remote, host]) {
+      await page.goto(`${host}/`)
+      await page.waitForSelector('#greeting >> text=Hello host, from the remote app.')
+      await clickUntil(page, '#remote-count', 'clicked 1')
+    },
+  },
+
   qiankun: {
     servers: [
       { dir: 'qiankun-slave' },

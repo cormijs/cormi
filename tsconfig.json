@@ -72,6 +72,9 @@
     },
     {
       "path": "./plugins/plugin-mpa"
+    },
+    {
+      "path": "./plugins/plugin-mf"
     }
   ]
 }

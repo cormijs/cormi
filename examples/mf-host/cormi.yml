@@ -1,0 +1,9 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · mf host
+    port: 8003
+- name: '@cormi/plugin-mf'
+  config:
+    name: host
+    remotes:
+      remote: !!js "(process.env.REMOTE_ORIGIN || 'http://localhost:8002') + '/remoteEntry.js'"
