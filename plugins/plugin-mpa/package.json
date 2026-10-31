@@ -1,0 +1,28 @@
+{
+  "name": "@cormi/plugin-mpa",
+  "description": "Multi-page Cormi apps: every src/pages/<name>/index.tsx is a page of its own",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "mpa", "multi-page"],
+  "peerDependencies": {
+    "cormi": "workspace:*"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3"
+  },
+  "devDependencies": {
+    "cormi": "workspace:*"
+  }
+}
