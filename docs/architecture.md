@@ -209,6 +209,19 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 
 `@cormi/client` 为此调整了两处：`$router.add()`；渲染时才读取 react-router 的工厂函数——子包独立运行时，共享模块在其模块求值之后才就绪。
 
+## 工作区与控制台
+
+**工作区**（`ctx.workspace`，`@cormi/core`，在加载插件树之前由 `start()` 提供）：应用 `plugins/*` 下的插件包按包名加载，直接运行源码，模型来自 koishi 模板项目的工作区。
+
+- Node：通过 `module.register()` 注册解析钩子，工作区包名解析到 `exports` 的 `source` 条件（没有时为 `src/index.ts`），再交给 tsx。包增删时经 MessagePort 更新钩子。
+- Vite：`cormi:workspace` 插件在浏览器与 SSR 中做同样的解析。
+- 类型：Renderer 在生成的 tsconfig 中写入工作区包的 `paths`。
+- `cormi g plugin <name>` 生成插件包（`--console`、`--no-client`）；dev 下监听 `plugins/*/package.json` 的增删。
+
+**控制台**（`@cormi/console`，preset 在 dev 模式下挂载，`console: false` 关闭）：挂在 `/__cormi/`，由应用自己的 Vite 提供。控制台本身是一个浏览器端的 cordis Context：页面是浏览器插件，经 `ctx.console.entry()` 注册（与 `ctx.app.entry()` 同构），生成的入口在 `src/.cormi/console/entry.tsx`。数据经 WebSocket：Node 端 `ctx.console.data(name, get)` 推送、`method(name, handler)` 响应调用、`broadcast()` 发事件；浏览器端 `ctx.$console.page()`、`useData()`、`call()`。
+
+内置页面读取 loader 的 include 子树（顺序与 `cormi.yml` 一致），修改经子树的 `update/create/remove` 写回文件；注册列表来自 `fiber.getEffects()`（含子 fiber），状态变化监听 `internal/status`、`internal/plugin`；服务来自 `ctx.reflect.store`；日志经 `ctx.logger.exporter()`。控制台文档只响应接受 `text/html` 的请求，`/__cormi/loader` 等端点不受影响。
+
 ## 与 umi 的覆盖情况
 
 已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置（title、metas、links、scripts、styles、favicons、crossorigin）；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载（`<Link prefetch>`）；exportStatic、MPA、legacy；dev、build、preview、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件；此外还有 umi 没有内置的联邦应用（federation）。

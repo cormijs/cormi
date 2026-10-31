@@ -30,6 +30,7 @@ ctx.on('build/after', async ({ outDir }) => {
 | `app/generate()` | emit | `src/.cormi` 写入之后 |
 | `build/before()` | parallel | Vite 构建开始之前 |
 | `build/after(result)` | parallel | 客户端与服务端 bundle 写入之后；`result` 含 `outDir`、`assets`、`inputs`、`server` |
+| `workspace/update(packages)` | emit | 工作区的插件包增加或减少之后 |
 
 ## 浏览器端
 

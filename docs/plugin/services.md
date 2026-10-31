@@ -9,6 +9,8 @@
 | `ctx.app` | `@cormi/preset-react` | `entry()`、`import()`、`file()`、`server()` |
 | `ctx.vite` | `@cormi/preset-react` | `plugin()`、`configure()`、`input()` |
 | `ctx.server` | `@cordisjs/plugin-server`（dev 与 preview） | `get()`、`post()`、`all()`、`use()`、`ws()` |
+| `ctx.workspace` | `cormi`（根上提供） | `create()` |
+| `ctx.console` | `@cormi/preset-react`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
 
 所有注册方法都是 effect：注册属于调用方插件，插件卸载时自动撤回，并返回一个可以提前撤回的函数。
 
@@ -137,6 +139,18 @@ ctx.vite.input('about', ctx.cormi.resolve('src/pages/about/index.tsx'))
 | `outDir` | 构建输出目录的绝对路径 |
 | `devServer` | dev 模式下的 Vite 开发服务器 |
 | `build()` | 构建客户端与服务端 bundle，前后触发 `build/before`、`build/after` |
+
+## ctx.workspace
+
+应用的 [工作区](/guide/console#工作区)：`plugins/*` 下的插件包。它在根上提供，但子插件读取它时要用 `ctx.get('workspace')`，或在 `inject` 中声明。
+
+| 成员 | 说明 |
+|---|---|
+| `packages` | 工作区包：`{ [name]: { name, version, description, dir, path, exports } }` |
+| `resolve(specifier, conditions)` | 工作区包中某个模块的文件，`source` 条件优先；不属于工作区时为 `undefined` |
+| `create(name, options?)` | 新建一个插件包：`{ client?, console? }` |
+
+包增删后触发 `workspace/update(packages)`。
 
 ## ctx.server
 

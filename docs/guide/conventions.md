@@ -6,6 +6,7 @@
 my-app/
 ├─ cormi.yml            插件树
 ├─ plugin.ts            应用自己的 Node 插件（可选，写进 cormi.yml）
+├─ plugins/             工作区插件包，按包名加载源码（见“控制台与工作区”）
 ├─ mock/                mock 接口（@cormi/plugin-mock）
 ├─ public/              原样提供的文件
 └─ src/

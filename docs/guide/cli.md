@@ -6,7 +6,7 @@ cormi <command> [options]
 
 | 命令 | 作用 |
 |---|---|
-| `cormi dev` | 启动开发服务器：HTTP 服务、Vite 开发中间件、文件监听；`cormi.yml` 与本地插件热重载 |
+| `cormi dev` | 启动开发服务器：HTTP 服务、Vite 开发中间件、文件监听、[控制台](/guide/console)；`cormi.yml` 与本地插件热重载 |
 | `cormi build` | 构建客户端（以及服务端）bundle，然后退出 |
 | `cormi preview` | 运行构建产物 |
 | `cormi setup` | 只写入 `src/.cormi` 下的生成文件，然后退出 |
@@ -32,6 +32,7 @@ cormi g page users/detail     # src/pages/users/detail.tsx 及其 CSS module
 cormi g component UserCard    # src/components/UserCard/index.tsx
 cormi g api users             # src/api/users.ts
 cormi g mock users            # mock/users.ts，需要 @cormi/plugin-mock
+cormi g plugin hello          # 工作区插件包 plugins/hello/（--console、--no-client）
 ```
 
 生成器不会覆盖已存在的文件。运行 `cormi g` 不带参数，会列出当前可用的生成器。

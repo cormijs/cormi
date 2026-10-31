@@ -44,21 +44,23 @@ export default (ctx: Context) => {
 ```
 
 ```sh
-cormi dev       # 开发
-cormi build     # 构建客户端（和服务端）bundle
-cormi preview   # 运行构建产物
+cormi dev              # 开发；控制台在 http://localhost:8000/__cormi/
+cormi build            # 构建客户端（和服务端）bundle
+cormi preview          # 运行构建产物
+cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名加载源码
 ```
 
 ## 仓库结构
 
 | 目录 | 内容 |
 |---|---|
-| `packages/core` | `ctx.cormi`、`ctx.router`、`ctx.html`、`ctx.app`，以及基于官方 loader 的启动 |
+| `packages/core` | `ctx.cormi`、`ctx.router`、`ctx.html`、`ctx.app`、`ctx.workspace`（`plugins/*` 工作区插件），以及基于官方 loader 的启动 |
 | `packages/vite` | `ctx.vite`：dev server（挂在 `ctx.server` 上）与构建 |
 | `packages/client` | 浏览器端 Context（`$app`、`$router`）、SSR |
 | `packages/server` | `ctx.server` 上的页面、loader 端点、API 路由、静态资源 |
 | `packages/preset-react` | 组合以上服务的 preset 与 React 渲染器 |
+| `packages/console` | dev 模式下的控制台（`/__cormi/`）：插件树管理、应用内部、日志、工作区与市场 |
 | `packages/cormi` | CLI，Node 端 API（`cormi`）与浏览器端 API（`cormi/client`） |
 | `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
 | `docs` | 官网兼文档站（VitePress） |
-| `examples/*` | basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave |
+| `examples/*` | with-console（控制台与工作区插件）、basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave |
