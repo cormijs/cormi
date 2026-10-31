@@ -4,6 +4,7 @@ import { createBrowserRouter, createHashRouter, createMemoryRouter, matchRoutes,
 import { RouterProvider } from 'react-router/dom'
 import { Root } from './app.tsx'
 import type { Context } from './context.ts'
+import type { HistoryType } from './router.ts'
 
 export interface RenderOptions {
   /** id of the element the app is mounted into */
@@ -21,10 +22,12 @@ export interface RenderOptions {
   props?: Record<string, any>
 }
 
-const createRouter = {
-  browser: createBrowserRouter,
-  hash: createHashRouter,
-  memory: createMemoryRouter,
+// react-router is read when the app renders, not when this module is evaluated:
+// shared by module federation, it may be resolved later than this module
+function createRouter(history: HistoryType, ...args: Parameters<typeof createBrowserRouter>) {
+  if (history === 'hash') return createHashRouter(...args)
+  if (history === 'memory') return createMemoryRouter(...args)
+  return createBrowserRouter(...args)
 }
 
 /** The lazy routes matching the initial location must be loaded before hydration. */
@@ -50,7 +53,7 @@ export async function render(ctx: Context, options: RenderOptions) {
   // server-rendered markup only belongs to the app's own document
   const hydrationData = options.container ? undefined : window.__staticRouterHydrationData
   if (hydrationData) await resolveLazyRoutes(routes, window.location.pathname, $router.basename)
-  const router = createRouter[$router.options.history ?? 'browser'](routes, { basename: $router.basename, hydrationData })
+  const router = createRouter($router.options.history ?? 'browser', routes, { basename: $router.basename, hydrationData })
   $router.router = router
 
   let location = router.state.location

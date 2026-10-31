@@ -1,3 +1,4 @@
+import { createMemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { Context } from '../src/index.ts'
 
@@ -65,5 +66,52 @@ describe('Context', () => {
       '/app/__cormi/loader?route=about&url=%2Fapp%2Fabout',
       '/app/__cormi/loader?route=users&url=%2Fapp%2Fusers%3Fpage%3D2',
     ])
+  })
+
+  it('adds routes at runtime, below their parent, until the plugin is disposed', async () => {
+    const ctx = new Context({ routes: { ...routes }, routeModules: { ...routeModules } })
+    const added = [
+      { id: 'pkg/orders', path: '/orders', parentId: 'layout' },
+      { id: 'pkg/order', path: ':id', parentId: 'pkg/orders' },
+    ]
+    const fiber = ctx.plugin((ctx: Context) => {
+      ctx.$router.add(added, { 'pkg/order': async () => ({ default: () => null }) })
+    })
+    await fiber
+    expect(ctx.$router.routes['pkg/order'].parentId).toBe('pkg/orders')
+    const [layout] = ctx.$router.createRoutes('client')
+    expect(layout.children!.map(route => route.id)).toEqual(['index', 'about', 'users', 'pkg/orders'])
+    expect(layout.children![3].children!.map(route => route.id)).toEqual(['pkg/order'])
+    await fiber.dispose()
+    expect(ctx.$router.routes['pkg/orders']).toBeUndefined()
+    expect(ctx.$router.options.routeModules['pkg/order']).toBeUndefined()
+  })
+
+  it('patches the rendered router, and removes the routes from it', async () => {
+    const ctx = new Context({ routes: { ...routes }, routeModules: { ...routeModules } })
+    const router = createMemoryRouter(ctx.$router.createRoutes('client'), { initialEntries: ['/'] })
+    ctx.$router.router = router
+    router.initialize()
+    const leaf = () => router.state.matches.at(-1)?.route.id
+
+    const fiber = ctx.plugin((ctx: Context) => {
+      ctx.$router.add([{ id: 'pkg/orders', path: '/orders', parentId: 'layout' }], { 'pkg/orders': async () => ({ default: () => null }) })
+    })
+    await fiber
+    await router.navigate('/orders')
+    expect(leaf()).toBe('pkg/orders')
+
+    await fiber.dispose()
+    expect(router.manifest['pkg/orders']).toBeUndefined()
+    await router.navigate('/orders')
+    expect(router.state.errors).toBeTruthy()
+
+    // the same routes can be added again
+    await ctx.plugin((ctx: Context) => {
+      ctx.$router.add([{ id: 'pkg/orders', path: '/orders', parentId: 'layout' }], { 'pkg/orders': async () => ({ default: () => null }) })
+    })
+    await router.navigate('/orders')
+    expect(leaf()).toBe('pkg/orders')
+    router.dispose()
   })
 })

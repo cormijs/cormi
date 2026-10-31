@@ -83,13 +83,81 @@ export class RouterService extends Service {
     return this.router.navigate(to, options)
   }
 
-  /** The route objects of react-router. On the client, server `loader`s are fetched. */
-  createRoutes(env: 'client' | 'server'): RouteObject[] {
+  /**
+   * Add routes at runtime, e.g. the routes of a package loaded by the app.
+   * A route without `parentId`, or whose parent is not among `routes`, is
+   * mounted below its `parentId` (at the top without). A rendered app is
+   * patched. The routes are removed when the calling plugin is disposed.
+   */
+  add(routes: RouteData[], modules: RouteModules = {}) {
+    return this.ctx.effect(() => {
+      for (const route of routes) {
+        if (this.options.routes[route.id]) throw new Error(`route ${route.id} exists already`)
+      }
+      for (const route of routes) this.options.routes[route.id] = route
+      Object.assign(this.options.routeModules, modules)
+      const roots = this._patch(routes)
+      return () => {
+        for (const route of routes) {
+          delete this.options.routes[route.id]
+          delete this.options.routeModules[route.id]
+          this._modules.delete(route.id)
+        }
+        this._unpatch(roots)
+      }
+    }, 'ctx.$router.add()')
+  }
+
+  /** Insert the topmost of `routes` into the rendered router; returns them by parent. */
+  private _patch(routes: RouteData[]) {
+    const ids = new Set(routes.map(route => route.id))
+    const roots = new Map<string | undefined, string[]>()
+    for (const route of routes) {
+      if (route.parentId && ids.has(route.parentId)) continue
+      roots.set(route.parentId, [...roots.get(route.parentId) ?? [], route.id])
+    }
+    if (this.router) {
+      const objects = this.createRoutes('client', ids)
+      for (const [parentId, children] of roots) {
+        this.router.patchRoutes(parentId ?? null, objects.filter(object => children.includes(object.id!)))
+      }
+    }
+    return roots
+  }
+
+  private _unpatch(roots: Map<string | undefined, string[]>) {
+    const router = this.router
+    if (!router) return
+    // react-router can only add routes: remove them from the tree and its manifest, then refresh its branches
+    const forget = (route: RouteObject) => {
+      delete router.manifest[route.id!]
+      route.children?.forEach(forget)
+    }
+    for (const [parentId, children] of roots) {
+      const siblings = parentId ? router.manifest[parentId]?.children : router.routes as RouteObject[]
+      if (!siblings) continue
+      for (let index = siblings.length - 1; index >= 0; index--) {
+        if (!children.includes(siblings[index].id!)) continue
+        forget(siblings[index])
+        siblings.splice(index, 1)
+      }
+      router.patchRoutes(parentId ?? null, [])
+    }
+  }
+
+  /**
+   * The route objects of react-router. On the client, server `loader`s are
+   * fetched. With `only`, the trees of those routes whose parent is not
+   * among them.
+   */
+  createRoutes(env: 'client' | 'server', only?: Set<string>): RouteObject[] {
     const children = new Map<string | undefined, RouteData[]>()
     for (const route of Object.values(this.routes)) {
-      const siblings = children.get(route.parentId) ?? []
+      if (only && !only.has(route.id)) continue
+      const parentId = only && route.parentId && !only.has(route.parentId) ? undefined : route.parentId
+      const siblings = children.get(parentId) ?? []
       siblings.push(route)
-      children.set(route.parentId, siblings)
+      children.set(parentId, siblings)
     }
     const build = (parentId?: string): RouteObject[] => (children.get(parentId) ?? []).map((route) => {
       const object: RouteObject = {
@@ -99,7 +167,7 @@ export class RouterService extends Service {
         children: build(route.id),
       }
       if (route.index) Object.assign(object, { index: true, children: undefined })
-      if (!parentId && env === 'client' && this.options.loading) object.HydrateFallback = this.options.loading
+      if (!route.parentId && env === 'client' && this.options.loading) object.HydrateFallback = this.options.loading
       if (this.options.routeModules[route.id]) {
         object.lazy = async () => {
           const module = await this.load(route.id)
