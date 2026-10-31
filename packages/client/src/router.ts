@@ -1,4 +1,5 @@
 import { Context as CordisContext, Service } from 'cordis'
+import type { ComponentType } from 'react'
 import { Dict } from 'cosmokit'
 import { type DataRouter, type Location, matchRoutes, type NavigateOptions, type NavigationType, Outlet, redirect, type RouteObject, type To } from 'react-router'
 import { LOADER_ENDPOINT, REDIRECT_HEADER } from './constants.ts'
@@ -24,6 +25,8 @@ export type HistoryType = 'browser' | 'hash' | 'memory'
 export interface RouterOptions {
   routes: Dict<RouteData>
   routeModules: RouteModules
+  /** rendered while the first routes of a client-rendered app load (`src/loading`) */
+  loading?: ComponentType
   /** basename of the app (default `/`) */
   base?: string
   history?: HistoryType
@@ -96,6 +99,7 @@ export class RouterService extends Service {
         children: build(route.id),
       }
       if (route.index) Object.assign(object, { index: true, children: undefined })
+      if (!parentId && env === 'client' && this.options.loading) object.HydrateFallback = this.options.loading
       if (this.options.routeModules[route.id]) {
         object.lazy = async () => {
           const module = await this.load(route.id)
