@@ -1,0 +1,25 @@
+{
+  "name": "@cormi/plugin-export-static",
+  "description": "Pre-render the pages of Cormi apps into HTML files for static hosts",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "ssg", "export-static"],
+  "peerDependencies": {
+    "cormi": "workspace:*"
+  },
+  "devDependencies": {
+    "cormi": "workspace:*"
+  }
+}
