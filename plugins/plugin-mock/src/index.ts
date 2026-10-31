@@ -2,11 +2,10 @@ import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { watch } from 'chokidar'
-import { type Context, Schema, send, toRequest } from 'cormi'
+import { type Context, createFile, Schema, send, toRequest } from 'cormi'
 import { match, type MatchFunction } from 'path-to-regexp'
 
 export const name = 'mock'
-export const inject = ['server']
 
 export type MockParams = Partial<Record<string, string | string[]>>
 
@@ -52,9 +51,23 @@ const MODULE_RE = /\.[cm]?[jt]s$/
  * routes, and editing a mock module applies on the next request.
  */
 export function apply(ctx: Context, config: Config) {
+  const dir = ctx.cormi.resolve(config.dir)
+  ctx.cli.generator('mock', {
+    description: `mocked routes: ${config.dir}/<name>.ts`,
+    async run(name) {
+      return [await createFile(join(dir, `${name}.ts`), [
+        `import { defineMock } from '@cormi/plugin-mock'`,
+        '',
+        `export default defineMock({`,
+        `  'GET /api/${name}': { message: 'hello from ${name}' },`,
+        `})`,
+        '',
+      ].join('\n'))]
+    },
+  })
+
   const { mode } = ctx.cormi
   if (mode !== 'dev' && !(mode === 'preview' && config.preview)) return
-  const dir = ctx.cormi.resolve(config.dir)
   let routes: Promise<MockRoute[]> | undefined
 
   const load = async () => {
@@ -82,26 +95,28 @@ export function apply(ctx: Context, config: Config) {
     }, 'watch mock modules')
   }
 
-  ctx.server.use(async (req, res, next) => {
-    let list: MockRoute[]
-    try {
-      list = await (routes ??= load())
-    } catch (error) {
-      routes = undefined
-      ctx.logger('mock').error(error)
+  ctx.inject(['server'], (ctx) => {
+    ctx.server.use(async (req, res, next) => {
+      let list: MockRoute[]
+      try {
+        list = await (routes ??= load())
+      } catch (error) {
+        routes = undefined
+        ctx.logger('mock').error(error)
+        return next()
+      }
+      const { pathname } = new URL(req.url, 'http://localhost')
+      for (const route of list) {
+        if (route.method && route.method !== req.method) continue
+        const matched = route.match(pathname)
+        if (!matched) continue
+        if (config.delay) await new Promise(resolve => setTimeout(resolve, config.delay))
+        const result = typeof route.value === 'function'
+          ? await (route.value as MockHandler)(toRequest(req), { params: matched.params })
+          : route.value
+        return send(req, res, result instanceof Response ? result : Response.json(result ?? null))
+      }
       return next()
-    }
-    const { pathname } = new URL(req.url, 'http://localhost')
-    for (const route of list) {
-      if (route.method && route.method !== req.method) continue
-      const matched = route.match(pathname)
-      if (!matched) continue
-      if (config.delay) await new Promise(resolve => setTimeout(resolve, config.delay))
-      const result = typeof route.value === 'function'
-        ? await (route.value as MockHandler)(toRequest(req), { params: matched.params })
-        : route.value
-      return send(req, res, result instanceof Response ? result : Response.json(result ?? null))
-    }
-    return next()
+    })
   })
 }
