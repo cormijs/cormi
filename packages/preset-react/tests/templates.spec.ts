@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getPackageName, renderRoutes, toSpecifier, transformExports } from '../src/index.ts'
+import { getPackageName, prefixSelectors, renderEntry, renderRoutes, toSpecifier, transformExports } from '../src/index.ts'
 
 describe('templates', () => {
   it('keeps package specifiers and relativizes files', () => {
@@ -30,5 +30,23 @@ describe('templates', () => {
     expect(result).not.toContain('node:fs')
     expect(result).not.toContain('loader()')
     expect(result).toContain('useLoaderData')
+  })
+
+  it('mounts the entry once the runtime plugins are applied, with src/loading', () => {
+    const app = { dir: '/app/src/.cormi', entries: new Set([{ file: '/app/src/app.tsx' }]), imports: new Set([{ source: '/app/src/global.css' }]) } as any
+    const code = renderEntry(app, { base: '/', history: 'browser', mountElementId: 'root', loading: '/app/src/loading.tsx' })
+    expect(code.indexOf('import "../global.css"')).toBe(0)
+    expect(code).toContain('import loading from "../loading.tsx"')
+    expect(code).toContain('history: "browser", loading })')
+    expect(code).toContain(`void Promise.allSettled(fibers).then(() => ctx.bail('app/bootstrap') || mount())`)
+    expect(code).toContain('export async function unmount()')
+  })
+
+  it('prefixes the selectors of overrides with body', () => {
+    const css = prefixSelectors('.a, body .b { color: red }\nhtml { margin: 0 }\n@media (min-width: 1px) { .c { color: blue } }\n@keyframes k { from { opacity: 0 } }')
+    expect(css).toContain('body .a, body .b { color: red }')
+    expect(css).toContain('html { margin: 0 }')
+    expect(css).toContain('body .c { color: blue }')
+    expect(css).toContain('from { opacity: 0 }')
   })
 })

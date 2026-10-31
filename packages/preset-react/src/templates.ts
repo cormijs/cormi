@@ -59,15 +59,16 @@ function renderEntries(dir: string, entries: Iterable<App.Entry>) {
   }
 }
 
-export function renderEntry(app: App, options: ContextOptions & { mountElementId: string }) {
+export function renderEntry(app: App, options: ContextOptions & { mountElementId: string; loading?: string }) {
   const entries = renderEntries(app.dir, app.entries)
   return [
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
     `import { Context, render, type RenderOptions, unwrapExports } from 'cormi/client'`,
     `import { routeModules, routes } from './routes'`,
+    ...options.loading ? [`import loading from ${json(toSpecifier(app.dir, options.loading))}`] : [],
     ...entries.imports,
     '',
-    `const ctx = new Context({ routes, routeModules, base: ${json(options.base)}, history: ${json(options.history)} })`,
+    `const ctx = new Context({ routes, routeModules, base: ${json(options.base)}, history: ${json(options.history)}${options.loading ? ', loading' : ''} })`,
     `const entries: [any, any][] = ${entries.array}`,
     `const fibers = entries.map(([module, config]) => ctx.plugin(unwrapExports(module), config))`,
     '',
