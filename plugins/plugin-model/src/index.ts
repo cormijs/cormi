@@ -23,10 +23,10 @@ interface Model {
 const MODEL_RE = /\.[jt]sx?$/
 
 /**
- * Global data models. Every module of `src/models` default-exports a React
- * hook; its return value is shared by every component calling
- * `useModel(<file name>)`. The models and their types are generated into
- * `src/.cormi/plugin-model`.
+ * Global data models. A module of `src/models` default-exporting a React
+ * hook is a model: the hook's return value is shared by every component
+ * calling `useModel(<file name>)`. Other modules (e.g. dva models) are left
+ * out. The models and their types are generated into `src/.cormi/plugin-model`.
  */
 export function apply(ctx: Context, config: Config) {
   const dir = ctx.cormi.resolve(config.dir)
@@ -58,7 +58,8 @@ export function apply(ctx: Context, config: Config) {
     '',
     `declare module '@cormi/plugin-model/client' {`,
     `  interface Models {`,
-    ...models.map(model => `    ${JSON.stringify(model.namespace)}: ReturnType<typeof import(${JSON.stringify(toSpecifier(model.file))}).default>`),
+    // modules that do not export a hook (e.g. dva models) are not models of useModel()
+    ...models.map(model => `    ${JSON.stringify(model.namespace)}: typeof import(${JSON.stringify(toSpecifier(model.file))}).default extends (...args: any[]) => infer R ? R : never`),
     `  }`,
     `}`,
     '',

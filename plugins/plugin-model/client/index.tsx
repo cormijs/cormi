@@ -25,6 +25,10 @@ class Store {
 
 const StoreContext = createContext<Store | null>(null)
 
+// modules exporting something else than a hook (e.g. dva models) are not models
+const hooks = Object.entries<unknown>(models).filter((entry): entry is [string, () => unknown] => typeof entry[1] === 'function')
+const namespaces = new Set(hooks.map(([namespace]) => namespace))
+
 /** Runs the hook of a model. The value is stored during render, so later siblings read it in the same pass. */
 function Executor(props: { store: Store; namespace: string; hook: () => unknown }) {
   const value = props.hook()
@@ -39,7 +43,7 @@ export default (ctx: Context) => {
     const [store] = useState(() => new Store())
     return (
       <StoreContext.Provider value={store}>
-        {Object.entries<() => unknown>(models).map(([namespace, hook]) => (
+        {hooks.map(([namespace, hook]) => (
           <Executor key={namespace} store={store} namespace={namespace} hook={hook} />
         ))}
         {children}
@@ -54,7 +58,7 @@ export function useModel<K extends keyof Models, T>(namespace: K, selector: (mod
 export function useModel(namespace: string, selector?: (model: any) => unknown) {
   const store = useContext(StoreContext)
   if (!store) throw new Error('useModel() is called outside of the app')
-  if (!(namespace in models)) throw new Error(`model ${namespace} is not found in src/models`)
+  if (!namespaces.has(namespace)) throw new Error(`model ${namespace} is not found in src/models`)
   const cache = useRef<{ value: unknown; result: unknown }>(undefined)
   const subscribe = useCallback((listener: () => void) => store.subscribe(namespace, listener), [store, namespace])
   const getSnapshot = () => {
