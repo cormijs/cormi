@@ -278,6 +278,55 @@ const examples: Record<string, Example> = {
     },
   },
 
+  federation: {
+    servers: [
+      { dir: 'federation-host', env: ([, users, orders]) => ({ USERS_URL: `${users}/`, ORDERS_URL: `${orders}/` }) },
+      { dir: 'federation-users' },
+      { dir: 'federation-orders' },
+    ],
+    async check(page, base, browser, [host, , orders]) {
+      // the menu lists the routes of both packages from their manifests; the eager users package is loaded
+      await page.goto(`${host}/users`)
+      await page.waitForSelector('#users >> text=Alice')
+      assert.deepEqual(await page.$$eval('#menu a', links => links.map(link => link.textContent)), ['Home', 'Users', 'Orders'])
+      assert.equal(await page.evaluate(() => document.documentElement.dataset.orders), undefined, 'the orders package loads on demand')
+
+      // a component exposed by the orders package loads the package, with its models
+      await page.click('#menu >> text=Home')
+      assert.equal(await text(page, '#packages'), 'packages: users, orders')
+      await page.waitForSelector('#cart >> text=cart: 0')
+      assert.equal(await page.evaluate(() => document.documentElement.dataset.orders), 'loaded')
+
+      // the pages of a package render in the host's layout
+      await page.click('#menu >> text=Orders')
+      await page.waitForSelector('#title >> text=Orders')
+      assert.equal(await page.$('#standalone'), null)
+      await page.click('#add-1')
+      await page.click('#add-2')
+      await page.click('#menu >> text=Home')
+      await page.waitForSelector('#cart >> text=cart: 2')
+
+      // a client loader of a package, and the service of another package
+      await page.click('#menu >> text=Orders')
+      await page.click('#orders >> text=Monitor')
+      await page.waitForSelector('#order >> text=Monitor')
+      assert.equal(await text(page, '#customer'), 'customer: Carol')
+      await page.click('#menu >> text=Users')
+      await page.waitForSelector('#users >> text=Alice')
+
+      // a route of a package loads directly
+      await page.goto(`${host}/orders/1`)
+      await page.waitForSelector('#order >> text=Keyboard')
+      assert.equal(await text(page, '#customer'), 'customer: Bob')
+
+      // a package runs by itself in its own frame
+      await page.goto(`${orders}/orders`)
+      await page.waitForSelector('#standalone >> #cart >> text=cart: 0')
+      await clickUntil(page, '#add-1', 'add to cart')
+      await page.waitForSelector('#cart >> text=cart: 1')
+    },
+  },
+
   qiankun: {
     servers: [
       { dir: 'qiankun-slave' },

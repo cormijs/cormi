@@ -1,0 +1,25 @@
+{
+  "name": "@cormi/example-federation-orders",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cormi dev",
+    "build": "cormi build",
+    "preview": "cormi preview",
+    "setup": "cormi setup"
+  },
+  "dependencies": {
+    "@cormi/plugin-federation": "workspace:*",
+    "@cormi/plugin-model": "workspace:*",
+    "@cormi/preset-react": "workspace:*",
+    "cordis": "4.0.0-rc.12",
+    "cormi": "workspace:*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^7.18.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
+  }
+}

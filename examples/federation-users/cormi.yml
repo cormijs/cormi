@@ -1,0 +1,13 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · users
+    port: 8012
+    routes:
+      - path: /users
+        component: users/index
+        name: Users
+- name: '@cormi/plugin-federation/package'
+  config:
+    name: users
+    # loaded with the host: other packages use its service
+    eager: true
