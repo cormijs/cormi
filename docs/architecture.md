@@ -109,7 +109,7 @@ export default (ctx: Context, config: Config) => {
 ```
 
 - 入口导出 `bootstrap`、`mount(options)`、`update(options)`、`unmount` 生命周期。入口会等运行时插件应用完毕后再挂载；某个插件在 `app/bootstrap`（bail）中返回 `true`，就表示由它接管挂载，例如 qiankun 子应用由加载脚本调用 `mount({ container, basename, origin, props })`。宿主传入的 props 用 `useHostProps()` 读取。
-- 核心服务在 root 上提供，任何运行时插件无需 inject：`ctx.$app`（根组件包装器，常用方法以 mixin 暴露为 `ctx.wrap(component, order?)`）、`ctx.$router`（React Router 7 数据路由）。名字带 `$`，与同一应用的 Node 端服务（`ctx.app`、`ctx.router`）在类型上互不冲突——koishi 的客户端也是这样做的。
+- 核心服务在 root 上提供，任何运行时插件无需 inject：`ctx.$app`（根组件包装器，常用方法以 mixin 暴露为 `ctx.wrap(component, order?)`）、`ctx.$router`（React Router 7 数据路由；`ctx.$router.add(routes, modules)` 在运行时添加路由，已渲染时直接修补路由器，插件销毁时移除）。名字带 `$`，与同一应用的 Node 端服务（`ctx.app`、`ctx.router`）在类型上互不冲突——koishi 的客户端也是这样做的。
 - 事件：`router/change(location, action)`（emit）、`app/bootstrap()`（bail）、`app/mount()`（emit）、`app/props(props)`（emit）。
 - `src/app.(ts|tsx)` 的默认导出会自动作为运行时插件挂载。
 - React 钩子：`useCordis()`（应用的 ctx）、`useContext()`（派生一个随组件卸载而销毁的 fiber，同 koishi）。
@@ -163,12 +163,55 @@ Node 部分以**包名**注册浏览器入口：`ctx.app.entry('@scope/plugin-fo
 | `@cormi/plugin-legacy` | `@vitejs/plugin-legacy` 构建旧浏览器 bundle，并按 manifest 把 nomodule 等标签注入应用的文档 |
 | `@cormi/plugin-mpa` | 多页应用：`src/pages/<name>/index.tsx` 各自成为 `<name>.html`，不带路由，运行时插件同样生效 |
 | `@cormi/plugin-mf` | 模块联邦（`@module-federation/vite`），host 在入口中初始化；服务端渲染时 remote 模块渲染为空 |
+| `@cormi/plugin-federation/host`、`/package` | 联邦应用：各子包单独构建、单独部署，底座通过 URL 汇集成一个应用，基础依赖为全局单例（见下文） |
 
 qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，不在 qiankun 的 JS 沙箱里；Vite 注入到 `document.head` 的样式不受样式隔离约束。这一点与 vite-plugin-qiankun 相同。
 
+## 联邦应用（`@cormi/plugin-federation`）
+
+适合多个团队用同一技术栈共同维护一个大应用：每个子包（package）是一个独立的 Cormi 应用，可以单独开发、单独构建、单独部署；底座（host）在启动时按 URL 收集子包，把它们的页面接入自己的路由和布局。与 qiankun 不同，子包不是被隔离的另一个应用，而是底座里的 cordis 插件：react、react-dom、react-router、cordis、`cormi/client` 以单例共享（可用 `shared` 追加，如 antd 或公共组件库），子包的页面在底座的路由器里渲染，子包之间可以通过 cordis 服务协作。这一设计来自 HZERO（`@hzerojs/plugin-micro`）的“模块联邦微前端”。
+
+```yaml
+# 底座 cormi.yml
+- name: '@cormi/plugin-federation/host'
+  config:
+    packages:                     # 写入构建产物 packages.json，部署时可直接修改
+      - https://cdn.example.com/users/
+      - url: https://cdn.example.com/orders/
+        eager: true               # 覆盖子包清单中的 eager
+    shared: [antd]                # 默认单例之外的共享依赖
+    parent: '@@/global-layout'    # 子包路由挂在哪个路由下，默认第一个顶层布局
+
+# 子包 cormi.yml
+- name: '@cormi/plugin-federation/package'
+  config:
+    name: orders                  # 容器名，默认取自 package.json
+    eager: false                  # true：随底座启动加载（例如提供服务的子包）
+    entries: ['@cormi/plugin-model/client']   # 随子包进入底座的插件运行时
+    exposes: { ./CartBadge: ./src/components/CartBadge.tsx }
+```
+
+| 环节 | 做法 |
+|---|---|
+| 子包构建 | 除了自身可独立运行的产物，额外输出 `remoteEntry.js`（暴露 `./plugin`）与清单 `federation.json`：名称、版本、入口、`eager`，以及**路由表（JSON）**。资源以相对路径加载，产物可以部署在任意 URL |
+| 底座启动 | 浏览器端读取 `packages.json`，并行获取各子包清单（失败的跳过），用 `registerRemotes` 注册远程容器，把所有子包的路由立即挂入 `$router`——菜单因此完整；`eager` 子包随即加载。全部完成后应用才挂载 |
+| 按需加载 | 子包路由的模块是惰性的：首次访问时加载 `<name>/plugin`，在底座里以子 fiber 应用子包的运行时插件（`src/app.tsx`、全局样式、`entries`），再加载页面模块。HZERO 的 `registerRegex` 因此不再需要 |
+| 共享页面与组件 | 子包的页面即底座的路由；`<RemoteComponent id="orders/CartBadge" />` 或 `ctx.$federation.import(id)` 加载其他子包暴露的模块（会先加载其所属子包） |
+| 子包间协作 | 子包的运行时插件可以提供 cordis 服务（如 `ctx.users`），其他子包与底座用 `ctx.get('users')` 或 `inject` 使用；提供服务的子包应设为 `eager` |
+| 开发 | 子包 `cormi dev` 时同时作为独立应用运行（使用自己的布局）并提供 `/federation.json` 与 `remoteEntry.js`；dev 模式下底座读取 `localStorage['cormi:packages']`（URL 数组），可把某个子包指向本地开发服务器 |
+
+清单中的路由：子包的顶层布局（独立运行时的外框）与 404 页不进入底座，顶层路由使用绝对路径，id 加上 `<name>/` 前缀。约束：
+
+- 共享依赖需是应用的直接依赖（pnpm 下 `react-router`、`cordis` 也要写进 package.json），否则插件会警告：模块联邦按应用能解析的包来共享和预构建。
+- 子包部署的服务器需允许底座跨域读取（CORS）；`cormi dev` / `cormi preview` 已经允许。
+- 子包页面在浏览器中运行，数据用 `clientLoader` 获取；导出服务端 `loader` 的路由会在构建时警告。底座开启 SSR 时，子包路由由客户端渲染，替换服务端的 404。
+- 懒加载的子包通过 `ctx.wrap()` 添加包装器时会让根组件重新挂载一次；需要全局 Provider 的子包宜设为 `eager`。
+
+`@cormi/client` 为此调整了两处：`$router.add()`；渲染时才读取 react-router 的工厂函数——子包独立运行时，共享模块在其模块求值之后才就绪。
+
 ## 与 umi 的覆盖情况
 
-已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置（title、metas、links、scripts、styles、favicons、crossorigin）；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载（`<Link prefetch>`）；exportStatic、MPA、legacy；dev、build、preview、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件。
+已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置（title、metas、links、scripts、styles、favicons、crossorigin）；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载（`<Link prefetch>`）；exportStatic、MPA、legacy；dev、build、preview、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件；此外还有 umi 没有内置的联邦应用（federation）。
 
 尚未覆盖：access、locale 插件（按计划暂缓）。webpack、mako、mfsu 这类与打包器绑定的功能有意不做。
 

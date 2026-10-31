@@ -59,5 +59,5 @@ cormi preview   # 运行构建产物
 | `packages/server` | `ctx.server` 上的页面、loader 端点、API 路由、静态资源 |
 | `packages/preset-react` | 组合以上服务的 preset 与 React 渲染器 |
 | `packages/cormi` | CLI，Node 端 API（`cormi`）与浏览器端 API（`cormi/client`） |
-| `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、qiankun、lint |
-| `examples/*` | basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、qiankun-master + qiankun-slave |
+| `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
+| `examples/*` | basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave |
