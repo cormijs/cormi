@@ -11,6 +11,10 @@ export interface RouteData {
   hasLoader?: boolean
   /** the route module exports `clientLoader`, which runs in the browser */
   hasClientLoader?: boolean
+  /** a layout wrapping other routes */
+  isLayout?: boolean
+  /** static data of the route, e.g. `name` and `icon` for menus */
+  meta?: Record<string, any>
 }
 
 /** Exports of a route module. */
