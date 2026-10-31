@@ -74,6 +74,9 @@ describe('services', () => {
 
     await fiber.dispose()
     expect(await html.render()).not.toContain('name="x"')
+
+    html.config.crossorigin = 'anonymous'
+    expect(await html.render({ scripts: ['/a.js'], styles: ['/a.css'] })).toMatch(/<link rel="stylesheet" href="\/a.css" crossorigin="anonymous">[\s\S]*<script type="module" src="\/a.js" crossorigin="anonymous">/)
   })
 
   it('generates files from contributions and removes them with their plugin', async () => {

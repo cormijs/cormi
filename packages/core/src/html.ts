@@ -78,15 +78,16 @@ export class Html extends Service {
     for (const attrs of config.metas) head.push(renderTag({ tag: 'meta', attrs }))
     for (const attrs of config.links) head.push(renderTag({ tag: 'link', attrs }))
     for (const style of config.styles) head.push(renderTag(toStyle(style)))
-    for (const href of options.styles ?? []) head.push(renderTag(toStyle(href)))
-    for (const href of options.preloads ?? []) head.push(renderTag({ tag: 'link', attrs: { rel: 'modulepreload', href } }))
+    const crossorigin = config.crossorigin || undefined
+    for (const href of options.styles ?? []) head.push(renderTag({ tag: 'link', attrs: { rel: 'stylesheet', href, crossorigin } }))
+    for (const href of options.preloads ?? []) head.push(renderTag({ tag: 'link', attrs: { rel: 'modulepreload', href, crossorigin } }))
     for (const script of config.headScripts) head.push(renderTag(toScript(script)))
     for (const tag of this._head) head.push(renderTag(tag))
     if (options.head) head.push(options.head)
 
     const body = [`<div id="${escapeHtml(config.mountElementId)}">${options.content ?? ''}</div>`]
     if (options.body) body.push(options.body)
-    for (const src of options.scripts ?? []) body.push(renderTag({ tag: 'script', attrs: { type: 'module', src } }))
+    for (const src of options.scripts ?? []) body.push(renderTag({ tag: 'script', attrs: { type: 'module', src, crossorigin } }))
     for (const script of config.scripts) body.push(renderTag(toScript(script)))
     for (const tag of this._body) body.push(renderTag(tag))
 
@@ -138,6 +139,8 @@ export namespace Html {
     scripts: (string | Tag)[]
     /** scripts in `<head>`: a URL or a tag */
     headScripts: (string | Tag)[]
+    /** `crossorigin` of the entry's scripts, stylesheets and preloads, e.g. when they are served by a CDN */
+    crossorigin: false | 'anonymous' | 'use-credentials'
   }
 
   export interface RenderOptions {
@@ -175,5 +178,7 @@ export namespace Html {
     styles: Schema.array(tag).default([]),
     scripts: Schema.array(tag).default([]),
     headScripts: Schema.array(tag).default([]),
+    crossorigin: Schema.union([Schema.const(false), 'anonymous', 'use-credentials'] as const).default(false)
+      .description('crossorigin of the entry\'s scripts, stylesheets and preloads'),
   })
 }
