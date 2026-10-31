@@ -120,6 +120,7 @@ export function renderServer(app: App, options: ContextOptions) {
     `for (const [module, config] of ${entries.array} as [any, any][]) ctx.plugin(unwrapExports(module), config)`,
     '',
     `export const handler = createRequestHandler(ctx)`,
+    `export const base = ${json(options.base)}`,
     '',
     `export const modules = {`,
     ...servers.map(([key], index) => `  ${json(key)}: server${index},`),
