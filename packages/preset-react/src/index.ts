@@ -4,9 +4,11 @@ import { ApiRoutes, Pages, Proxy, Static } from '@cormi/server'
 import Vite from '@cormi/vite'
 import { Context } from 'cordis'
 import { Conventions } from './conventions.ts'
+import { Generators } from './generators.ts'
 import { Renderer } from './renderer.ts'
 
 export * from './conventions.ts'
+export * from './generators.ts'
 export * from './renderer.ts'
 export * from './route-exports.ts'
 export * from './templates.ts'
@@ -50,6 +52,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(Vite, config)
   ctx.plugin(Renderer, config)
   ctx.plugin(Conventions)
+  ctx.plugin(Generators)
   ctx.plugin(Pages, config)
   ctx.plugin(ApiRoutes)
   if (mode === 'dev' || mode === 'preview') {

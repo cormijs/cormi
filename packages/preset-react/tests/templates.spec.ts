@@ -50,3 +50,11 @@ describe('templates', () => {
     expect(css).toContain('from { opacity: 0 }')
   })
 })
+
+describe('generators', () => {
+  it('names components after the last segment', async () => {
+    const { toComponentName } = await import('../src/index.ts')
+    expect(toComponentName('users/order-list')).toBe('OrderList')
+    expect(toComponentName('button')).toBe('Button')
+  })
+})
