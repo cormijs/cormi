@@ -73,7 +73,8 @@ export class Html extends Service {
       '<meta charset="utf-8">',
       '<meta name="viewport" content="width=device-width, initial-scale=1">',
     ]
-    if (config.title) head.push(`<title>${escapeHtml(config.title)}</title>`)
+    const title = options.title ?? config.title
+    if (title) head.push(`<title>${escapeHtml(title)}</title>`)
     for (const href of config.favicons) head.push(renderTag({ tag: 'link', attrs: { rel: 'icon', href } }))
     for (const attrs of config.metas) head.push(renderTag({ tag: 'meta', attrs }))
     for (const attrs of config.links) head.push(renderTag({ tag: 'link', attrs }))
@@ -146,6 +147,8 @@ export namespace Html {
   export interface RenderOptions {
     /** URL of the request being rendered */
     url?: string
+    /** the title of this document, instead of the configured one */
+    title?: string
     /** server-rendered markup of the app */
     content?: string
     /** entry modules */
