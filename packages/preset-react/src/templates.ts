@@ -19,14 +19,27 @@ export function getPackageName(specifier: string) {
   return specifier.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0]
 }
 
+/** Route props of umi-style configured routes that go to the client's `meta`. */
+const META_KEYS = ['name', 'icon', 'hideInMenu']
+
+function getMeta(route: Route) {
+  const meta: Record<string, unknown> = { ...route.meta }
+  for (const key of META_KEYS) {
+    if (route[key] !== undefined) meta[key] = route[key]
+  }
+  return Object.keys(meta).length ? meta : undefined
+}
+
 export function renderRoutes(dir: string, routes: Dict<Route>) {
   const data = Object.values(routes).map(route => ({
     id: route.id,
     path: route.path,
     index: route.index || undefined,
     parentId: route.parentId,
+    isLayout: route.isLayout || undefined,
     hasLoader: route.exports?.includes('loader') || undefined,
     hasClientLoader: route.exports?.includes('clientLoader') || undefined,
+    meta: getMeta(route),
   }))
   const modules = Object.values(routes)
     .filter(route => route.file)
