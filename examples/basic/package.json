@@ -9,6 +9,7 @@
     "setup": "cormi setup"
   },
   "dependencies": {
+    "@cormi/plugin-export-static": "workspace:*",
     "@cormi/preset-react": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",

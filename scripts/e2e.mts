@@ -6,6 +6,9 @@
 // with `--dev`, it is served by the dev server.
 import assert from 'node:assert/strict'
 import { type ChildProcess, execFileSync, spawn } from 'node:child_process'
+import { readFile, stat } from 'node:fs/promises'
+import { createServer } from 'node:http'
+import { extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Browser, Page } from 'playwright-core'
 import { launch } from './browser.ts'
@@ -27,6 +30,22 @@ interface Example {
 
 async function text(page: Page, selector: string) {
   return (await page.textContent(selector))?.trim()
+}
+
+/** A static host for exported pages: files, then `<path>/index.html`. */
+async function serveStatic(dir: string, port: number) {
+  const types: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' }
+  const server = createServer(async (req, res) => {
+    const path = decodeURIComponent(new URL(req.url!, 'http://localhost').pathname)
+    for (const file of [join(dir, path), join(dir, path, 'index.html')]) {
+      if (!(await stat(file).catch(() => undefined))?.isFile()) continue
+      res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' })
+      return res.end(await readFile(file))
+    }
+    res.writeHead(404).end()
+  })
+  await new Promise<void>(resolve => server.listen(port, resolve))
+  return server
 }
 
 /** Click until the element reads `expected`: server-rendered markup ignores clicks until it hydrates. */
@@ -73,6 +92,23 @@ const checks: Record<string, Check> = {
     assert.equal((await fetch(`${base}/api/users/9`)).status, 404)
     assert.equal((await fetch(`${base}/api/users`, { method: 'POST' })).status, 405)
     assert.deepEqual(await fetch(`${base}/proxy/users/1`).then(res => res.json()), { id: 1, name: 'Alice' })
+
+    // pages exported by @cormi/plugin-export-static work on a static host
+    if (!dev) {
+      const port = Number(new URL(base).port) + 5
+      const host = await serveStatic(`${root}examples/basic/dist`, port)
+      try {
+        await page.goto(`http://localhost:${port}/about`)
+        assert.match((await text(page, '#loader'))!, /^served by \w+ on \d{4}-\d{2}-\d{2}$/)
+        await page.waitForFunction(() => document.title === 'Cormi · /about')
+        await page.goto(`http://localhost:${port}/users/1`)
+        assert.equal(await text(page, '#user'), 'User 1')
+        await page.click('text=Home')
+        await page.waitForSelector('#title')
+      } finally {
+        host.close()
+      }
+    }
   },
 
   async 'with-tailwind'(page, base) {

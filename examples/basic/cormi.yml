@@ -11,3 +11,7 @@
 - name: ./plugin.ts
   config:
     generator: cormi
+# pre-renders the pages into dist/ after builds
+- name: '@cormi/plugin-export-static'
+  config:
+    extraRoutePaths: [/users/1]

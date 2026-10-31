@@ -39,6 +39,9 @@
     },
     {
       "path": "./plugins/plugin-request"
+    },
+    {
+      "path": "./plugins/plugin-export-static"
     }
   ]
 }

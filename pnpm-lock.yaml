@@ -29,6 +29,9 @@ importers:
 
   examples/basic:
     dependencies:
+      '@cormi/plugin-export-static':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-export-static
       '@cormi/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
@@ -456,6 +459,12 @@ importers:
       react:
         specifier: ^19.3.1
         version: 19.3.1
+
+  plugins/plugin-export-static:
+    devDependencies:
+      cormi:
+        specifier: workspace:*
+        version: link:../../packages/cormi
 
   plugins/plugin-initial-state:
     dependencies:
