@@ -19,5 +19,7 @@ export interface Route {
   layout?: boolean
   /** named exports of the route module, collected by `ctx.router` */
   exports?: string[]
+  /** static data of the route, sent to the client (e.g. `name`, `icon`) */
+  meta?: Record<string, any>
   [key: string]: any
 }
