@@ -194,7 +194,7 @@ export class Vite extends Service {
       build: {
         assetsDir: 'static',
         sourcemap: this.config.sourcemap,
-        target: 'es2022',
+        target: toBuildTarget(this.config.targets),
       },
     }
   }
@@ -266,6 +266,14 @@ export class Vite extends Service {
   }
 }
 
+/** umi's `{ chrome: 87, safari: 14 }` or esbuild targets (`['chrome87', 'es2020']`); Vite's default otherwise. */
+export function toBuildTarget(targets: Vite.Config['targets']) {
+  if (!targets) return
+  if (Array.isArray(targets)) return targets.length ? targets : undefined
+  const list = Object.entries(targets).filter(([, version]) => version !== false).map(([browser, version]) => `${browser}${version}`)
+  return list.length ? list : undefined
+}
+
 export namespace Vite {
   export interface ConfigEnv {
     command: 'serve' | 'build'
@@ -292,6 +300,8 @@ export namespace Vite {
     alias: Dict<string>
     define: Dict<any>
     sourcemap: boolean
+    /** browsers to build for: `{ chrome: 87, safari: 14 }` or esbuild targets */
+    targets?: string[] | Record<string, number | string | false>
     /** raw Vite config, merged over the defaults */
     vite?: InlineConfig
   }
@@ -302,6 +312,7 @@ export namespace Vite {
     alias: Schema.dict(String).default({}),
     define: Schema.dict(Schema.any()).default({}),
     sourcemap: Schema.boolean().default(false),
+    targets: Schema.union([Schema.array(String), Schema.dict(Schema.union([Number, String, Schema.const(false)]))]).description('browsers to build for'),
     vite: Schema.any().description('raw Vite config, merged over the defaults'),
   })
 }

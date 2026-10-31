@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getEntryAssets, toAliases } from '../src/config.ts'
+import { toBuildTarget } from '../src/index.ts'
 
 describe('vite helpers', () => {
   it('turns aliases into exact or prefix matches, longest key first', () => {
@@ -21,5 +22,11 @@ describe('vite helpers', () => {
       css: ['/base/static/cormi.css', '/base/static/index.css'],
       preload: ['/base/static/shared.js'],
     })
+  })
+
+  it('turns targets into esbuild targets', () => {
+    expect(toBuildTarget({ chrome: 87, safari: '14', ie: false })).toEqual(['chrome87', 'safari14'])
+    expect(toBuildTarget(['es2020'])).toEqual(['es2020'])
+    expect(toBuildTarget(undefined)).toBeUndefined()
   })
 })
