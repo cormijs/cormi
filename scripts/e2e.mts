@@ -250,6 +250,22 @@ const examples: Record<string, Example> = {
     },
   },
 
+  'with-mpa': {
+    async check(page, base) {
+      await page.goto(`${base}/`)
+      assert.equal(await page.title(), 'Home · Cormi MPA')
+      await clickUntil(page, 'button', 'clicked 1')
+      // pages are documents of their own: links load them
+      await page.click('nav >> text=About')
+      await page.waitForSelector('#title >> text=About page')
+      assert.equal(new URL(page.url()).pathname, '/about.html')
+      assert.equal(await page.title(), 'About · Cormi MPA')
+      await page.goto(`${base}/about`)
+      await page.waitForSelector('#title >> text=About page')
+      assert.equal((await fetch(`${base}/nothing`)).status, 404)
+    },
+  },
+
   qiankun: {
     servers: [
       { dir: 'qiankun-slave' },

@@ -1,0 +1,4 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · MPA
+- name: '@cormi/plugin-mpa'

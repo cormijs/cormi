@@ -250,6 +250,31 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
 
+  examples/with-mpa:
+    dependencies:
+      '@cormi/plugin-mpa':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-mpa
+      '@cormi/preset-react':
+        specifier: workspace:*
+        version: link:../../packages/preset-react
+      cormi:
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.1
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+
   examples/with-request:
     dependencies:
       '@cormi/plugin-mock':
@@ -724,6 +749,16 @@ importers:
       react:
         specifier: ^19.3.1
         version: 19.3.1
+
+  plugins/plugin-mpa:
+    dependencies:
+      chokidar:
+        specifier: ^4.0.3
+        version: 4.0.3
+    devDependencies:
+      cormi:
+        specifier: workspace:*
+        version: link:../../packages/cormi
 
   plugins/plugin-qiankun:
     dependencies:
