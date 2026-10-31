@@ -1,0 +1,4 @@
+/* prefixed with `body`, so it wins over .layout nav a of the same specificity */
+.layout nav a {
+  color: rgb(124, 58, 237);
+}

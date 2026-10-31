@@ -47,10 +47,15 @@ const checks: Record<string, Check> = {
     assert.match((await text(noJs, '#loader'))!, /^served by \w+ on \d{4}-\d{2}-\d{2}$/)
     assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('nav')!).display), 'flex')
     assert.equal(await noJs.getAttribute('meta[name=generator]', 'content'), 'cormi')
+    // file conventions: global.css, overrides.css (prefixed with body), public/favicon.svg
+    assert.equal(await noJs.evaluate(() => getComputedStyle(document.body).margin), '0px')
+    assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('nav a')!).color), 'rgb(124, 58, 237)')
+    assert.equal(await noJs.getAttribute('link[rel=icon]', 'href'), '/favicon.svg')
 
     // hydrated, with the runtime plugin of src/app.ts
     await page.goto(`${base}/`)
     await page.waitForFunction(() => document.title === 'Cormi · /')
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.global), 'loaded')
     await page.click('button')
     await page.click('button')
     assert.equal(await text(page, 'button'), 'clicked 2')
@@ -67,9 +72,12 @@ const checks: Record<string, Check> = {
     assert.deepEqual(await fetch(`${base}/api/users/2`).then(res => res.json()), { id: 2, name: 'Bob' })
     assert.equal((await fetch(`${base}/api/users/9`)).status, 404)
     assert.equal((await fetch(`${base}/api/users`, { method: 'POST' })).status, 405)
+    assert.deepEqual(await fetch(`${base}/proxy/users/1`).then(res => res.json()), { id: 1, name: 'Alice' })
   },
 
   async 'with-tailwind'(page, base) {
+    const html = await fetch(base, { headers: { accept: 'text/html' } }).then(res => res.text())
+    assert.match(html, /<script type="module" src="[^"]+" crossorigin="anonymous">/)
     await page.goto(`${base}/`)
     await page.click('button')
     assert.equal(await text(page, 'button'), 'clicked 1')

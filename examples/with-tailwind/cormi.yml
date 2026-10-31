@@ -1,4 +1,5 @@
 - name: '@cormi/preset-react'
   config:
     title: Cormi · Tailwind CSS
+    crossorigin: anonymous
 - name: '@cormi/plugin-tailwindcss'

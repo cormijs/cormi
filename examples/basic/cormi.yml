@@ -2,6 +2,12 @@
   config:
     title: Cormi Basic
     ssr: true
+    proxy:
+      # forwards /proxy/* to this app's own API, to show the option
+      /proxy:
+        target: !!js "'http://localhost:' + (process.env.CORMI_PORT || 8000) + '/api'"
+        pathRewrite:
+          ^/proxy: ''
 - name: ./plugin.ts
   config:
     generator: cormi

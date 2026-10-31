@@ -1,3 +1,5 @@
+.layout { padding: 0 24px; }
 .layout nav { display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid #ddd; }
+.layout nav a { color: rgb(37, 99, 235); }
 .layout .count { margin-left: auto; color: #888; }
 .layout main { padding: 16px 0; }

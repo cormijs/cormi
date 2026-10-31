@@ -371,6 +371,9 @@ importers:
       cosmokit:
         specifier: ^1.8.1
         version: 1.8.1
+      postcss:
+        specifier: ^8.5.6
+        version: 8.5.32
       react:
         specifier: '>=19'
         version: 19.3.1
