@@ -301,6 +301,28 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
 
+  examples/with-console:
+    dependencies:
+      '@cormi/preset-react':
+        specifier: workspace:*
+        version: link:../../packages/preset-react
+      cormi:
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.1
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+
   examples/with-data:
     dependencies:
       '@cormi/plugin-dva':
@@ -546,6 +568,49 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
 
+  packages/console:
+    dependencies:
+      '@cordisjs/plugin-loader':
+        specifier: 1.0.0-rc.9
+        version: 1.0.0-rc.9(cordis@4.0.0-rc.12)
+      '@cordisjs/plugin-server':
+        specifier: ^1.7.0
+        version: 1.7.0(cordis@4.0.0-rc.12)
+      '@cormi/client':
+        specifier: workspace:*
+        version: link:../client
+      '@cormi/core':
+        specifier: workspace:*
+        version: link:../core
+      '@cormi/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@fontsource-variable/recursive':
+        specifier: ^5.3.0
+        version: 5.3.0
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+      cosmokit:
+        specifier: ^1.8.1
+        version: 1.8.1
+      schemastery:
+        specifier: ^3.18.0
+        version: 3.18.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.1
+        version: 19.3.1(react@19.3.1)
+
   packages/core:
     dependencies:
       '@cordisjs/plugin-hmr':
@@ -605,6 +670,9 @@ importers:
       '@cormi/client':
         specifier: workspace:*
         version: link:../client
+      '@cormi/console':
+        specifier: workspace:*
+        version: link:../console
       '@cormi/core':
         specifier: workspace:*
         version: link:../core
@@ -654,6 +722,9 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
+      '@cormi/console':
+        specifier: workspace:*
+        version: link:../console
       '@cormi/core':
         specifier: workspace:*
         version: link:../core

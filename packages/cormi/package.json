@@ -24,12 +24,14 @@
       "types": "./lib/client-server.d.ts",
       "default": "./lib/client-server.js"
     },
+    "./console": "./console.ts",
     "./package.json": "./package.json"
   },
   "files": [
     "bin",
     "lib",
-    "src"
+    "src",
+    "console.ts"
   ],
   "license": "MIT",
   "keywords": [
@@ -55,6 +57,7 @@
     "@cordisjs/plugin-loader": "1.0.0-rc.9",
     "@cordisjs/plugin-server": "^1.7.0",
     "@cormi/client": "workspace:*",
+    "@cormi/console": "workspace:*",
     "@cormi/core": "workspace:*",
     "@cormi/server": "workspace:*",
     "@cormi/vite": "workspace:*",
