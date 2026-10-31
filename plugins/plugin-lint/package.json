@@ -1,0 +1,32 @@
+{
+  "name": "@cormi/plugin-lint",
+  "description": "cormi lint: ESLint with a default config for TypeScript and React hooks",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "eslint", "lint"],
+  "peerDependencies": {
+    "cormi": "workspace:*"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "typescript-eslint": "^8.72.1"
+  },
+  "devDependencies": {
+    "cormi": "workspace:*"
+  }
+}
