@@ -1,0 +1,9 @@
+- name: '@cormi/preset-react'
+  config:
+    title: Cormi · styles
+    ssr: true
+- name: '@cormi/plugin-styled-components'
+  config:
+    theme:
+      primary: '#db2777'
+- name: '@cormi/plugin-unocss'

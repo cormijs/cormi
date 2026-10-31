@@ -23,5 +23,10 @@
     "typescript": "~5.9.3",
     "vitest": "^4.1.12",
     "vite": "^7.3.7"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "^7.3.7"
+    }
   }
 }

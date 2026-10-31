@@ -182,6 +182,32 @@ const examples: Record<string, Example> = {
     },
   },
 
+  'with-styles': {
+    async check(page, base, browser) {
+      // both kinds of styles are server-rendered
+      const noJs = await (await browser.newContext({ javaScriptEnabled: false })).newPage()
+      await noJs.goto(`${base}/`)
+      assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('#styled')!).backgroundColor), 'rgb(219, 39, 119)')
+      assert.notEqual(await noJs.evaluate(() => getComputedStyle(document.querySelector('#title')!).color), 'rgb(0, 0, 0)')
+      await page.goto(`${base}/`)
+      await clickUntil(page, '#styled', 'clicked 1')
+    },
+  },
+
+  'with-data': {
+    async check(page, base) {
+      await page.goto(`${base}/`)
+      await page.waitForFunction(() => document.querySelectorAll('#todos li').length === 2)
+      await clickUntil(page, '#add', 'add')
+      await page.waitForFunction(() => document.querySelector('#count')?.textContent === 'count: 1')
+      await page.click('#add-later')
+      await page.waitForFunction(() => document.querySelector('#add-later')?.textContent === 'adding…')
+      await page.waitForFunction(() => document.querySelector('#count')?.textContent === 'count: 2')
+      await page.check('#compact')
+      assert.equal(await text(page, '#mode'), 'compact')
+    },
+  },
+
   qiankun: {
     servers: [
       { dir: 'qiankun-slave' },

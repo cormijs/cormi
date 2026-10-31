@@ -45,6 +45,24 @@
     },
     {
       "path": "./plugins/plugin-lint"
+    },
+    {
+      "path": "./plugins/plugin-react-query"
+    },
+    {
+      "path": "./plugins/plugin-styled-components"
+    },
+    {
+      "path": "./plugins/plugin-unocss"
+    },
+    {
+      "path": "./plugins/plugin-analytics"
+    },
+    {
+      "path": "./plugins/plugin-valtio"
+    },
+    {
+      "path": "./plugins/plugin-dva"
     }
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "name": "@cormi/example-with-data",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cormi dev",
+    "build": "cormi build",
+    "preview": "cormi preview",
+    "setup": "cormi setup"
+  },
+  "dependencies": {
+    "@cormi/plugin-dva": "workspace:*",
+    "@cormi/plugin-mock": "workspace:*",
+    "@cormi/plugin-react-query": "workspace:*",
+    "@cormi/plugin-valtio": "workspace:*",
+    "@cormi/preset-react": "workspace:*",
+    "@tanstack/react-query": "^5.105.0",
+    "cormi": "workspace:*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
+  }
+}
