@@ -59,8 +59,13 @@
     "@cormi/server": "workspace:*",
     "@cormi/vite": "workspace:*",
     "cordis": "4.0.0-rc.12",
+    "react-router": "^7.18.5",
     "tsx": "^4.23.15",
     "yargs-parser": "^21.1.1"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
   },
   "devDependencies": {
     "@types/yargs-parser": "^21.0.3"
