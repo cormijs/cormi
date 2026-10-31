@@ -1,0 +1,45 @@
+{
+  "name": "@cormi/plugin-federation",
+  "description": "Federated apps for Cormi: packages built and deployed apart, linked by URL into one app with shared singletons",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./host": {
+      "source": "./src/host.ts",
+      "types": "./lib/host.d.ts",
+      "default": "./lib/host.js"
+    },
+    "./host/client": "./client/host.tsx",
+    "./package": {
+      "source": "./src/package.ts",
+      "types": "./lib/package.d.ts",
+      "default": "./lib/package.js"
+    },
+    "./client": "./client/index.tsx",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src", "client"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "module-federation", "micro-frontends"],
+  "peerDependencies": {
+    "cormi": "workspace:*",
+    "react": ">=19"
+  },
+  "dependencies": {
+    "@cormi/plugin-mf": "workspace:*",
+    "@module-federation/runtime": "2.9.2",
+    "cordis": "4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "cormi": "workspace:*",
+    "react": "^19.3.1"
+  }
+}
