@@ -1,0 +1,31 @@
+{
+  "name": "@cormi/plugin-styled-components",
+  "description": "styled-components for Cormi apps: theme and server-rendered styles",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/index.tsx",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src", "client"],
+  "license": "MIT",
+  "keywords": ["cormi", "cormi-plugin", "cordis", "styled-components", "css-in-js"],
+  "peerDependencies": {
+    "cormi": "workspace:*",
+    "react": ">=19",
+    "styled-components": "^6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "cormi": "workspace:*",
+    "react": "^19.3.1",
+    "styled-components": "^6.6.0"
+  }
+}
