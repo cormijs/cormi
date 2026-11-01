@@ -56,10 +56,10 @@ const DIMENSIONS: Dimension[] = ['bundler', 'renderer']
 
 /** The implementations of the bundler and the UI framework, for packages that declare nothing. */
 const IMPLEMENTATIONS: Dict<[Dimension, string]> = {
-  '@cormi/vite': ['bundler', 'vite'],
-  '@cormi/rsbuild': ['bundler', 'rsbuild'],
-  '@cormi/react': ['renderer', 'react'],
-  '@cormi/vue': ['renderer', 'vue'],
+  '@cormijs/vite': ['bundler', 'vite'],
+  '@cormijs/rsbuild': ['bundler', 'rsbuild'],
+  '@cormijs/react': ['renderer', 'react'],
+  '@cormijs/vue': ['renderer', 'vue'],
 }
 
 const strings = (value: unknown) => Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : undefined
@@ -87,7 +87,7 @@ function toCompat(value: any): Manifest.Compat {
  * it, the keywords its tooling writes (`bundler:vite`, `renderer:*`,
  * `required:server`…) are read, as search results of the registry have
  * them; without either, the bundler and the UI framework are inferred
- * from the peer dependencies on their implementations (`@cormi/react`).
+ * from the peer dependencies on their implementations (`@cormijs/react`).
  */
 export function conclude(meta: PackageMeta): Manifest {
   const field = meta.cormi && typeof meta.cormi === 'object' ? meta.cormi : undefined
@@ -199,7 +199,7 @@ export interface CompatResult {
 
 /**
  * Whether a plugin works in an app. A dimension the app does not have yet
- * (no bundler) is not judged, nor one the package provides: `@cormi/rsbuild`
+ * (no bundler) is not judged, nor one the package provides: `@cormijs/rsbuild`
  * (`implements: ['bundler']`, `bundler: ['rsbuild']`) replaces the bundler.
  */
 export function checkCompat(manifest: Manifest, stack: Stack): CompatResult {
@@ -219,5 +219,36 @@ export function checkCompat(manifest: Manifest, stack: Stack): CompatResult {
     status: reasons.length ? 'incompatible' : manifest.source === 'unknown' ? 'unknown' : 'ok',
     reasons,
     inferred: manifest.source === 'inferred',
+  }
+}
+
+/** The index of the Cormi registry (cormijs/registry): the plugins on npm, synced daily. */
+export interface RegistryIndex {
+  version: 1
+  /** when the index was synced */
+  time: string
+  objects: RegistryObject[]
+}
+
+/** A plugin package of the registry index, at its latest version. */
+export interface RegistryObject {
+  name: string
+  version: string
+  description?: string
+  keywords: string[]
+  /** when this version was published */
+  date: string
+  links: { npm: string; homepage?: string; repository?: string }
+  manifest: Manifest
+  /** published by the Cormi project (`@cormijs/*`, `cormi`) */
+  official: boolean
+  downloads?: { lastMonth: number }
+  /** the result of `cormi plugin check` on this version */
+  verified?: {
+    time: string
+    /** the declaration the check infers */
+    compat: Manifest.Compat & { exports?: Record<string, Manifest.Compat> }
+    /** the package declares the same */
+    matches: boolean
   }
 }

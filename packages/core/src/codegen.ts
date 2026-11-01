@@ -31,7 +31,7 @@ function getMeta(route: Route) {
 /**
  * The route manifest of the browser (`src/.cormi/routes.ts`): the route
  * data, and the modules imported lazily. `client` is the module of the UI
- * framework's client that types them, e.g. `@cormi/react/client`.
+ * framework's client that types them, e.g. `@cormijs/react/client`.
  */
 export function renderRoutes(dir: string, routes: Dict<Route>, client: string) {
   const data = Object.values(routes).map(route => ({

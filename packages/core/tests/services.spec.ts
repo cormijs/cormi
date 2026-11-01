@@ -23,7 +23,7 @@ describe('services', () => {
     // eslint-disable-next-line no-new
     new Cormi(ctx, { cwd, mode: 'setup' })
     await ctx.plugin(Router, {})
-    // a UI framework registers its route modules, as @cormi/react does
+    // a UI framework registers its route modules, as @cormijs/react does
     ctx.get('router')!.extension('.tsx')
     await ctx.get('router')!.flush()
     await ctx.plugin(Html, { title: 'Test' })

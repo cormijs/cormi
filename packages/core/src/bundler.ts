@@ -30,7 +30,7 @@ export interface EntryAssets {
 }
 
 /**
- * The bundler of the app (`ctx.bundler`), implemented by `@cormi/vite` and
+ * The bundler of the app (`ctx.bundler`), implemented by `@cormijs/vite` and
  * other bundler plugins. The core and the neutral plugins only use this
  * contract; what is specific to one bundler stays on its own service
  * (`ctx.vite`), which plugins inject when they need it.
@@ -109,7 +109,7 @@ export namespace Bundler {
 }
 
 /**
- * The UI framework of the app (`ctx.renderer`), implemented by `@cormi/react`
+ * The UI framework of the app (`ctx.renderer`), implemented by `@cormijs/react`
  * and other renderer plugins: it generates the browser and the server entry
  * from `ctx.app` and `ctx.router`. Plugins that only work with one framework
  * inject its own service (`ctx.react`).

@@ -4,7 +4,7 @@ import { checkCompat, conclude, forExport, manifestKeywords, providedStack } fro
 describe('manifest', () => {
   it('reads the cormi field: omitted dimensions support any', () => {
     const manifest = conclude({
-      name: '@cormi/plugin-tailwindcss',
+      name: '@cormijs/plugin-tailwindcss',
       description: 'Tailwind CSS',
       peerDependencies: { cormi: '^0.2.0' },
       cormi: { bundler: ['vite', 'rsbuild'], renderer: [], service: { optional: ['server'] } },
@@ -24,11 +24,11 @@ describe('manifest', () => {
   })
 
   it('infers the stack from peer dependencies on its implementations', () => {
-    const react = conclude({ name: 'x', peerDependencies: { '@cormi/react': '*', 'cormi': '*' } })
+    const react = conclude({ name: 'x', peerDependencies: { '@cormijs/react': '*', 'cormi': '*' } })
     expect(react).toMatchObject({ source: 'inferred', renderer: ['react'] })
     expect(react.bundler).toBeUndefined()
     // optional peers are integrations, not requirements
-    const optional = conclude({ name: 'x', peerDependencies: { '@cormi/vite': '*' }, peerDependenciesMeta: { '@cormi/vite': { optional: true } } })
+    const optional = conclude({ name: 'x', peerDependencies: { '@cormijs/vite': '*' }, peerDependenciesMeta: { '@cormijs/vite': { optional: true } } })
     expect(optional.source).toBe('unknown')
   })
 
@@ -55,7 +55,7 @@ describe('manifest', () => {
   })
 
   it('takes the implementations of the stack as switching it', () => {
-    const rsbuild = conclude({ name: '@cormi/rsbuild', cormi: { bundler: ['rsbuild'], service: { implements: ['bundler', 'rsbuild'] } } })
+    const rsbuild = conclude({ name: '@cormijs/rsbuild', cormi: { bundler: ['rsbuild'], service: { implements: ['bundler', 'rsbuild'] } } })
     expect(providedStack(rsbuild)).toEqual({ bundler: 'rsbuild' })
     expect(checkCompat(rsbuild, { bundler: 'vite', renderer: 'react' }).status).toBe('ok')
   })
