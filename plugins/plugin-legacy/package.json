@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-legacy",
+  "name": "@cormijs/plugin-legacy",
   "description": "Legacy browsers for Cormi apps, with @vitejs/plugin-legacy",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,6 +18,15 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-legacy#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-legacy"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -32,8 +41,11 @@
       "vite"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@cormi/vite": "workspace:*",
+    "@cormijs/vite": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {
@@ -42,11 +54,11 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

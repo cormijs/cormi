@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-mf",
+  "name": "@cormijs/plugin-mf",
   "description": "Module federation for Cormi apps, with @module-federation/vite",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,6 +18,15 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-mf#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-mf"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -39,6 +48,9 @@
       }
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",
@@ -53,11 +65,11 @@
     }
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",
     "@rsbuild/core": "^2.3.0",

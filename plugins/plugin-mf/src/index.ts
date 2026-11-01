@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { type Context, importPeer, Schema } from 'cormi'
-import type {} from '@cormi/rsbuild'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/rsbuild'
+import type {} from '@cormijs/vite'
 
 export const name = 'mf'
 export const inject = ['app', 'bundler']
@@ -83,7 +83,7 @@ export function apply(ctx: Context, config: Config) {
       load(id) {
         if (id.startsWith(SSR_STUB)) return STUB
       },
-    }, env.ssr ? [] : importPeer('@module-federation/vite', '@cormi/plugin-mf with vite', () => import('@module-federation/vite')).then(({ federation }) => federation({
+    }, env.ssr ? [] : importPeer('@module-federation/vite', '@cormijs/plugin-mf with vite', () => import('@module-federation/vite')).then(({ federation }) => federation({
       name: config.name,
       filename: config.filename,
       remotes: Object.fromEntries(remotes.map(({ key, name, entry }) => [key, { type: 'module', name, entry, entryGlobalName: name, shareScope: 'default' }])),
@@ -94,7 +94,7 @@ export function apply(ctx: Context, config: Config) {
       hostInitInjectLocation: 'entry',
     }) as any)],
     rsbuild: async () => {
-      const { pluginModuleFederation } = await importPeer('@module-federation/rsbuild-plugin', '@cormi/plugin-mf with rsbuild', () => import('@module-federation/rsbuild-plugin'))
+      const { pluginModuleFederation } = await importPeer('@module-federation/rsbuild-plugin', '@cormijs/plugin-mf with rsbuild', () => import('@module-federation/rsbuild-plugin'))
       return [pluginModuleFederation({
         name: config.name,
         filename: config.filename,

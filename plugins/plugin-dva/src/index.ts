@@ -25,7 +25,7 @@ const MODEL_RE = /\.[jt]sx?$/
 /**
  * dva: redux with models of `src/models` (`namespace`, `state`, `reducers`,
  * `effects`, `subscriptions`). Modules exporting a hook are left to
- * @cormi/plugin-model, so both share the directory.
+ * @cormijs/plugin-model, so both share the directory.
  */
 export function apply(ctx: Context, config: Config) {
   const dir = ctx.cormi.resolve(config.dir)
@@ -49,7 +49,7 @@ export function apply(ctx: Context, config: Config) {
       '',
     ].join('\n')
   })
-  ctx.app.entry('@cormi/plugin-dva/client', { loading: config.loading, immer: config.immer } satisfies ClientConfig)
+  ctx.app.entry('@cormijs/plugin-dva/client', { loading: config.loading, immer: config.immer } satisfies ClientConfig)
 
   if (ctx.cormi.mode === 'dev') {
     ctx.effect(() => {

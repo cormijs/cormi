@@ -1,7 +1,7 @@
 // the CommonJS build of dva-core (which Node loads) expects a global regeneratorRuntime
 import 'regenerator-runtime/runtime'
 import models from '@@/plugin-dva/models'
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 import { create, type DvaInstance, type Model } from 'dva-core'
 import createLoading from 'dva-loading'
 import { produce } from 'immer'

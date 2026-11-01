@@ -1,5 +1,5 @@
 import models from '@@/plugin-model/models'
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 import { createContext, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 /** Models of the app by namespace; declared in the generated `src/.cormi/plugin-model/types.d.ts`. */

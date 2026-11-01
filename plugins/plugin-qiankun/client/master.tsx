@@ -1,4 +1,4 @@
-import { type Context, useCordis } from '@cormi/react/client'
+import { type Context, useCordis } from '@cormijs/react/client'
 import type { MicroApp as QiankunMicroApp } from 'qiankun'
 import { createContext, type CSSProperties, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import type { MasterClientConfig } from '../src/types.ts'
@@ -44,7 +44,7 @@ export interface MicroAppProps {
 /** Load and mount a micro app; it is unmounted with the component. */
 export function MicroApp({ name, base = '/', className, style, loading, fallback, ...props }: MicroAppProps) {
   const config = useContext(ConfigContext)
-  if (!config) throw new Error('<MicroApp> needs @cormi/plugin-qiankun/master in cormi.yml')
+  if (!config) throw new Error('<MicroApp> needs @cormijs/plugin-qiankun/master in cormi.yml')
   const { $router } = useCordis()
   const container = useRef<HTMLDivElement>(null)
   const instance = useRef<QiankunMicroApp>(undefined)
@@ -55,7 +55,7 @@ export function MicroApp({ name, base = '/', className, style, loading, fallback
 
   useEffect(() => {
     if (!app) {
-      setState({ status: 'failed', error: new Error(`micro app ${name} is not in the apps of @cormi/plugin-qiankun/master`) })
+      setState({ status: 'failed', error: new Error(`micro app ${name} is not in the apps of @cormijs/plugin-qiankun/master`) })
       return
     }
     let disposed = false

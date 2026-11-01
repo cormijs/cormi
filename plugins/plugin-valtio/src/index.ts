@@ -14,5 +14,5 @@ export const Config: Schema<Config> = Schema.object({
 
 /** valtio, with stores connected to Redux DevTools in dev mode. */
 export function apply(ctx: Context, config: Config) {
-  ctx.app.entry('@cormi/plugin-valtio/client', { devtools: config.devtools && ctx.cormi.mode === 'dev' })
+  ctx.app.entry('@cormijs/plugin-valtio/client', { devtools: config.devtools && ctx.cormi.mode === 'dev' })
 }

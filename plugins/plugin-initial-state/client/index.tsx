@@ -1,4 +1,4 @@
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 declare module 'cordis' {

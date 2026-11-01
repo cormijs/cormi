@@ -1,8 +1,8 @@
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { type Context, importPeer, Schema, winPath } from 'cormi'
-import type {} from '@cormi/rsbuild'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/rsbuild'
+import type {} from '@cormijs/vite'
 
 export const name = 'tailwindcss'
 export const inject = ['app', 'bundler']
@@ -27,11 +27,11 @@ export const Config: Schema<Config> = Schema.object({
 export function apply(ctx: Context, config: Config) {
   ctx.bundler.plugin({
     vite: async () => {
-      const { default: tailwindcss } = await importPeer('@tailwindcss/vite', '@cormi/plugin-tailwindcss with vite', () => import('@tailwindcss/vite'))
+      const { default: tailwindcss } = await importPeer('@tailwindcss/vite', '@cormijs/plugin-tailwindcss with vite', () => import('@tailwindcss/vite'))
       return tailwindcss()
     },
     rsbuild: async () => {
-      const { default: tailwindcss } = await importPeer('@tailwindcss/postcss', '@cormi/plugin-tailwindcss with rsbuild', () => import('@tailwindcss/postcss'))
+      const { default: tailwindcss } = await importPeer('@tailwindcss/postcss', '@cormijs/plugin-tailwindcss with rsbuild', () => import('@tailwindcss/postcss'))
       return {
         name: 'cormi:tailwindcss',
         setup(api) {

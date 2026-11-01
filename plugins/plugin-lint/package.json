@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-lint",
+  "name": "@cormijs/plugin-lint",
   "description": "cormi lint: ESLint with a default config for TypeScript and React hooks",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,6 +18,15 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-lint#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-lint"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -28,6 +37,9 @@
     "renderer:*"
   ],
   "cormi": {},
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "cormi": "workspace:*"
   },
@@ -39,11 +51,11 @@
     "typescript-eslint": "^8.72.1"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

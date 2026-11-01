@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import type { ClientConfig } from '../src/types.ts'
 

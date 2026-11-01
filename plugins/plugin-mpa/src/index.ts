@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import { watch } from 'chokidar'
 import { type App, type Context, expandExtensions, readJSON, Schema, tryPaths, winPath } from 'cormi'
-import type {} from '@cormi/react'
+import type {} from '@cormijs/react'
 
 export const name = 'mpa'
 // the pages are rendered with React
@@ -40,7 +40,7 @@ export function renderPageEntry(app: App, page: Page, mountElementId: string) {
   const entries = [...app.entries]
   return [
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(dir, source))}`),
-    `import { Context, renderPage, unwrapExports } from '@cormi/react/client'`,
+    `import { Context, renderPage, unwrapExports } from '@cormijs/react/client'`,
     `import Page from ${json(toSpecifier(dir, page.file))}`,
     ...entries.map((entry, index) => `import * as entry${index} from ${json(toSpecifier(dir, entry.file))}`),
     '',

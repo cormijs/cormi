@@ -18,9 +18,9 @@ export const Config: Schema<Config> = Schema.object({
 
 /**
  * HTTP requests in the browser: `request()` and `useRequest()` from
- * `@cormi/plugin-request/client`. Runtime plugins intercept requests through
+ * `@cormijs/plugin-request/client`. Runtime plugins intercept requests through
  * the `request/fetch` event and report errors through `request/error`.
  */
 export function apply(ctx: Context, config: Config) {
-  ctx.app.entry('@cormi/plugin-request/client', config satisfies ClientConfig)
+  ctx.app.entry('@cormijs/plugin-request/client', config satisfies ClientConfig)
 }

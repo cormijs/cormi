@@ -1,9 +1,9 @@
 import { writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
-import * as mf from '@cormi/plugin-mf'
+import * as mf from '@cormijs/plugin-mf'
 import { type App, type Context, readJSON, type Route, Schema, winPath } from 'cormi'
 import { checkShared, getShared, MANIFEST_FILE, type Manifest, REMOTE_ENTRY, toContainerName, toManifestRoutes } from './shared.ts'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/vite'
 
 export const name = 'federation-package'
 export const inject = ['app', 'router', 'vite', 'react']
@@ -15,7 +15,7 @@ export interface Config {
   eager: boolean
   /**
    * runtime plugins of other packages that the host applies along with this
-   * package's own (`src/app.tsx`), e.g. `@cormi/plugin-model/client`
+   * package's own (`src/app.tsx`), e.g. `@cormijs/plugin-model/client`
    */
   entries: string[]
   /** modules the host and the other packages import: `{ './Card': './src/components/Card.tsx' }` */
@@ -49,7 +49,7 @@ function toSpecifier(dir: string, file: string) {
  */
 function renderPlugin(dir: string, routes: Route[], entries: App.Entry[], imports: App.Import[]) {
   return [
-    `import { unwrapExports } from '@cormi/react/client'`,
+    `import { unwrapExports } from '@cormijs/react/client'`,
     ...imports.map(({ source }) => `import ${json(toSpecifier(dir, source))}`),
     ...entries.map((entry, index) => `import * as entry${index} from ${json(toSpecifier(dir, entry.file))}`),
     '',

@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-federation",
+  "name": "@cormijs/plugin-federation",
   "description": "Federated apps for Cormi: packages built and deployed apart, linked by URL into one app with shared singletons",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -31,6 +31,15 @@
     "client"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-federation#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-federation"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -48,23 +57,26 @@
       "react"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@cormi/react": "workspace:*",
-    "@cormi/vite": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
   "dependencies": {
-    "@cormi/plugin-mf": "workspace:*",
+    "@cormijs/plugin-mf": "workspace:*",
     "@module-federation/runtime": "2.9.2",
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

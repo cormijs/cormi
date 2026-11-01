@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-mpa",
+  "name": "@cormijs/plugin-mpa",
   "description": "Multi-page Cormi apps: every src/pages/<name>/index.tsx is a page of its own",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,6 +18,15 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-mpa#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-mpa"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -32,19 +41,22 @@
       "react"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@cormi/react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {
     "chokidar": "^4.0.3"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

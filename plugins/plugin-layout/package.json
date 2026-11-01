@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-layout",
+  "name": "@cormijs/plugin-layout",
   "description": "A layout with a menu built from the routes, for Cormi apps, with Ant Design",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,6 +21,15 @@
     "client"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-layout#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-layout"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -36,8 +45,11 @@
       "react"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@cormi/react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "antd": ">=6",
     "cormi": "workspace:*",
     "react": ">=19"
@@ -46,11 +58,11 @@
     "@ant-design/icons": "^6.3.4"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "antd": "^6.6.8",
     "cormi": "workspace:*",

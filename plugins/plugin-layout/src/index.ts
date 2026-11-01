@@ -26,7 +26,7 @@ const ICON_RE = /^[A-Z]\w*$/
  * `hideInMenu`; other routes are named after their path.
  */
 export function apply(ctx: Context, config: Config) {
-  ctx.app.entry('@cormi/plugin-layout/client', config satisfies ClientConfig)
+  ctx.app.entry('@cormijs/plugin-layout/client', config satisfies ClientConfig)
 
   // the icons of the menu are imported by name, so only those are bundled
   ctx.app.file('plugin-layout/icons.ts', () => {
@@ -37,8 +37,8 @@ export function apply(ctx: Context, config: Config) {
     }
     if (!icons.size) return 'export default {}\n'
     const names = [...icons].sort().join(', ')
-    return `import { ${names} } from '@cormi/plugin-layout/icons'\n\nexport default { ${names} }\n`
+    return `import { ${names} } from '@cormijs/plugin-layout/icons'\n\nexport default { ${names} }\n`
   })
-  ctx.app.file('plugin-layout/Layout.tsx', `export { Layout as default } from '@cormi/plugin-layout/client'\n`)
+  ctx.app.file('plugin-layout/Layout.tsx', `export { Layout as default } from '@cormijs/plugin-layout/client'\n`)
   ctx.router.layout(join(ctx.app.dir, 'plugin-layout/Layout.tsx'), { id: '@@/plugin-layout' })
 }

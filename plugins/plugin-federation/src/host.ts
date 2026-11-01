@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as mf from '@cormi/plugin-mf'
+import * as mf from '@cormijs/plugin-mf'
 import { type Context, readJSON, Schema } from 'cormi'
 import { checkShared, getShared, REGISTRY_FILE, REMOTE_ENTRY, toContainerName } from './shared.ts'
 
@@ -58,7 +58,7 @@ export function apply(ctx: Context, config: Config) {
   checkShared(ctx, shared)
   // modules are loaded by id at runtime: there are no types of remotes to download
   ctx.plugin(mf, { name, remotes: {}, exposes: {}, shared, filename: REMOTE_ENTRY, dts: false })
-  ctx.app.entry('@cormi/plugin-federation/host/client', {
+  ctx.app.entry('@cormijs/plugin-federation/host/client', {
     registry: publicPath + REGISTRY_FILE,
     parent: config.parent,
     override: config.override ?? ctx.cormi.mode === 'dev',

@@ -1,4 +1,4 @@
-import { type Context, useHostProps } from '@cormi/react/client'
+import { type Context, useHostProps } from '@cormijs/react/client'
 
 /** Props qiankun passes to a micro app, plus the props of the master. */
 export interface MasterProps {

@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { type Context, Schema } from 'cormi'
 import { type Preset, presetMini, presetWind3, presetWind4 } from 'unocss'
 import UnoCSS from 'unocss/vite'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/vite'
 
 export const name = 'unocss'
 export const inject = ['app', 'bundler']

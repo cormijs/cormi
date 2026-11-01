@@ -35,5 +35,5 @@ export function apply(ctx: Context, config: Config) {
   ctx.app.file('plugin-antd/locale.ts', locale
     ? `export { default } from 'antd/locale/${locale}'\n`
     : 'export default undefined\n')
-  ctx.app.entry('@cormi/plugin-antd/client', client satisfies ClientConfig)
+  ctx.app.entry('@cormijs/plugin-antd/client', client satisfies ClientConfig)
 }

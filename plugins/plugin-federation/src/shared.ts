@@ -1,6 +1,6 @@
-import type { Shared } from '@cormi/plugin-mf'
+import type { Shared } from '@cormijs/plugin-mf'
 import { type Context, resolvePackageDir, type Route } from 'cormi'
-import type { RouteData } from '@cormi/react/client'
+import type { RouteData } from '@cormijs/react/client'
 
 /** The host loads the packages listed in this file of its build. */
 export const REGISTRY_FILE = 'packages.json'
@@ -31,7 +31,7 @@ export interface Manifest {
  * uses. The framework is among them, so packages run in the host's context
  * and render in its router.
  */
-export const SINGLETONS = ['react', 'react-dom', 'react-router', 'cordis', 'cormi/client', '@cormi/react/client']
+export const SINGLETONS = ['react', 'react-dom', 'react-router', 'cordis', 'cormi/client', '@cormijs/react/client']
 
 export function getShared(extra: string[]): Record<string, Shared> {
   return Object.fromEntries([...new Set([...SINGLETONS, ...extra])].map(name => [name, { singleton: true }]))

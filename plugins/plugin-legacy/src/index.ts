@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import legacy from '@vitejs/plugin-legacy'
 import { type Context, renderTag, Schema, winPath } from 'cormi'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/vite'
 
 export const name = 'legacy'
 export const inject = ['app', 'html', 'vite']

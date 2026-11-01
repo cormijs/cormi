@@ -1,6 +1,6 @@
 import { type Context, Schema } from 'cormi'
 import type { ClientConfig } from './types.ts'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/vite'
 
 export type * from './types.ts'
 
@@ -18,7 +18,7 @@ export const Config: Schema<Config> = Schema.object({
  * rendering the styles are collected into `<head>`.
  */
 export function apply(ctx: Context, config: Config) {
-  ctx.app.entry('@cormi/plugin-styled-components/client', config satisfies ClientConfig)
+  ctx.app.entry('@cormijs/plugin-styled-components/client', config satisfies ClientConfig)
   // styled-components has no `exports`: Node would import its CommonJS build,
   // whose default export is not `styled`; the server bundle uses its ES build
   ctx.bundler.plugin({

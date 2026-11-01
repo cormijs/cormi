@@ -1,6 +1,6 @@
 import { useRequest as useAhooksRequest } from 'ahooks'
 import type { Options, Plugin, Result } from 'ahooks/lib/useRequest/src/types'
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 import type { ClientConfig } from '../src/types.ts'
 
 declare module 'cordis' {
@@ -93,7 +93,7 @@ async function decode(response: Response, type: ResponseType | undefined) {
 const ABSOLUTE_URL_RE = /^([a-z][a-z\d+.-]*:)?\/\//i
 
 async function send(url: string | URL, options: RequestConfig = {}): Promise<any> {
-  if (!current) throw new Error('@cormi/plugin-request is not in cormi.yml')
+  if (!current) throw new Error('@cormijs/plugin-request is not in cormi.yml')
   const { ctx, config: defaults } = current
   const config: RequestConfig = { ...defaults, ...options, headers: undefined }
   const { params, data, baseURL, timeout, responseType, validateStatus, skipErrorHandler, dataField: _, ...rest } = config as RequestConfig & ClientConfig

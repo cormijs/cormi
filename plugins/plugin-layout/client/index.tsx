@@ -1,6 +1,6 @@
 import icons from '@@/plugin-layout/icons'
 import { Breadcrumb, Layout as AntdLayout, Menu, type MenuProps } from 'antd'
-import { type Context, Link, Outlet, useCordis, useMatches } from '@cormi/react/client'
+import { type Context, Link, Outlet, useCordis, useMatches } from '@cormijs/react/client'
 import { type ComponentType, createContext, createElement, useContext, useMemo, useState } from 'react'
 import type { ClientConfig } from '../src/types.ts'
 import { getBreadcrumb, getMenuItems, type MenuItem } from './menu.ts'
@@ -31,7 +31,7 @@ function flatten(items: MenuItem[]): MenuItem[] {
 /** The layout route of the plugin: the menu, the breadcrumb and the page. */
 export function Layout() {
   const config = useContext(ConfigContext)
-  if (!config) throw new Error('<Layout> needs @cormi/plugin-layout in cormi.yml')
+  if (!config) throw new Error('<Layout> needs @cormijs/plugin-layout in cormi.yml')
   const { $router } = useCordis()
   const matches = useMatches()
   const [collapsed, setCollapsed] = useState(false)

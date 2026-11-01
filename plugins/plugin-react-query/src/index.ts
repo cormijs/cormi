@@ -18,7 +18,7 @@ export const Config: Schema<Config> = Schema.object({
  * plugins configure the client on `reactQuery/client`.
  */
 export function apply(ctx: Context, config: Config) {
-  ctx.app.entry('@cormi/plugin-react-query/client', {
+  ctx.app.entry('@cormijs/plugin-react-query/client', {
     ...config,
     devtools: config.devtools && ctx.cormi.mode === 'dev',
   } satisfies ClientConfig)

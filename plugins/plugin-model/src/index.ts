@@ -54,9 +54,9 @@ export function apply(ctx: Context, config: Config) {
   ].join('\n'))
 
   ctx.app.file('plugin-model/types.d.ts', () => [
-    `import type {} from '@cormi/plugin-model/client'`,
+    `import type {} from '@cormijs/plugin-model/client'`,
     '',
-    `declare module '@cormi/plugin-model/client' {`,
+    `declare module '@cormijs/plugin-model/client' {`,
     `  interface Models {`,
     // modules that do not export a hook (e.g. dva models) are not models of useModel()
     ...models.map(model => `    ${JSON.stringify(model.namespace)}: typeof import(${JSON.stringify(toSpecifier(model.file))}).default extends (...args: any[]) => infer R ? R : never`),
@@ -65,7 +65,7 @@ export function apply(ctx: Context, config: Config) {
     '',
   ].join('\n'))
 
-  ctx.app.entry('@cormi/plugin-model/client')
+  ctx.app.entry('@cormijs/plugin-model/client')
 
   if (ctx.cormi.mode === 'dev') {
     ctx.effect(() => {

@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-request",
+  "name": "@cormijs/plugin-request",
   "description": "HTTP requests for Cormi apps: fetch-based request() and useRequest(), intercepted through events",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,6 +20,15 @@
     "client"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-request#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-request"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -35,8 +44,11 @@
       "react"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@cormi/react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
@@ -45,11 +57,11 @@
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

@@ -56,7 +56,7 @@ export function apply(ctx: Context, config: Config) {
     description: `mocked routes: ${config.dir}/<name>.ts`,
     async run(name) {
       return [await createFile(join(dir, `${name}.ts`), [
-        `import { defineMock } from '@cormi/plugin-mock'`,
+        `import { defineMock } from '@cormijs/plugin-mock'`,
         '',
         `export default defineMock({`,
         `  'GET /api/${name}': { message: 'hello from ${name}' },`,

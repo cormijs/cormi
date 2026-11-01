@@ -1,4 +1,4 @@
-import { type Context, useServerInsertedHTML } from '@cormi/react/client'
+import { type Context, useServerInsertedHTML } from '@cormijs/react/client'
 import { type ReactNode, useState } from 'react'
 import { ServerStyleSheet, StyleSheetManager, ThemeProvider } from 'styled-components'
 import type { ClientConfig } from '../src/types.ts'

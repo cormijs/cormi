@@ -1,6 +1,6 @@
 import { type Context, readJSON, Schema } from 'cormi'
 import { toQiankunDocument } from './document.ts'
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/vite'
 
 export { toQiankunDocument } from './document.ts'
 
@@ -27,7 +27,7 @@ export function apply(ctx: Context, config: Config) {
   const transform = (html: string) => toQiankunDocument(html, name, mountElementId)
 
   // the loader mounts the app, so the entry does not mount itself
-  ctx.app.entry('@cormi/plugin-qiankun/slave/client')
+  ctx.app.entry('@cormijs/plugin-qiankun/slave/client')
 
   // the dev server adds its own module scripts, so the dev document is transformed by Vite, last
   ctx.html.transform(html => ctx.cormi.mode === 'dev' ? html : transform(html))

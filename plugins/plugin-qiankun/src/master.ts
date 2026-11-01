@@ -48,11 +48,11 @@ function getBase(path: string) {
 
 /**
  * The master app of qiankun. Micro apps render with `<MicroApp name>` from
- * `@cormi/plugin-qiankun/master/client`, or on the configured `routes`.
+ * `@cormijs/plugin-qiankun/master/client`, or on the configured `routes`.
  */
 export function apply(ctx: Context, config: Config) {
   const { routes, ...client } = config
-  ctx.app.entry('@cormi/plugin-qiankun/master/client', client satisfies MasterClientConfig)
+  ctx.app.entry('@cormijs/plugin-qiankun/master/client', client satisfies MasterClientConfig)
 
   routes.forEach((route, index) => {
     if (!config.apps.some(app => app.name === route.app)) {
@@ -61,7 +61,7 @@ export function apply(ctx: Context, config: Config) {
     const file = `plugin-qiankun-master/route-${index}.tsx`
     const props = { name: route.app, base: getBase(route.path), ...route.props }
     ctx.app.file(file, [
-      `import { MicroApp } from '@cormi/plugin-qiankun/master/client'`,
+      `import { MicroApp } from '@cormijs/plugin-qiankun/master/client'`,
       '',
       `export default function MicroAppRoute() {`,
       `  return <MicroApp {...${JSON.stringify(props)}} />`,

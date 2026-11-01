@@ -14,8 +14,8 @@ export const inject = ['app', 'react']
  * }
  * ```
  *
- * Components read it with `useInitialState()` from `@cormi/plugin-initial-state/client`.
+ * Components read it with `useInitialState()` from `@cormijs/plugin-initial-state/client`.
  */
 export function apply(ctx: Context) {
-  ctx.app.entry('@cormi/plugin-initial-state/client')
+  ctx.app.entry('@cormijs/plugin-initial-state/client')
 }

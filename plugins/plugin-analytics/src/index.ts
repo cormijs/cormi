@@ -37,5 +37,5 @@ export function apply(ctx: Context, config: Config) {
       content: `var _hmt=_hmt||[];(function(){var s=document.createElement('script');s.src='https://hm.baidu.com/hm.js?'+${json(config.baidu)};var f=document.getElementsByTagName('script')[0];f.parentNode.insertBefore(s,f)})();`,
     })
   }
-  ctx.app.entry('@cormi/plugin-analytics/client', { ga: config.ga, baidu: config.baidu } satisfies ClientConfig)
+  ctx.app.entry('@cormijs/plugin-analytics/client', { ga: config.ga, baidu: config.baidu } satisfies ClientConfig)
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/plugin-mock",
+  "name": "@cormijs/plugin-mock",
   "description": "Mocked API routes for Cormi apps in dev mode",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,6 +18,15 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-mock#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-mock"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cormi-plugin",
@@ -27,6 +36,9 @@
     "renderer:*"
   ],
   "cormi": {},
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "cormi": "workspace:*"
   },
@@ -35,11 +47,11 @@
     "path-to-regexp": "^8.3.0"
   },
   "devDependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }
