@@ -1,7 +1,7 @@
 {
   "name": "cormi",
   "description": "A React full-stack framework built on Cordis: the CLI, the node API for plugins and the browser API (cormi/client)",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -29,6 +29,15 @@
     "console.ts"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/cormi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/cormi"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cordis",
@@ -36,14 +45,8 @@
     "framework",
     "ssr"
   ],
-  "cordis": {
-    "ecosystem": {
-      "name": "cormi",
-      "pattern": [
-        "@cormi/plugin-*",
-        "cormi-plugin-*"
-      ]
-    }
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -51,10 +54,10 @@
   "dependencies": {
     "@cordisjs/plugin-loader": "1.0.0-rc.9",
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/console": "workspace:*",
-    "@cormi/core": "workspace:*",
-    "@cormi/runtime": "workspace:*",
-    "@cormi/server": "workspace:*",
+    "@cormijs/console": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/runtime": "workspace:*",
+    "@cormijs/server": "workspace:*",
     "cordis": "4.0.0-rc.12",
     "import-meta-resolve": "^4.2.0",
     "tsx": "^4.23.15",
@@ -62,5 +65,14 @@
   },
   "devDependencies": {
     "@types/yargs-parser": "^21.0.3"
+  },
+  "cordis": {
+    "ecosystem": {
+      "name": "cormi",
+      "pattern": [
+        "@cormijs/plugin-*",
+        "cormi-plugin-*"
+      ]
+    }
   }
 }

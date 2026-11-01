@@ -17,7 +17,7 @@ import {
   resolveExport,
   resolvePackageDir,
   stop,
-} from '@cormi/core'
+} from '@cormijs/core'
 import { Context, Logger, type Message } from 'cordis'
 import { resolve } from 'import-meta-resolve'
 
@@ -217,10 +217,10 @@ export async function checkPlugin(dir: string): Promise<CheckReport> {
   }
   const bundlers = implementations.filter(item => item.dimension === 'bundler')
   const renderers = implementations.filter(item => item.dimension === 'renderer')
-  if (!resolvePackageDir('@cormi/preset', dir) || !bundlers.length || !renderers.length) {
-    throw new CommandError('the check loads the plugin in apps: add @cormi/preset, a bundler (@cormi/vite, @cormi/rsbuild) and a UI framework (@cormi/react, @cormi/vue) to the devDependencies')
+  if (!resolvePackageDir('@cormijs/preset', dir) || !bundlers.length || !renderers.length) {
+    throw new CommandError('the check loads the plugin in apps: add @cormijs/preset, a bundler (@cormijs/vite, @cormijs/rsbuild) and a UI framework (@cormijs/react, @cormijs/vue) to the devDependencies')
   }
-  const preset = unwrapPlugin(await importFrom('@cormi/preset', dir))
+  const preset = unwrapPlugin(await importFrom('@cormijs/preset', dir))
   const modules: Dict<any> = {}
   for (const item of implementations) modules[item.name] = unwrapPlugin(await importFrom(item.package, dir))
   const stackServices = new Set(['bundler', 'renderer', ...KNOWN.bundler, ...KNOWN.renderer, ...implementations.map(item => item.name)])

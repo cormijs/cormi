@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type {} from '@cordisjs/plugin-loader'
-import { CommandError, idle, type Mode, settle, start, stop } from '@cormi/core'
+import { CommandError, idle, type Mode, settle, start, stop } from '@cormijs/core'
 import type { Context } from 'cordis'
 import parse from 'yargs-parser'
 import { MIN_NODE_VERSION, RESTART_EXIT_CODE } from './constants.ts'
@@ -14,7 +14,7 @@ const BUILTIN_COMMANDS: [string, string][] = [
   ['build', 'write the client and server bundles'],
   ['preview', 'serve the build output'],
   ['setup', 'write the generated files (src/.cormi) only'],
-  ['plugin check', 'check a plugin package with each bundler and UI framework (--write)'],
+  ['plugin check', 'check a plugin package with each bundler and UI framework (--write, --json)'],
 ]
 
 function formatCommands(commands: [string, string][]) {
@@ -46,7 +46,7 @@ async function registerTypeScript() {
 
 function getService<K extends 'bundler' | 'app'>(ctx: Context, name: K): Context[K] {
   const service = ctx.get(name)
-  if (!service) throw new CommandError(`service ${name} is not available: is a bundler (e.g. @cormi/vite or @cormi/rsbuild) with @cormi/preset, or @cormi/preset-react, in cormi.yml?`)
+  if (!service) throw new CommandError(`service ${name} is not available: is a bundler (e.g. @cormijs/vite or @cormijs/rsbuild) with @cormijs/preset, or @cormijs/preset-react, in cormi.yml?`)
   return service
 }
 
@@ -133,9 +133,11 @@ function daemon(argv: string[]) {
  * bundler and UI framework it can be loaded with, infer what it supports,
  * and compare with the `cormi` field of its package.json.
  */
-async function checkPluginCommand(cwd: string, write: boolean) {
+async function checkPluginCommand(cwd: string, write: boolean, json: boolean) {
   await registerTypeScript()
   const report = await checkPlugin(cwd)
+  // for tools, e.g. the registry that verifies plugins
+  if (json) return console.log(JSON.stringify(report))
   console.log(formatReport(report))
   if (report.exports.some(item => item.error)) throw new CommandError('cannot infer what the plugin supports')
   if (!report.mismatches.length && !report.keywords) return console.log('  package.json declares the same')
@@ -153,7 +155,7 @@ export async function run(argv = process.argv.slice(2)) {
   }
   const args = parse(argv, {
     alias: { version: ['v'], help: ['h'] },
-    boolean: ['version', 'help', 'write'],
+    boolean: ['version', 'help', 'write', 'json'],
     string: ['config', 'host', 'port'],
   })
   if (args.version) return console.log(getVersion())
@@ -179,8 +181,8 @@ export async function run(argv = process.argv.slice(2)) {
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())
     case 'plugin':
-      if (args._[1] !== 'check') throw new CommandError('usage: cormi plugin check [--write]')
-      return checkPluginCommand(cwd, !!args.write)
+      if (args._[1] !== 'check') throw new CommandError('usage: cormi plugin check [--write] [--json]')
+      return checkPluginCommand(cwd, !!args.write, !!args.json)
     default:
       // commands of plugins, e.g. generate and config
       return once(cwd, 'setup', async (ctx) => {
