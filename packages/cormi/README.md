@@ -1,6 +1,6 @@
-# cormi
+# @cormijs/cormi
 
-[![npm](https://img.shields.io/npm/v/cormi/next?style=flat-square)](https://www.npmjs.com/package/cormi)
+[![npm](https://img.shields.io/npm/v/@cormijs/cormi/next?style=flat-square)](https://www.npmjs.com/package/@cormijs/cormi)
 
 A React full-stack framework built on Cordis: the CLI, the node API for plugins and the browser API (cormi/client)
 

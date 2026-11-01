@@ -14,7 +14,7 @@ export interface Manifest extends Manifest.Compat {
   /** not listed by default */
   preview?: boolean
   hidden?: boolean
-  /** the range of Cormi versions (`peerDependencies.cormi`) */
+  /** the range of Cormi versions (the peer dependency on `@cormijs/cormi`) */
   cormi?: string
   /** declarations of the plugins of a package, by export: `{ './slave': { bundler: ['vite'] } }` */
   exports?: Dict<Manifest.Compat>
@@ -98,7 +98,7 @@ export function conclude(meta: PackageMeta): Manifest {
     category: typeof field?.category === 'string' ? field.category : undefined,
     preview: field?.preview === true || undefined,
     hidden: field?.hidden === true || undefined,
-    cormi: meta.peerDependencies?.cormi,
+    cormi: meta.peerDependencies?.['@cormijs/cormi'],
     source: 'unknown',
   }
   if (field) {
@@ -240,7 +240,7 @@ export interface RegistryObject {
   date: string
   links: { npm: string; homepage?: string; repository?: string }
   manifest: Manifest
-  /** published by the Cormi project (`@cormijs/*`, `cormi`) */
+  /** published by the Cormi project (`@cormijs/*`) */
   official: boolean
   downloads?: { lastMonth: number }
   /** the result of `cormi plugin check` on this version */

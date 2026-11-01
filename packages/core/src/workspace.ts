@@ -180,10 +180,10 @@ export async function createPlugin(root: string, name: string, options: Workspac
     keywords: ['cormi', 'cormi-plugin'],
     // what the market shows: the bundlers and UI frameworks it supports (`bundler: ['vite']`…), any when omitted
     cormi: {},
-    peerDependencies: { cormi: '*' },
+    peerDependencies: { '@cormijs/cormi': '*' },
   }
   const node = [
-    `import { type Context, Schema } from 'cormi'`,
+    `import { type Context, Schema } from '@cormijs/cormi'`,
     '',
     `export const name = ${quote(short)}`,
     ...options.client ? [`export const inject = ['app']`] : [],
@@ -212,7 +212,7 @@ export async function createPlugin(root: string, name: string, options: Workspac
     '',
   ]
   const client = [
-    `import type { Context } from 'cormi/client'`,
+    `import type { Context } from '@cormijs/cormi/client'`,
     '',
     `export default (ctx: Context, config: { greeting: string }) => {`,
     `  ctx.on('app/mount', () => console.info(config.greeting))`,
@@ -220,8 +220,8 @@ export async function createPlugin(root: string, name: string, options: Workspac
     '',
   ]
   const consolePage = [
-    `import type { Context } from 'cormi/client'`,
-    `import type {} from 'cormi/console'`,
+    `import type { Context } from '@cormijs/cormi/client'`,
+    `import type {} from '@cormijs/cormi/console'`,
     '',
     `function Page() {`,
     `  return <p>The page of ${name} in the console.</p>`,

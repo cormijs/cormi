@@ -267,7 +267,7 @@ export class Vite extends Service implements Bundler {
       server: { fs: { strict: false } },
       plugins: [workspacePlugin(this.ctx.get('workspace'))],
       // one instance of the framework, shared by the server entry, the pages and the runtime plugins
-      ssr: { external: ['cormi'] },
+      ssr: { external: ['@cormijs/cormi'] },
       build: {
         assetsDir: 'static',
         sourcemap: this.config.sourcemap,

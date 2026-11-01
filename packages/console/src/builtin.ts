@@ -106,7 +106,7 @@ export interface CompatInfo {
 
 /** The bundler, the UI framework and the Cormi version of the app. */
 export function getStack(ctx: Context): Stack {
-  return { bundler: ctx.get('bundler')?.name, renderer: ctx.get('renderer')?.name, cormi: version(ctx.cormi.cwd, 'cormi') }
+  return { bundler: ctx.get('bundler')?.name, renderer: ctx.get('renderer')?.name, cormi: version(ctx.cormi.cwd, '@cormijs/cormi') }
 }
 
 export function toCompat(manifest: Manifest, stack: Stack): CompatInfo {
@@ -241,8 +241,8 @@ export function Builtin(ctx: Context, config: Console.Config) {
         renderer: renderer && { name: renderer.name, version: renderer.version },
       },
       versions: {
-        cormi: version(cwd, 'cormi'),
-        cordis: version(cwd, 'cordis') ?? version(join(cwd, 'node_modules/cormi'), 'cordis'),
+        cormi: version(cwd, '@cormijs/cormi'),
+        cordis: version(cwd, 'cordis') ?? version(join(cwd, 'node_modules/@cormijs/cormi'), 'cordis'),
         node: process.versions.node,
       },
     }

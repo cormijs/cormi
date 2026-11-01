@@ -1,4 +1,4 @@
-// The node API of Cormi, for plugins. The browser API is `cormi/client`.
+// The node API of Cormi, for plugins. The browser API is `@cormijs/cormi/client`.
 import type {} from '@cordisjs/plugin-loader'
 import type {} from '@cordisjs/plugin-server'
 

@@ -6,7 +6,7 @@ describe('manifest', () => {
     const manifest = conclude({
       name: '@cormijs/plugin-tailwindcss',
       description: 'Tailwind CSS',
-      peerDependencies: { cormi: '^0.2.0' },
+      peerDependencies: { '@cormijs/cormi': '^0.2.0' },
       cormi: { bundler: ['vite', 'rsbuild'], renderer: [], service: { optional: ['server'] } },
     })
     expect(manifest).toMatchObject({ source: 'declared', bundler: ['vite', 'rsbuild'], description: 'Tailwind CSS', cormi: '^0.2.0' })
@@ -24,7 +24,7 @@ describe('manifest', () => {
   })
 
   it('infers the stack from peer dependencies on its implementations', () => {
-    const react = conclude({ name: 'x', peerDependencies: { '@cormijs/react': '*', 'cormi': '*' } })
+    const react = conclude({ name: 'x', peerDependencies: { '@cormijs/react': '*', '@cormijs/cormi': '*' } })
     expect(react).toMatchObject({ source: 'inferred', renderer: ['react'] })
     expect(react.bundler).toBeUndefined()
     // optional peers are integrations, not requirements
@@ -39,7 +39,7 @@ describe('manifest', () => {
   })
 
   it('checks a plugin against the stack of the app', () => {
-    const manifest = conclude({ name: 'x', peerDependencies: { cormi: '^0.2.0' }, cormi: { bundler: ['vite'], renderer: ['react'] } })
+    const manifest = conclude({ name: 'x', peerDependencies: { '@cormijs/cormi': '^0.2.0' }, cormi: { bundler: ['vite'], renderer: ['react'] } })
     expect(checkCompat(manifest, { bundler: 'vite', renderer: 'react', cormi: '0.2.3' }).status).toBe('ok')
     expect(checkCompat(manifest, { bundler: 'rsbuild', renderer: 'react', cormi: '0.3.0' })).toEqual({
       status: 'incompatible',
@@ -50,7 +50,7 @@ describe('manifest', () => {
       ],
     })
     // the app has no UI framework yet; workspace ranges are not compared
-    expect(checkCompat(conclude({ name: 'x', peerDependencies: { cormi: 'workspace:*' }, cormi: { renderer: ['vue'] } }), { bundler: 'vite', cormi: '0.1.0' }).status).toBe('ok')
+    expect(checkCompat(conclude({ name: 'x', peerDependencies: { '@cormijs/cormi': 'workspace:*' }, cormi: { renderer: ['vue'] } }), { bundler: 'vite', cormi: '0.1.0' }).status).toBe('ok')
     expect(checkCompat(conclude({ name: 'x' }), { bundler: 'vite' }).status).toBe('unknown')
   })
 
