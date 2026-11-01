@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { PackageInfo, PluginInfo } from '../../src/builtin.ts'
 import { useAction } from '../hooks.ts'
 import { useData } from '../index.tsx'
+import { CompatReasons, CompatTags } from '../compat.tsx'
 import { Empty, Section, Tag } from '../ui.tsx'
 
 export default function WorkspacePage() {
@@ -26,11 +27,14 @@ export default function WorkspacePage() {
                   {packages.map((pkg) => {
                     const plugin = plugins.find(plugin => plugin.name === pkg.name)
                     return (
-                      <li key={pkg.name} className="cc-package">
+                      <li key={pkg.name} className="cc-package" data-compat={pkg.compat?.result.status}>
                         <div>
                           <code className="cc-package-name">{pkg.name}</code>
                           {pkg.version && <Tag>{pkg.version}</Tag>}
+                          {' '}
+                          <CompatTags compat={pkg.compat} />
                           <p className="cc-muted">{pkg.description} · <code>{pkg.path}</code></p>
+                          <CompatReasons compat={pkg.compat} />
                         </div>
                         {plugin
                           ? <Link to={`/plugins?id=${plugin.id}`} className="cc-button">{plugin.disabled ? '已停用' : '已启用'} · 查看</Link>

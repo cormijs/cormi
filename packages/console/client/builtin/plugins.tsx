@@ -4,7 +4,9 @@ import type { PluginInfo } from '../../src/builtin.ts'
 import { reviveSchema, SchemaForm } from '../form.tsx'
 import { useAction, useQuery } from '../hooks.ts'
 import { useData } from '../index.tsx'
+import { CompatReasons, CompatTags, StackSwitch } from '../compat.tsx'
 import { CodeLine, Empty, Lamp, Tag } from '../ui.tsx'
+import type { OverviewData } from './overview.tsx'
 
 const STATE_TEXT: Record<string, string> = {
   active: '运行中',
@@ -109,6 +111,8 @@ type Tab = 'config' | 'effects' | 'deps'
 
 function PluginDetail(props: { plugin: PluginInfo }) {
   const { plugin } = props
+  const plugins = useData<PluginInfo[]>('plugins') ?? []
+  const stack = useData<OverviewData>('overview')?.stack
   const [tab, setTab] = useState<Tab>('config')
   const toggle = useAction((console, disabled: boolean) => console.call('plugin/update', plugin.id, { disabled }))
   const remove = useAction(console => console.call('plugin/remove', plugin.id))
@@ -124,6 +128,13 @@ function PluginDetail(props: { plugin: PluginInfo }) {
           <Tag tone={plugin.state === 'active' ? 'leaf' : plugin.state === 'failed' ? 'cord' : plugin.state === 'pending' ? 'amber' : 'muted'}>{STATE_TEXT[plugin.state]}</Tag>
         </div>
         {plugin.package?.description && <p className="cc-muted">{plugin.package.description}</p>}
+        {plugin.compat && (
+          <div className="cc-detail-compat">
+            <CompatTags compat={plugin.compat} />
+            <CompatReasons compat={plugin.compat} />
+          </div>
+        )}
+        {plugin.state !== 'active' && <StackSwitch compat={plugin.compat} name={plugin.name} plugins={plugins} stack={stack} />}
         <div className="cc-actions">
           <button type="button" className="cc-button" disabled={toggle.pending} onClick={() => toggle.run(!plugin.disabled)}>{plugin.disabled ? '启用' : '停用'}</button>
           <button type="button" className="cc-button cc-button-danger" disabled={remove.pending} onClick={() => confirm(`从 cormi.yml 中移除 ${plugin.name}？`) && remove.run()}>移除</button>

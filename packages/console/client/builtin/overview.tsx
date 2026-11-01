@@ -1,5 +1,6 @@
 import { Link } from '@cormi/react/client'
 import type { PluginInfo, ServiceInfo } from '../../src/builtin.ts'
+import { describeReason, label } from '../compat.tsx'
 import { formatTime, useLogs } from '../hooks.ts'
 import { useData } from '../index.tsx'
 import { Empty, Lamp, Section } from '../ui.tsx'
@@ -20,13 +21,11 @@ export interface OverviewData {
   versions: Record<string, string | undefined>
 }
 
-const LABELS: Record<string, string> = { vite: 'Vite', rsbuild: 'Rsbuild', react: 'React', vue: 'Vue' }
-
 function Stack(props: { item?: StackItem; missing: string }) {
   if (!props.item) return <span className="cc-muted">{props.missing}</span>
   return (
     <>
-      <strong>{LABELS[props.item.name] ?? props.item.name}</strong>
+      <strong>{label(props.item.name)}</strong>
       {props.item.version && <code>{props.item.version}</code>}
     </>
   )
@@ -91,7 +90,11 @@ export default function Overview() {
               <li key={plugin.id}>
                 <Lamp state={plugin.state} />
                 <Link to={`/plugins?id=${plugin.id}`}><code>{plugin.name}</code></Link>
-                <span className="cc-muted">{plugin.state === 'failed' ? '加载失败，查看日志' : `等待服务：${plugin.inject.join('、') || '—'}`}</span>
+                <span className="cc-muted">
+                  {plugin.compat?.result.status === 'incompatible'
+                    ? describeReason(plugin.compat.result.reasons[0])
+                    : plugin.state === 'failed' ? '加载失败，查看日志' : `等待服务：${plugin.inject.join('、') || '—'}`}
+                </span>
               </li>
             ))}
           </ul>

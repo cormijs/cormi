@@ -2,10 +2,11 @@ import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import type { Entry, EntryGroup, EntryTree } from '@cordisjs/plugin-loader'
-import { readJSON, resolvePackageDir, winPath } from '@cormi/core'
+import { checkCompat, type CompatResult, conclude, type Dimension, forExport, getPackageName, type Manifest, providedStack, readJSON, resolvePackageDir, type Stack, winPath } from '@cormi/core'
 import type {} from '@cormi/rsbuild'
 import type {} from '@cormi/vite'
 import { type Context, type Fiber, Logger, type Message } from 'cordis'
+import { compare, prerelease, rcompare, valid } from 'semver'
 import { type Console, getServerUrl } from './index.ts'
 
 const STATES = ['pending', 'loading', 'active', 'failed', 'disposed', 'unloading'] as const
@@ -24,6 +25,8 @@ export interface PluginInfo {
   /** the serialized `Config` schema, once the plugin has loaded */
   schema?: unknown
   package?: { name: string; version?: string; description?: string; local?: boolean }
+  /** what its package declares, and whether it works in this app */
+  compat?: CompatInfo
   /** what the plugin and its sub-plugins registered: effect labels */
   effects: string[]
   inject: string[]
@@ -60,6 +63,7 @@ export interface PackageInfo {
   description?: string
   path: string
   enabled: boolean
+  compat?: CompatInfo
 }
 
 export interface MarketPackage {
@@ -69,6 +73,43 @@ export interface MarketPackage {
   date?: string
   links?: { npm?: string; homepage?: string; repository?: string }
   installed?: string
+  /** from the keywords of the search result */
+  compat: CompatInfo
+}
+
+/** A package of the registry, resolved for the app: its latest version, and the newest one that works if that does not. */
+export interface MarketResolution {
+  latest: string
+  compat: CompatInfo
+  compatible?: { version: string; compat: CompatInfo }
+}
+
+/** What a package declares about the stacks it supports, and whether it works in this app. */
+export interface CompatInfo {
+  bundler?: string[]
+  renderer?: string[]
+  /** services it provides: a bundler or a UI framework is `bundler` or `renderer` */
+  implements?: string[]
+  /** the part of the stack it provides: `{ bundler: 'rsbuild' }` */
+  provides: Partial<Record<Dimension, string>>
+  source: Manifest['source']
+  result: CompatResult
+}
+
+/** The bundler, the UI framework and the Cormi version of the app. */
+export function getStack(ctx: Context): Stack {
+  return { bundler: ctx.get('bundler')?.name, renderer: ctx.get('renderer')?.name, cormi: version(ctx.cormi.cwd, 'cormi') }
+}
+
+export function toCompat(manifest: Manifest, stack: Stack): CompatInfo {
+  return {
+    bundler: manifest.bundler,
+    renderer: manifest.renderer,
+    implements: manifest.service?.implements,
+    provides: providedStack(manifest),
+    source: manifest.source,
+    result: checkCompat(manifest, stack),
+  }
 }
 
 /** The entries of cormi.yml: the tree of the include plugin. */
@@ -94,20 +135,26 @@ function localPackages(ctx: Context) {
   return ctx.get('workspace')?.packages ?? {}
 }
 
-function packageOf(ctx: Context, name: string): PluginInfo['package'] {
-  const local = localPackages(ctx)[name]
-  if (local) return { name, version: local.version, description: local.description, local: true }
-  if (/^[./]/.test(name)) return
-  const packageName = name.split('/').slice(0, name.startsWith('@') ? 2 : 1).join('/')
-  const dir = resolvePackageDir(packageName, ctx.cormi.cwd)
+/** The package of a plugin of cormi.yml (`@scope/plugin-foo/sub`), and the declaration of that plugin. */
+function packageOf(ctx: Context, name: string, stack = getStack(ctx)): Pick<PluginInfo, 'package' | 'compat'> {
+  const packageName = getPackageName(name)
+  if (!packageName) return {}
+  const local = localPackages(ctx)[packageName]
+  const dir = local?.dir ?? resolvePackageDir(packageName, ctx.cormi.cwd)
   const meta = dir && readJSON(join(dir, 'package.json'))
-  if (meta) return { name: packageName, version: meta.version, description: meta.description }
+  if (!meta) return {}
+  const manifest = forExport(conclude(meta), `.${name.slice(packageName.length)}`)
+  return {
+    package: { name: packageName, version: meta.version, description: meta.description, local: local ? true : undefined },
+    compat: toCompat(manifest, stack),
+  }
 }
 
 export function getPlugins(ctx: Context): PluginInfo[] {
   const tree = getTree(ctx)
   if (!tree) return []
   const fibers = allFibers(ctx)
+  const stack = getStack(ctx)
   const result: PluginInfo[] = []
   const walk = (group: EntryGroup, depth: number) => {
     for (const options of group.data) {
@@ -123,7 +170,7 @@ export function getPlugins(ctx: Context): PluginInfo[] {
         state: disabled ? 'disabled' : STATES[fiber?.state ?? 0],
         config: options.config ?? {},
         schema: (fiber?.runtime?.Config as { toJSON?(): unknown } | undefined)?.toJSON?.(),
-        package: packageOf(ctx, options.name),
+        ...packageOf(ctx, options.name, stack),
         effects: fiber ? getFiberEffects(fiber, fibers) : [],
         inject: fiber ? Object.keys(fiber.inject) : [],
         provides: fiber ? [...fiber.provisions].map(impl => impl.name) : [],
@@ -240,12 +287,14 @@ export function Builtin(ctx: Context, config: Console.Config) {
 
   const workspace = ctx.console.data('workspace', () => {
     const names = new Set(getPlugins(ctx).map(plugin => plugin.name))
+    const stack = getStack(ctx)
     return Object.values(localPackages(ctx)).map((pkg): PackageInfo => ({
       name: pkg.name,
       version: pkg.version,
       description: pkg.description,
       path: pkg.path,
       enabled: names.has(pkg.name),
+      compat: toCompat(conclude(readJSON(join(pkg.dir, 'package.json')) ?? { name: pkg.name }), stack),
     }))
   })
   ctx.on('workspace/update', () => workspace.refresh())
@@ -284,7 +333,7 @@ export function Builtin(ctx: Context, config: Console.Config) {
     const pattern = /^(@cormi\/plugin-|cormi-plugin-|@[^/]+\/cormi-plugin-)/
     return [
       ...Object.values(localPackages(ctx)).map(pkg => ({ name: pkg.name, description: pkg.description, local: true })),
-      ...dependencies.filter(name => pattern.test(name)).map(name => ({ name, description: packageOf(ctx, name)?.description, local: false })),
+      ...dependencies.filter(name => pattern.test(name)).map(name => ({ name, description: packageOf(ctx, name).package?.description, local: false })),
     ]
   })
 
@@ -314,12 +363,16 @@ export function Builtin(ctx: Context, config: Console.Config) {
     return names
   })
 
+  // the registry of the app's package manager, e.g. a mirror, unless the console is given one
+  const registry = (config.registry || process.env.npm_config_registry || 'https://registry.npmjs.org').replace(/\/$/, '')
+
   ctx.console.method('market/search', async (query: string = '') => {
     const text = ['keywords:cormi-plugin', query].filter(Boolean).join(' ')
-    const response = await fetch(`${config.registry.replace(/\/$/, '')}/-/v1/search?text=${encodeURIComponent(text)}&size=100`)
+    const response = await fetch(`${registry}/-/v1/search?text=${encodeURIComponent(text)}&size=100`)
     if (!response.ok) throw new Error(`the registry answered ${response.status}`)
-    const result = await response.json() as { objects: { package: MarketPackage }[] }
+    const result = await response.json() as { objects: { package: Omit<MarketPackage, 'compat'> & { keywords?: string[] } }[] }
     const installed: Record<string, string> = { ...app.dependencies, ...app.devDependencies }
+    const stack = getStack(ctx)
     return result.objects.map(({ package: pkg }): MarketPackage => ({
       name: pkg.name,
       version: pkg.version,
@@ -327,7 +380,27 @@ export function Builtin(ctx: Context, config: Console.Config) {
       date: pkg.date,
       links: pkg.links,
       installed: installed[pkg.name],
+      // search results have the keywords that mirror the manifest, not the manifest
+      compat: toCompat(conclude({ name: pkg.name, description: pkg.description, keywords: pkg.keywords }), stack),
     }))
+  })
+
+  // the versions of a package, read when the market needs one that works in the app
+  ctx.console.method('market/resolve', async (name: string): Promise<MarketResolution> => {
+    const response = await fetch(`${registry}/${name.replace('/', '%2f')}`, { headers: { accept: 'application/json' } })
+    if (!response.ok) throw new Error(`the registry answered ${response.status}`)
+    const doc = await response.json() as { 'dist-tags'?: Record<string, string>; versions: Record<string, any> }
+    const stack = getStack(ctx)
+    const check = (version: string) => toCompat(conclude(doc.versions[version]), stack)
+    const latest = doc['dist-tags']?.latest ?? Object.keys(doc.versions).filter(version => valid(version)).sort(rcompare)[0]
+    const compat = check(latest)
+    if (compat.result.status !== 'incompatible') return { latest, compat }
+    for (const version of Object.keys(doc.versions).filter(version => valid(version) && !prerelease(version)).sort(rcompare)) {
+      if (compare(version, latest) >= 0) continue
+      const older = check(version)
+      if (older.result.status === 'ok') return { latest, compat, compatible: { version, compat: older } }
+    }
+    return { latest, compat }
   })
 
   ctx.console.method('market/install', (spec: string) => install(ctx, spec))

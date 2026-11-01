@@ -240,14 +240,14 @@ export namespace Console {
     path: string
     /** title of the console's document */
     title: string
-    /** the registry the market searches */
-    registry: string
+    /** the registry the market searches; by default the package manager's (`npm_config_registry`) */
+    registry?: string
   }
 
   export const Config: Schema<Config> = Schema.object({
     path: Schema.string().default('/__cormi/').description('where the console is served'),
     title: Schema.string().default('Cormi Console'),
-    registry: Schema.string().default('https://registry.npmjs.org').description('the registry the market searches'),
+    registry: Schema.string().description('the registry the market searches, by default the package manager\'s'),
   })
 
   export interface Source {

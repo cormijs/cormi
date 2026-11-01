@@ -1133,3 +1133,71 @@ textarea {
     transition: none;
   }
 }
+
+/* compatibility of packages with the app */
+
+.cc-compat {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.cc-compat .cc-tag + .cc-tag {
+  margin-left: 0;
+}
+
+/* inferred from peer dependencies, not declared */
+.cc-compat[data-source='inferred'] .cc-tag {
+  outline: 1px dashed var(--cc-ink-3);
+  outline-offset: -1px;
+}
+
+.cc-compat-reasons {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--cc-amber);
+  font-size: 13px;
+}
+
+.cc-package[data-compat='incompatible'] .cc-package-name,
+.cc-package[data-compat='incompatible'] p {
+  opacity: 0.7;
+}
+
+.cc-confirm {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--cc-amber);
+  background: var(--cc-amber-soft);
+  font-size: 13px;
+}
+
+.cc-switch-impact p {
+  margin: 0;
+}
+
+.cc-switch-impact p + p {
+  margin-top: 6px;
+}
+
+.cc-switch-impact code + code {
+  margin-left: 6px;
+}
+
+.cc-hidden-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+
+.cc-row-note {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 13px;
+}
+
+.cc-detail-compat {
+  margin-top: 8px;
+}
