@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkCompat, conclude, forExport, manifestKeywords } from '../src/index.ts'
+import { checkCompat, conclude, forExport, manifestKeywords, providedStack } from '../src/index.ts'
 
 describe('manifest', () => {
   it('reads the cormi field: omitted dimensions support any', () => {
@@ -52,5 +52,11 @@ describe('manifest', () => {
     // the app has no UI framework yet; workspace ranges are not compared
     expect(checkCompat(conclude({ name: 'x', peerDependencies: { cormi: 'workspace:*' }, cormi: { renderer: ['vue'] } }), { bundler: 'vite', cormi: '0.1.0' }).status).toBe('ok')
     expect(checkCompat(conclude({ name: 'x' }), { bundler: 'vite' }).status).toBe('unknown')
+  })
+
+  it('takes the implementations of the stack as switching it', () => {
+    const rsbuild = conclude({ name: '@cormi/rsbuild', cormi: { bundler: ['rsbuild'], service: { implements: ['bundler', 'rsbuild'] } } })
+    expect(providedStack(rsbuild)).toEqual({ bundler: 'rsbuild' })
+    expect(checkCompat(rsbuild, { bundler: 'vite', renderer: 'react' }).status).toBe('ok')
   })
 })

@@ -153,6 +153,16 @@ export function forExport(manifest: Manifest, subpath = '.'): Manifest {
   return { ...manifest, ...entry, service: entry.service ?? manifest.service }
 }
 
+/** What a package provides of the stack: `{ bundler: 'rsbuild' }` for one that implements `bundler` and supports `rsbuild` only. */
+export function providedStack(manifest: Manifest.Compat): Partial<Record<Dimension, string>> {
+  const provided: Partial<Record<Dimension, string>> = {}
+  for (const dimension of DIMENSIONS) {
+    const names = manifest[dimension]
+    if (manifest.service?.implements?.includes(dimension) && names?.length === 1) provided[dimension] = names[0]
+  }
+  return provided
+}
+
 /** The keywords that mirror the manifest, for the search results of the registry. */
 export function manifestKeywords(manifest: Manifest): string[] {
   return [
@@ -187,12 +197,17 @@ export interface CompatResult {
   inferred: boolean
 }
 
-/** Whether a plugin works in an app. A dimension the app does not have yet (no bundler) is not judged. */
+/**
+ * Whether a plugin works in an app. A dimension the app does not have yet
+ * (no bundler) is not judged, nor one the package provides: `@cormi/rsbuild`
+ * (`implements: ['bundler']`, `bundler: ['rsbuild']`) replaces the bundler.
+ */
 export function checkCompat(manifest: Manifest, stack: Stack): CompatResult {
   const reasons: CompatReason[] = []
   for (const dimension of DIMENSIONS) {
     const supported = manifest[dimension]
     const current = stack[dimension]
+    if (manifest.service?.implements?.includes(dimension)) continue
     if (supported && current && !supported.includes(current)) reasons.push({ dimension, supported, current })
   }
   // ranges such as `workspace:*` are not versions to compare
