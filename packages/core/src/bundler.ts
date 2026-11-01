@@ -115,4 +115,10 @@ export namespace Bundler {
 export interface Renderer {
   /** the name of the implementation, e.g. `react` */
   readonly name: string
+  /**
+   * The exports of a route module that is not a script, e.g. those of the
+   * `<script>` of a `.vue` file; `undefined` for scripts, which the router
+   * reads itself.
+   */
+  routeExports?(file: string): Promise<string[] | undefined>
 }

@@ -168,9 +168,11 @@ export class Router extends Service {
       })
     }
 
+    const renderer = this.ctx.get('renderer')
     for (const route of Object.values(routes)) {
       if (!route.file) continue
-      route.exports = /\.[cm]?[jt]sx?$/.test(route.file) ? await getModuleExports({ file: route.file }) : []
+      route.exports = await renderer?.routeExports?.(route.file)
+        ?? (/\.[cm]?[jt]sx?$/.test(route.file) ? await getModuleExports({ file: route.file }) : [])
     }
     for (const patch of this._patches) await patch(routes)
 
