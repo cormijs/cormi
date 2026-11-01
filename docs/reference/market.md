@@ -1,6 +1,6 @@
 # 设计：插件市场与兼容性
 
-> 状态：设计已定，第 1、2 阶段（声明与匹配、控制台）已完成。本页记录决策与理由。
+> 状态：设计已定，第 1–3 阶段（声明与匹配、控制台、`cormi plugin check`）已完成，索引服务尚未开始。本页记录决策与理由。
 
 目标：用户在控制台的市场里在线安装插件之前，就能知道它支持哪些打包器、哪些 UI 框架，以及是否适用于当前的应用；装上之后，不兼容的原因也说得清楚。
 
@@ -153,5 +153,5 @@ rsbuild     ✗ rsbuild  ✗ rsbuild
 
 1. **声明与匹配**（已完成）：`Manifest`、`conclude()`、`forExport()`、`checkCompat()`、`manifestKeywords()` 进入 `@cormi/core`；官方插件、打包器与 UI 框架的包写上声明；`cormi g plugin` 的模板带上 `cormi` 字段。
 2. **控制台**（已完成）：市场的徽章、筛选（默认只看兼容的）、“仍要安装”与查找兼容的版本；插件页与工作区页的声明与不兼容原因；换上打包器或 UI 框架之前列出受影响的插件。registry 默认与包管理器相同（`npm_config_registry`）；e2e 用一个本地的假 registry 检查市场。
-3. **`cormi plugin check`**：组合矩阵、推断、`--write` 与关键词生成，官方插件在 CI 中运行。
+3. **`cormi plugin check`**（已完成）：组合来自插件包的开发依赖中提供打包器或 UI 框架的包；栈本身加载失败的组合标为跳过；打包器的支持取自插件注册的 `ctx.bundler.plugin()` 映射的键（否则一个支持 vite 与 rsbuild 的插件在两者都通过时会被误写成“不限”），UI 框架取自 `inject`；浏览器模块（插件注册的入口与 `client`、`console`）不检查——它们与 Node 插件形状相同；必填的配置写在 `cormi.check`。官方插件都以 `@cormi/preset` 与四个实现为开发依赖，`pnpm check:plugins` 检查全部官方插件。
 4. **索引服务**。

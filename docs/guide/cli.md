@@ -12,10 +12,12 @@ cormi <command> [options]
 | `cormi setup` | 只写入 `src/.cormi` 下的生成文件，然后退出 |
 | `cormi generate <type> <name>` | 由生成器创建文件，别名 `g` |
 | `cormi config [name]` | 列出插件树，或打印匹配插件解析后的配置 |
+| `cormi plugin check [--write]` | 在插件包中运行：用每个打包器与 UI 框架加载插件，推断它支持什么，与 package.json 的声明比较（见 [声明兼容性](/plugin/#声明兼容性)） |
 | `cormi help` | 列出所有命令，包括插件注册的命令 |
 
 | 选项 | 作用 |
 |---|---|
+| `--config <file>` | 用另一份插件树代替 `cormi.yml` |
 | `--port <port>` | dev 与 preview 服务器的端口，优先于 `cormi.yml` |
 | `--host <host>` | dev 与 preview 服务器的主机，优先于 `cormi.yml` |
 | `-v`、`--version` | 显示版本 |

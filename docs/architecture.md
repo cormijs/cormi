@@ -267,6 +267,7 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 pnpm build             # tsc -b
 pnpm typecheck:client  # 插件的浏览器端代码
 pnpm test              # 单元测试
+pnpm check:plugins     # 官方插件的兼容性声明与代码一致（cormi plugin check）
 pnpm e2e               # 构建并 preview 每个示例，在浏览器中断言
 pnpm e2e:dev           # 同上，使用 dev server
 pnpm e2e --bundler rsbuild      # 支持 Rsbuild 的示例改用它运行

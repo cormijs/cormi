@@ -187,7 +187,34 @@ export function apply(ctx: Context, config: Config) {
 | `service` | koishi 式的 `required`、`optional`、`implements` |
 | `description` | 市场显示的描述，可以按语言给出：`{ "zh-CN": "…", "en": "…" }` |
 
-声明要与代码一致：`inject: ['react']` 的插件声明 `renderer: ["react"]`，`ctx.bundler.plugin()` 只给了 `vite` 一项的插件声明 `bundler: ["vite"]`。没有 `cormi` 字段的包，市场从它对 `@cormi/react`、`@cormi/vite` 等的 peer 依赖推断，并标为推断。`cormi g plugin` 生成的包已经带上了 `cormi` 字段。设计见 [插件市场与兼容性](/reference/market)。
+声明要与代码一致：`inject: ['react']` 的插件声明 `renderer: ["react"]`，`ctx.bundler.plugin()` 只给了 `vite` 一项的插件声明 `bundler: ["vite"]`。不必手写，在插件包中运行：
+
+```sh
+cormi plugin check            # 检查，与 package.json 不一致时退出码非零（适合 CI）
+cormi plugin check --write    # 写回 cormi 字段，以及镜像它的关键词
+```
+
+```
+@scope/plugin-foo
+
+              react     vue
+    rsbuild   failed    failed
+    vite      ok        pending
+    rsbuild × react, rsbuild × vue: failed: the plugin supports vite, not rsbuild
+    vite × vue: pending: waits for react
+
+  inferred  bundler: vite   renderer: react
+```
+
+它对每个组合以 setup 模式启动一个最小的应用（`@cormi/preset`、打包器、UI 框架与这个插件），看插件是加载了、在等待 `react` 这类服务，还是因为缺少当前打包器的一项而失败；打包器的列表来自 `ctx.bundler.plugin()` 的键，UI 框架来自 `inject`。
+
+- 组合来自插件包的开发依赖：把 `@cormi/preset`，以及想要检查的打包器与 UI 框架（`@cormi/vite`、`@cormi/rsbuild`、`@cormi/react`、`@cormi/vue`）加入 `devDependencies`。没有安装的组合不检查，也不会被写成不支持。
+- 打包器或 UI 框架本身缺少集成包（如 `@rsbuild/plugin-react`）时，那个组合标为跳过，不算插件的问题。
+- 一个包导出多个插件时逐个检查，写回 `exports` 中的覆盖；浏览器模块（插件注册的入口，以及 `client`、`console`）不检查。
+- 插件有必填的配置时，在 `cormi.check` 中给出检查用的配置：`"check": { ".": { "name": "example" } }`。
+- 只在 dev 模式下才有的服务（如 `server`）缺少时，不影响结论。
+
+没有 `cormi` 字段的包，市场从它对 `@cormi/react`、`@cormi/vite` 等的 peer 依赖推断，并标为推断。`cormi g plugin` 生成的包已经带上了 `cormi` 字段。设计见 [插件市场与兼容性](/reference/market)。
 
 ## 下一步
 
