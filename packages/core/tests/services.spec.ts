@@ -23,6 +23,9 @@ describe('services', () => {
     // eslint-disable-next-line no-new
     new Cormi(ctx, { cwd, mode: 'setup' })
     await ctx.plugin(Router, {})
+    // a UI framework registers its route modules, as @cormi/react does
+    ctx.get('router')!.extension('.tsx')
+    await ctx.get('router')!.flush()
     await ctx.plugin(Html, { title: 'Test' })
     await ctx.plugin(App)
   })
@@ -31,7 +34,7 @@ describe('services', () => {
     rmSync(cwd, { recursive: true, force: true })
   })
 
-  it('scans convention routes, their exports and the layout', () => {
+  it('scans convention routes, their exports and the layout', async () => {
     const router = ctx.get('router')!
     expect(router.routes.index).toMatchObject({ path: '/', parentId: '@@/global-layout', exports: ['default'] })
     expect(router.routes.about).toMatchObject({ path: 'about', exports: ['default', 'loader'] })

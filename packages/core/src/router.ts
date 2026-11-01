@@ -23,8 +23,7 @@ declare module 'cordis' {
   }
 }
 
-const ROUTE_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js', '.md', '.mdx']
-const LAYOUT_EXTENSIONS = ['.tsx', '.ts', '.jsx', '.js']
+const SCRIPT_EXTENSIONS = ['.ts', '.js']
 
 interface Layout extends Router.LayoutOptions {
   id: string
@@ -44,6 +43,7 @@ export class Router extends Service {
   routes: Dict<Route> = Object.create(null)
 
   private _routes = new Set<Route>()
+  private _extensions = new Set<string>()
   private _layouts = new Set<Layout>()
   private _patches = new Set<Router.Patch>()
   private _refresher: Refresher
@@ -66,6 +66,27 @@ export class Router extends Service {
     const watcher = watch([this.pagesDir, join(this.ctx.cormi.paths.src, 'layouts')], { ignoreInitial: true })
     watcher.on('all', () => this.refresh())
     yield () => watcher.close()
+  }
+
+  /**
+   * Extensions of route and layout modules: `.ts` and `.js`, and those the
+   * UI framework registers (`.tsx`, `.vue`). Registered ones are tried first.
+   */
+  get extensions() {
+    return [...this._extensions, ...SCRIPT_EXTENSIONS.filter(ext => !this._extensions.has(ext))]
+  }
+
+  /** Let files with these extensions be route modules, e.g. `ctx.router.extension('.tsx', '.jsx')`. */
+  extension(...extensions: string[]) {
+    return this.ctx.effect(() => {
+      const added = extensions.filter(ext => !this._extensions.has(ext))
+      for (const ext of added) this._extensions.add(ext)
+      this.refresh()
+      return () => {
+        for (const ext of added) this._extensions.delete(ext)
+        this.refresh()
+      }
+    }, `ctx.router.extension(${extensions.map(ext => JSON.stringify(ext)).join(', ')})`)
   }
 
   /** Add a route, or replace the route with the same id. */
@@ -120,7 +141,7 @@ export class Router extends Service {
   resolveFile(file: string, basedir = this.pagesDir) {
     if (file.startsWith('@/')) file = join(this.ctx.cormi.paths.src, file.slice(2))
     if (!isAbsolute(file) && !file.startsWith('.')) file = `./${file}`
-    return winPath(resolveModule(file, basedir, ROUTE_EXTENSIONS))
+    return winPath(resolveModule(file, basedir, this.extensions))
   }
 
   private async _update() {
@@ -136,7 +157,7 @@ export class Router extends Service {
     }
 
     const layouts = [...this._layouts]
-    const conventionLayout = this.config.layout && tryPaths(expandExtensions(join(this.ctx.cormi.paths.src, 'layouts/index'), LAYOUT_EXTENSIONS))
+    const conventionLayout = this.config.layout && tryPaths(expandExtensions(join(this.ctx.cormi.paths.src, 'layouts/index'), this.extensions))
     if (conventionLayout) layouts.unshift({ id: '@@/global-layout', file: conventionLayout })
     for (const layout of layouts) {
       addParentRoute({
@@ -160,7 +181,7 @@ export class Router extends Service {
 
   private _getConventionRoutes() {
     const base = this.pagesDir
-    const routes = getConventionRoutes({ base })
+    const routes = getConventionRoutes({ base, extensions: this.extensions })
     for (const route of Object.values(routes)) {
       route.file = winPath(join(base, route.file!))
       // a top-level 404 page catches every unmatched path

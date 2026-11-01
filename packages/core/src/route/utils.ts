@@ -13,13 +13,14 @@ export function byLongestFirst(a: string, b: string): number {
   return b.length - a.length
 }
 
-const routeModuleExts = ['.js', '.jsx', '.ts', '.tsx', '.md', '.mdx']
+/** Extensions of route modules that every app has; UI frameworks add theirs (`.tsx`, `.vue`). */
+export const SCRIPT_EXTENSIONS = ['.ts', '.js']
 
-export function isRouteModuleFile(opts: { file: string; exclude?: RegExp[] }) {
+export function isRouteModuleFile(opts: { file: string; exclude?: RegExp[]; extensions?: string[] }) {
   for (const excludeRegExp of opts.exclude || []) {
     if (opts.file && excludeRegExp instanceof RegExp && excludeRegExp.test(opts.file)) {
       return false
     }
   }
-  return routeModuleExts.includes(extname(opts.file))
+  return (opts.extensions ?? SCRIPT_EXTENSIONS).includes(extname(opts.file))
 }

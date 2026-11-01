@@ -11,14 +11,14 @@ import { byLongestFirst, createRouteId, isRouteModuleFile } from './utils.ts'
  * - `users.tsx` + `users/foo.tsx` -> `/users` layout with nested `foo`
  * - `$id.tsx` -> `:id`, `$.tsx` -> `*`, `not.nested.tsx` -> `not/nested`
  */
-export function getConventionRoutes(opts: { base: string; prefix?: string; exclude?: RegExp[] }) {
+export function getConventionRoutes(opts: { base: string; prefix?: string; exclude?: RegExp[]; extensions?: string[] }) {
   const files: Record<string, string> = {}
   if (!isDirectory(opts.base)) return {}
   visitFiles({
     dir: opts.base,
     visitor: (file) => {
       const routeId = createRouteId(file)
-      if (isRouteModuleFile({ file: winPath(file), exclude: opts.exclude })) {
+      if (isRouteModuleFile({ file: winPath(file), exclude: opts.exclude, extensions: opts.extensions })) {
         files[routeId] = winPath(file)
       }
     },
@@ -62,7 +62,7 @@ function visitFiles(opts: { dir: string; visitor: (file: string) => void; baseDi
     const stat = lstatSync(file)
     if (stat.isDirectory()) {
       visitFiles({ ...opts, dir: file })
-    } else if (stat.isFile() && ['.tsx', '.ts', '.js', '.jsx', '.md', '.mdx'].includes(extname(file))) {
+    } else if (stat.isFile()) {
       opts.visitor(relative(opts.baseDir, file))
     }
   }
