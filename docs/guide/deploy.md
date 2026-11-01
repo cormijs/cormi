@@ -39,7 +39,7 @@ cormi preview
 
 ```ts
 ctx.on('build/before', async () => {
-  // Vite 构建开始之前
+  // 打包器开始构建之前
 })
 
 ctx.on('build/after', async ({ outDir, assets, server }) => {

@@ -14,6 +14,8 @@
 
 联邦应用：每个子包（package）是一个独立的 Cormi 应用，可以单独开发、单独构建、单独部署；底座（host）启动时按 URL 收集子包，把它们的页面接入自己的路由和布局。这一设计来自 HZERO 的“模块联邦微前端”。
 
+federation 建立在 mf 的 Vite 实现之上，目前要求 Vite 与 React：底座与子包都安装 `@module-federation/vite`。
+
 ### 底座
 
 ```yaml
@@ -118,7 +120,7 @@ localStorage.setItem('cormi:packages', JSON.stringify(['http://localhost:8011/']
 
 ## mf
 
-模块联邦（`@module-federation/vite`）：在应用之间共享个别模块。
+模块联邦：在应用之间共享个别模块。Vite 下使用 `@module-federation/vite`，Rsbuild 下使用 `@module-federation/rsbuild-plugin`，由应用安装；host 与 remote 宜使用同一个打包器。
 
 ```yaml
 # remote：暴露模块
@@ -151,7 +153,7 @@ const Greeting = lazy(() => import('remote/Greeting'))
 | `filename` | `remoteEntry.js` | remote 入口的文件名 |
 | `dts` | `true` | 生成暴露模块的类型，并下载 remote 的类型 |
 
-host 在应用入口中初始化（Cormi 的应用没有 index.html）。服务端渲染时 remote 的模块渲染为空，由浏览器加载。暴露模块的应用会允许跨域访问。
+host 在应用入口中初始化（Cormi 的应用没有 index.html；Rsbuild 下入口异步启动，等共享模块就绪）。服务端渲染时 remote 的模块渲染为空，由浏览器加载。暴露模块的应用会允许跨域访问，它的资源以 remote 入口的地址为基准加载。
 
 ## qiankun
 

@@ -70,7 +70,7 @@ Ant Design：`ConfigProvider` 的主题与语言、antd 的 `<App>`，服务端�
 
 ## tailwindcss
 
-Tailwind CSS v4，由打包器的插件处理（Vite 下是 `@tailwindcss/vite`）。
+Tailwind CSS v4，由打包器的插件处理：Vite 下是 `@tailwindcss/vite`，Rsbuild 下是 `@tailwindcss/postcss`，应用安装所用打包器的那一个。
 
 ```yaml
 - name: '@cormi/plugin-tailwindcss'

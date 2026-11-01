@@ -7,10 +7,12 @@
 | `ctx.router` | `@cormi/preset` | `route()`、`layout()`、`patch()`、`extension()` |
 | `ctx.html` | `@cormi/preset` | `head()`、`body()`、`transform()` |
 | `ctx.app` | `@cormi/preset` | `entry()`、`import()`、`file()`、`server()` |
-| `ctx.bundler` | 打包器，如 `@cormi/vite` | `plugin()`、`input()`；构建、开发文档与服务端入口 |
-| `ctx.renderer` | UI 框架，如 `@cormi/react` | — |
+| `ctx.bundler` | 打包器：`@cormi/vite` 或 `@cormi/rsbuild` | `plugin()`、`input()`；构建、开发文档与服务端入口 |
+| `ctx.renderer` | UI 框架：`@cormi/react` 或 `@cormi/vue` | — |
 | `ctx.vite` | `@cormi/vite` | `plugin()`、`configure()`、`input()` |
+| `ctx.rsbuild` | `@cormi/rsbuild` | `plugin()`、`configure()`、`input()` |
 | `ctx.react` | `@cormi/react` | — |
+| `ctx.vue` | `@cormi/vue` | — |
 | `ctx.server` | `@cordisjs/plugin-server`（dev 与 preview） | `get()`、`post()`、`all()`、`use()`、`ws()` |
 | `ctx.workspace` | `cormi`（根上提供） | `create()` |
 | `ctx.console` | `@cormi/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
@@ -20,9 +22,9 @@
 | 插件只用到 | 写法 | 例子 |
 |---|---|---|
 | 通用服务 | `inject: ['app', 'html', 'router', 'bundler']`…… | mock、analytics、export-static、lint |
-| 打包器插件 | `ctx.bundler.plugin({ vite: …, rsbuild: … })`，为支持的每个打包器各给一个 | tailwindcss、unocss |
+| 打包器插件 | `ctx.bundler.plugin({ vite: …, rsbuild: … })`，为支持的每个打包器各给一个 | tailwindcss、mf |
 | React | 再 `inject: ['react']`，浏览器端从 `@cormi/react/client` 导入 | antd、model、request、layout |
-| Vite 特有的能力 | `inject: ['vite']`，使用 `ctx.vite` | legacy、mf、qiankun 子应用 |
+| Vite 特有的能力 | `inject: ['vite']`，使用 `ctx.vite` | legacy、qiankun 子应用 |
 
 所有注册方法都是 effect：注册属于调用方插件，插件卸载时自动撤回，并返回一个可以提前撤回的函数。
 
@@ -132,18 +134,23 @@ ctx.app.server('foo', ctx.cormi.resolve('src/server/foo.ts'))
 各个打包器的插件不能通用，所以 `plugin()` 接收一个按打包器名称索引的对象，为插件支持的每个打包器各给一个它自己的插件。当前的打包器取用自己的那一项；没有时抛出错误，插件加载失败，而不是悄悄缺少一部分功能。
 
 ```ts
-import tailwindcss from '@tailwindcss/vite'
-import type {} from '@cormi/vite'   // 类型：vite 一项的形式由 @cormi/vite 声明
+import { type Context, importPeer } from 'cormi'
+import type {} from '@cormi/rsbuild'   // 类型：rsbuild 一项的形式由 @cormi/rsbuild 声明
+import type {} from '@cormi/vite'
 
 export const inject = ['app', 'bundler']
 
 export function apply(ctx: Context) {
   ctx.bundler.plugin({
-    // 与 ctx.vite.plugin() 接收的相同：插件、插件数组，或每次启动、构建时调用的函数
-    vite: () => tailwindcss(),
+    // 与 ctx.vite.plugin() 接收的相同：插件、插件数组，或每次启动、构建时调用的函数（可以是异步的）
+    vite: async () => (await importPeer('@tailwindcss/vite', 'my-plugin with vite', () => import('@tailwindcss/vite'))).default(),
+    // 与 ctx.rsbuild.plugin() 接收的相同
+    rsbuild: { name: 'my-plugin', setup(api) { /* … */ } },
   })
 }
 ```
+
+各打包器的集成包宜作为可选的 peer 依赖，在用到时才用 `importPeer()` 导入：应用只需安装它所用打包器的那一个，缺少时报出包名。
 
 修改打包配置也写成打包器的插件，例如 Vite 插件的 `config` 钩子：
 
@@ -153,7 +160,7 @@ ctx.bundler.plugin({
 })
 ```
 
-用 [unplugin](https://unplugin.unjs.io) 写的插件一份实现覆盖多个打包器，把它的各个变体放进对象：`{ vite: () => plugin.vite(options), rspack: () => plugin.rspack(options) }`。
+用 [unplugin](https://unplugin.unjs.io) 写的插件一份实现覆盖多个打包器，把它的各个变体放进对象：`{ vite: () => plugin.vite(options), rspack: () => plugin.rspack(options) }`——`@cormi/rsbuild` 没有 `rsbuild` 一项时使用 `rspack` 一项。
 
 | 成员 | 说明 |
 |---|---|
@@ -164,6 +171,7 @@ ctx.bundler.plugin({
 | `input(name, file)` | 客户端构建的额外入口 |
 | `assets(file)` | 一个入口的资源：dev 下是模块本身，构建后是它的产物 |
 | `transformDocument(url, html)` | dev 下给文档加上 HMR 客户端等 |
+| `hotAccept(imports, callback)` | 生成热替换代码：`import * as name` 的模块更新时，以新模块调用 `callback`；渲染器生成入口时使用 |
 | `loadServerEntry()` | 服务端入口：dev 下由开发服务器加载，否则来自构建产物 |
 | `build()` | 构建，前后触发 `build/before`、`build/after` |
 
@@ -194,6 +202,18 @@ ctx.vite.input('about', ctx.cormi.resolve('src/pages/about/index.tsx'))
 | `outDir` | 构建输出目录的绝对路径 |
 | `devServer` | dev 模式下的 Vite 开发服务器 |
 | `build()` | 构建客户端与服务端 bundle，前后触发 `build/before`、`build/after` |
+
+## ctx.rsbuild
+
+Rsbuild 特有的能力，`ctx.bundler` 在 Rsbuild 下就是它。应用分两个环境构建：`web`（浏览器入口与 `input()` 的入口）与 `node`（服务端入口），插件可以用 `api.modifyEnvironmentConfig` 只修改其中一个。dev 模式下开发服务器以中间件模式挂在 `ctx.server` 上，HMR 的 WebSocket 也在同一个 HTTP 服务上。
+
+| 成员 | 说明 |
+|---|---|
+| `plugin(plugin)` | 加一个 Rsbuild 插件，或函数（每次启动、构建时调用）；也接收 `ctx.bundler.plugin()` 的对象 |
+| `configure(config)` | 合并或修改 Rsbuild 配置，按注册顺序 |
+| `input(name, file)` | 客户端构建的额外入口 |
+| `devServer` | dev 模式下的 Rsbuild 开发服务器 |
+| `build()` | 构建两个环境，前后触发 `build/before`、`build/after` |
 
 ## ctx.workspace
 

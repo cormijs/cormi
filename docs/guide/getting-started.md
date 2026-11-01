@@ -36,6 +36,9 @@ pnpm dev            # http://localhost:8000
 | `mf-host` + `mf-remote` | 模块联邦 |
 | `federation-host` + `federation-users` + `federation-orders` | 联邦应用：子包单独部署，底座汇集 |
 | `qiankun-master` + `qiankun-slave` | qiankun 主应用与子应用 |
+| `with-vue` | Vue：单文件组件的路由与 loader、运行时插件安装 Vue 插件 |
+
+`basic`、`with-tailwind`、`with-vue` 与模块联邦的示例也在 Rsbuild 上运行，见 [打包器与 UI 框架](/guide/stack)。
 
 ## 创建一个应用
 
@@ -58,6 +61,7 @@ pnpm dev            # http://localhost:8000
     "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@vitejs/plugin-react": "^5.2.0",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
@@ -85,7 +89,7 @@ pnpm dev            # http://localhost:8000
 
 :::
 
-三行也可以合成一行 `- name: '@cormi/preset-react'`，配置写在一起，效果相同。
+三行也可以合成一行 `- name: '@cormi/preset-react'`，配置写在一起，效果相同（它自带 `@vitejs/plugin-react`）。用 Rsbuild 或 Vue 时换掉对应的一行和依赖，见 [打包器与 UI 框架](/guide/stack)。
 
 写一个页面，React 的 API 从 `@cormi/react/client` 导入：
 

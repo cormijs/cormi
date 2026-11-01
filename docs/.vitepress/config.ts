@@ -5,7 +5,7 @@ const repo = 'https://github.com/Mahoo12138/cormijs'
 export default defineConfig({
   lang: 'zh-CN',
   title: 'Cormi',
-  description: '以 Cordis 为插件宿主的 React 全栈框架：一份 cormi.yml，就是整个应用。',
+  description: '以 Cordis 为插件宿主的前端全栈框架：一份 cormi.yml，就是整个应用。',
   cleanUrls: true,
   lastUpdated: true,
   head: [
@@ -31,6 +31,7 @@ export default defineConfig({
           items: [
             { text: '介绍', link: '/guide/' },
             { text: '快速开始', link: '/guide/getting-started' },
+            { text: '打包器与 UI 框架', link: '/guide/stack' },
           ],
         },
         {

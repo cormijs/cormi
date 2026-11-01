@@ -14,7 +14,7 @@
 | **界面与样式** | | |
 | [`@cormi/plugin-antd`](/plugins/ui#antd) | Ant Design 的主题与语言，SSR 时抽取样式 | React |
 | [`@cormi/plugin-layout`](/plugins/ui#layout) | 基于 antd 的布局，由路由生成菜单与面包屑 | React |
-| [`@cormi/plugin-tailwindcss`](/plugins/ui#tailwindcss) | Tailwind CSS v4 | Vite¹ |
+| [`@cormi/plugin-tailwindcss`](/plugins/ui#tailwindcss) | Tailwind CSS v4 | Vite、Rsbuild¹ |
 | [`@cormi/plugin-unocss`](/plugins/ui#unocss) | UnoCSS | Vite¹ |
 | [`@cormi/plugin-styled-components`](/plugins/ui#styled-components) | `ThemeProvider` 与 SSR 样式抽取 | React · Vite¹ |
 | **构建与开发** | | |
@@ -26,12 +26,12 @@
 | [`@cormi/plugin-lint`](/plugins/build#lint) | `cormi lint` | — |
 | **微前端与联邦** | | |
 | [`@cormi/plugin-federation`](/plugins/micro#federation) | 联邦应用：子包单独构建、部署，底座按 URL 汇集成一个应用 | React · Vite |
-| [`@cormi/plugin-mf`](/plugins/micro#mf) | 模块联邦（`@module-federation/vite`） | Vite |
+| [`@cormi/plugin-mf`](/plugins/micro#mf) | 模块联邦 | Vite、Rsbuild¹ |
 | [`@cormi/plugin-qiankun`](/plugins/micro#qiankun) | qiankun 主应用，以及由 Vite 构建的 qiankun 子应用 | React；子应用另需 Vite |
 
 “要求”是插件需要的 UI 框架与打包器，“—”表示都可以。在不满足要求的应用里，插件转入 pending（控制台显示它在等待的服务），或者加载失败并说明原因。
 
-¹ 通过 `ctx.bundler.plugin()` 为每个打包器各给一个插件，目前提供了 Vite 的；其他打包器随它们的实现补上。
+¹ 通过 `ctx.bundler.plugin()` 为每个打包器各给一个插件；只列出 Vite 的，表示其他打包器的还没有提供。各打包器的集成包由应用安装，例如 tailwindcss 在 Vite 下需要 `@tailwindcss/vite`、在 Rsbuild 下需要 `@tailwindcss/postcss`，mf 需要 `@module-federation/vite` 或 `@module-federation/rsbuild-plugin`。
 
 ## 依赖
 

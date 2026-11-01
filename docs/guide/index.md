@@ -1,6 +1,6 @@
 # 介绍
 
-Cormi 是一个 React 全栈框架。它的插件宿主是 [Cordis](https://github.com/cordiverse/cordis)——[Koishi](https://koishi.chat) 背后的插件系统——设计也遵循 cordis 与 koishi 的哲学。
+Cormi 是一个前端全栈框架，打包器可选 Vite 或 Rsbuild，UI 框架可选 React 或 Vue。它的插件宿主是 [Cordis](https://github.com/cordiverse/cordis)——[Koishi](https://koishi.chat) 背后的插件系统——设计也遵循 cordis 与 koishi 的哲学。
 
 它提供的能力与 umi 这一类框架相当：约定式与配置式路由、布局、服务端渲染、数据加载、API 路由、mock、代理，以及一组覆盖 antd、状态管理、请求、微前端的官方插件。不同之处在于这些能力的形态：Cormi 没有 `api.modifyXxx` 式的插件 API，没有阶段状态机，能力是 `ctx` 上的服务，扩展点是类型化事件。
 
@@ -21,7 +21,7 @@ Cormi 是一个 React 全栈框架。它的插件宿主是 [Cordis](https://gith
 - name: ./plugin.ts
 ```
 
-打包器与 UI 框架也只是插件：`@cormi/vite` 提供 `ctx.bundler`，`@cormi/react` 提供 `ctx.renderer`，换一个实现就是换掉一行（见 [设计：可选的打包器与 UI 框架](/reference/pluggable)）。`@cormi/preset-react` 是前三者合在一起的简写。`cormi.yml` 由 cordis 官方的 loader 加载，所以 cordis 生态里的插件同样可以写进来。
+打包器与 UI 框架也只是插件：`@cormi/vite`、`@cormi/rsbuild` 提供 `ctx.bundler`，`@cormi/react`、`@cormi/vue` 提供 `ctx.renderer`，换一个实现就是换掉一行（见 [打包器与 UI 框架](/guide/stack)）。`@cormi/preset-react` 是前三者合在一起的简写。`cormi.yml` 由 cordis 官方的 loader 加载，所以 cordis 生态里的插件同样可以写进来。
 
 ## 能力是服务
 

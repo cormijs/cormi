@@ -6,7 +6,7 @@ import CordDiagram from './CordDiagram.vue'
 <template>
   <section class="hero">
     <div class="hero-text">
-      <p class="eyebrow"><span class="eyebrow-lamp" />以 Cordis 为插件宿主的 React 全栈框架</p>
+      <p class="eyebrow"><span class="eyebrow-lamp" />以 Cordis 为插件宿主的前端全栈框架</p>
       <h1 class="headline">一份 <span class="file">cormi.yml</span>，<br>就是整个应用。</h1>
       <p class="lede">
         路由、HTML、打包配置、服务端和浏览器运行时，都由插件在 <code>ctx</code> 上注册。修改一个插件的配置，只有它会重载；卸载一个插件，它注册过的一切随之撤回。

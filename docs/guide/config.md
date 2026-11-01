@@ -31,7 +31,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 
 - 修改某个条目的 `config`：只有这个插件重载
 - 新增条目：加载对应插件
-- 删除条目或设置 `disabled: true`：卸载对应插件，它注册的路由、标签、Vite 插件、浏览器入口都会撤回
+- 删除条目或设置 `disabled: true`：卸载对应插件，它注册的路由、标签、打包器插件、浏览器入口都会撤回
 
 本地插件（如 `./plugin.ts`）的源码修改后也会被热替换。
 
@@ -91,7 +91,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 | `scripts` | `[]` | `<body>` 末尾的脚本 |
 | `crossorigin` | `false` | 入口脚本、样式和预加载的 `crossorigin`，资源由 CDN 提供时使用 |
 
-### 构建（`@cormi/vite`）
+### 构建（`@cormi/vite`、`@cormi/rsbuild`）
 
 | 配置 | 默认值 | 说明 |
 |---|---|---|
@@ -101,13 +101,13 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 | `define` | `{}` | 编译时替换的常量 |
 | `sourcemap` | `false` | 生成 source map |
 | `targets` | — | 目标浏览器：`{ chrome: 87, safari: 14 }`（umi 写法）或 esbuild 目标数组 |
-| `vite` | — | 原始的 Vite 配置，合并在默认配置之上 |
+| `vite` / `rsbuild` | — | 原始的 Vite / Rsbuild 配置，合并在默认配置之上 |
 
 ## 环境变量
 
 启动时，应用目录下的 `.env` 与 `.env.local` 会被读入 `process.env`（后者优先，支持 `${VAR}` 展开）。`NODE_ENV` 在 dev 模式下为 `development`，其余模式为 `production`。
 
-浏览器代码通过 `import.meta.env` 读取以 `VITE_` 或 `CORMI_APP_` 开头的变量。
+浏览器代码通过 `import.meta.env` 读取以 `CORMI_APP_` 开头的变量，以及打包器自己的前缀：Vite 的 `VITE_`、Rsbuild 的 `PUBLIC_`。
 
 ## 查看解析后的配置
 

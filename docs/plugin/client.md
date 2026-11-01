@@ -1,6 +1,6 @@
 # 浏览器端
 
-浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormi/react/client` 导入。浏览器插件的形式是：
+浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormi/react/client` 导入，Vue 应用从 `@cormi/vue/client` 导入（见 [Vue](#vue)）。浏览器插件的形式是：
 
 ```tsx
 import type { Context } from '@cormi/react/client'
@@ -23,7 +23,8 @@ export default (ctx: Context, config: { color: string }) => {
 
 | 成员 | 说明 |
 |---|---|
-| `wrap(component, order?)`（React） | 用组件包裹应用根部，也可以写作 `ctx.wrap()`。`order` 大的在外层，相同时后注册的在外层 |
+| `wrap(component, order?)` | 用组件包裹应用根部，也可以写作 `ctx.wrap()`。`order` 大的在外层，相同时后注册的在外层；Vue 的包装组件渲染默认插槽 |
+| `use(plugin, ...options)`（Vue） | 安装一个 Vue 插件，即 `app.use()` |
 | `props` | 宿主（如 qiankun 主应用）传入的 props；独立运行时为空对象 |
 | `setProps(props)` | 更新 props，触发 `app/props` |
 
@@ -31,12 +32,12 @@ export default (ctx: Context, config: { color: string }) => {
 
 ### ctx.$router
 
-路由表、模块与导航。React 应用中由 React Router 7 的数据路由实现。
+路由表、模块与导航。React 应用中由 React Router 7 的数据路由实现，Vue 应用中由 Vue Router 实现（路由以 id 命名）。
 
 | 成员 | 说明 |
 |---|---|
 | `routes` | 路由清单 `{ [id]: RouteData }`，含 `path`、`parentId`、`meta` |
-| `router` | React Router 的路由器实例，应用渲染后可用 |
+| `router` | React Router 或 Vue Router 的路由器实例，应用渲染后可用 |
 | `add(routes, modules?)` | 在运行时添加路由；已渲染时直接修补路由器，插件卸载时移除 |
 | `navigate(to, options?)` | 导航 |
 | `href(location)` | 一个位置的 URL：带上 basename，hash 模式下在 `#` 之后 |
@@ -102,6 +103,30 @@ function Tracker() {
   return null
 }
 ```
+
+## Vue
+
+Vue 应用的浏览器插件与 React 的写法相同，只是从 `@cormi/vue/client` 导入，并多了 `ctx.$app.use()`：
+
+```ts
+import type { Context } from '@cormi/vue/client'
+import { createPinia } from 'pinia'
+
+export default (ctx: Context) => {
+  ctx.$app.use(createPinia())
+}
+```
+
+Vue 插件无法卸载，所以 `use()` 的注册被撤回时，应用会重新挂载一次。组合式函数：
+
+| 函数 | 说明 |
+|---|---|
+| `useCordis()` | 应用的根 Context |
+| `useContext()` | 派生一个随组件作用域销毁的 Context |
+| `useHostProps()` | 宿主传入的 props，一个 ref |
+| `useLoaderData()` | 当前路由组件的 loader 数据，一个 computed ref |
+
+`@cormi/vue/client` 还重新导出了 Vue Router（`RouterLink`、`RouterView`、`useRoute`……）与 `redirect()`。
 
 ## 入口的生命周期
 

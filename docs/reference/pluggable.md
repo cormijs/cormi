@@ -1,6 +1,6 @@
 # 设计：可选的打包器与 UI 框架
 
-> 状态：设计已定，按阶段实施中（第 1、2 阶段已完成）。本页记录决策与理由。
+> 状态：设计已定，按阶段实施中（第 1–3 阶段已完成）。本页记录决策与理由。
 
 目标：Vite 与 React 不再是框架的一部分，而是可替换的实现。用户在 `cormi.yml` 里选择打包器与 UI 框架，其余能力（路由表、HTML、页面服务、API、loader、插件树、控制台）保持一致。
 
@@ -55,21 +55,25 @@ interface Renderer {
 
 缺少当前打包器的一项时抛出错误，而不是忽略：插件加载失败，并说明它支持哪些打包器。悄悄跳过会让 tailwind 这类插件“加载成功”却不生效。可有可无的增强（只在 Vite 下才需要的额外配置）由插件写成 `ctx.inject(['vite'], …)`。
 
-随第二个实现补上的部分：
+第二个实现带来的部分：
 
 ```ts
 interface Bundler {
-  /** 生成代码中的热更新：import.meta.hot（Vite）或 import.meta.webpackHot（Rspack） */
-  hmr: { accept(deps: string[], callback: string): string }
+  /**
+   * 生成热替换代码：import * as name 的模块更新时，以新模块调用 callback。
+   * Vite 用 import.meta.hot.accept()；Rspack 用 import.meta.webpackHot.accept()，
+   * 它在回调前重新绑定更新过的导入，新模块就是绑定变了的那些
+   */
+  hotAccept(imports: [specifier: string, name: string][], callback: string): string
 }
 
 interface Renderer {
-  /** 编译 UI 框架的打包器插件 */
-  compile: { vite?(): unknown; rspack?(): unknown }
-  /** loader、clientLoader 等导出的识别（.vue 需要自己的实现） */
-  analyzeExports(file: string): Promise<string[]>
+  /** 不是脚本的路由模块的导出，例如 .vue 文件 <script> 块的；脚本由路由器自己读取 */
+  routeExports?(file: string): Promise<string[] | undefined>
 }
 ```
+
+原计划中 `Renderer` 的 `compile`（按打包器分派的编译插件）不需要单独的方法：渲染器用 `ctx.bundler.plugin({ vite, rsbuild })` 注册它们，与其他插件相同。
 
 浏览器端同样分两层：
 
@@ -102,17 +106,30 @@ interface Renderer {
 - name: '@cormi/react'       # UI 框架；或 @cormi/vue
 ```
 
+### 第二个实现的取舍
+
+| 问题 | 做法 |
+|---|---|
+| 打包器与 UI 框架的集成包（`@vitejs/plugin-react`、`@rsbuild/plugin-vue`……） | `@cormi/react`、`@cormi/vue` 与官方插件的可选 peer 依赖，用到时才由 `importPeer()` 导入，缺少时报出包名；Vite 应用不会装上 Rspack。`@cormi/preset-react` 自带 `@vitejs/plugin-react` |
+| Rsbuild 的服务端入口 | `node` 环境；应用的依赖从它的 `node_modules` 导入（`autoExternal`），框架只有一份实例，工作区包与浏览器插件的包从源码打包。dev 下产出 CommonJS：Rsbuild 运行 ES 模块的 bundle 需要 `--experimental-vm-modules`，CommonJS 则可以 `require()` ES 模块（Node 22.12） |
+| Rsbuild 的 dev 资源 | 来自 manifest（`output.manifest.generate` 在编译时记下）；关闭懒编译，否则服务端渲染的页面拿不到路由的样式 |
+| Rsbuild 的 HMR | 中间件模式挂在 `ctx.server` 上，WebSocket 在同一个 HTTP 服务；客户端端口固定为应用的端口，模块联邦的 remote 被其他应用加载时也连回自己 |
+| 模块联邦 | Rsbuild 下用 `@module-federation/rsbuild-plugin`，入口异步启动（`asyncStartup`）而不需要 bootstrap 模块；remote 的资源以 `assetPrefix: 'auto'` 从自己的地址加载；服务端用 `NormalModuleReplacementPlugin` 把 remote 换成空组件 |
+| Vue 的路由模块 | `loader` 写在 `<script>` 块；剥离发生在编译之前，从源码中去掉——Vue 的编译器在 dev 下把组件的所有顶层绑定交给模板，编译之后再删会留下引用 |
+| Vue 的 loader | 在 Vue Router 的 `beforeResolve` 中运行，数据在导航确认后写入；按路由器实例保存，服务端每个请求一份。`useLoaderData()` 通过 `matchedRouteKey` 找到所在的路由 |
+| e2e | `--bundler rsbuild` 把示例的 `@cormi/vite` 换成 `@cormi/rsbuild`（或把 `@cormi/preset-react` 展开），用 `--config` 运行生成的插件树 |
+
 ## 插件的分类
 
 | 类别 | 插件 | 写法 |
 |---|---|---|
 | 通用 | mock、analytics、export-static、lint | 只用通用服务 |
-| 按打包器适配 | tailwindcss、unocss | `ctx.bundler.plugin({ vite, … })` |
+| 按打包器适配 | tailwindcss、mf（Vite、Rsbuild）；unocss（Vite） | `ctx.bundler.plugin({ vite, … })` |
 | React | model、initial-state、request、react-query、dva、valtio、antd、layout、mpa、qiankun 主应用；styled-components 另按打包器适配 | `inject: ['react']` |
-| Vite | legacy、mf | `inject: ['vite']` |
+| Vite | legacy | `inject: ['vite']` |
 | React 与 Vite | federation、qiankun 子应用 | `inject: ['vite', 'react']` |
 
-legacy 是 `@vitejs/plugin-legacy` 的封装，Rsbuild 自己按 browserslist 降级，不需要它。mf 与 federation 依赖 `@module-federation/vite`，Rsbuild 下改用原生的模块联邦，在第 3 阶段补上。
+legacy 是 `@vitejs/plugin-legacy` 的封装，Rsbuild 自己按 browserslist 降级，不需要它。federation 的子包是 `@module-federation/vite` 的 ES 模块容器，所以底座也注入 `vite`。
 
 ## 实施阶段
 
@@ -120,5 +137,5 @@ legacy 是 `@vitejs/plugin-legacy` 的封装，Rsbuild 自己按 browserslist �
 
 1. **无行为变化的拆分**（已完成）：`@cormi/client` 拆为 `@cormi/runtime` 与 `@cormi/react`；preset 中的 React 渲染器移入 `@cormi/react`，与 UI 框架无关的部分成为 `@cormi/preset`；`@cormi/vite` 提供 `bundler`；页面服务中 Vite 特有的逻辑移到 `bundler` 接口之后；core 不再写死 `.tsx`；`cormi` 不再依赖 React 与 Vite。只适用于 Vite 的插件已改用 `ctx.vite` 的类型并以 `@cormi/vite` 为 peer 依赖。
 2. **插件分类与改造**（已完成）：`ctx.bundler.plugin()` 与 `Bundler.Plugins`；React 渲染器、文件约定、tailwindcss、unocss、styled-components 通过它注册打包器插件，不再注入 `vite`；React 插件声明 `inject: ['react']`；plugin-lint 只在 React 应用中启用 hooks 规则。分类见下表。
-3. **第二实现**：`@cormi/rsbuild`（basic、tailwind、模块联邦的 e2e），`@cormi/vue` 与 Vue 示例；e2e 变为组合矩阵。
+3. **第二实现**（已完成）：`@cormi/rsbuild`；React、文件约定、tailwindcss、mf 的 Rsbuild 实现；`@cormi/vue` 与 `with-vue` 示例。e2e 是组合矩阵：Vite 上全部示例，Rsbuild 上 basic、with-tailwind、with-vue 与模块联邦，各自 preview 与 dev。
 4. **控制台解耦**与文档，控制台概览显示当前的打包器与 UI 框架。

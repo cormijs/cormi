@@ -6,7 +6,7 @@ cormi <command> [options]
 
 | 命令 | 作用 |
 |---|---|
-| `cormi dev` | 启动开发服务器：HTTP 服务、Vite 开发中间件、文件监听、[控制台](/guide/console)；`cormi.yml` 与本地插件热重载 |
+| `cormi dev` | 启动开发服务器：HTTP 服务、打包器的开发中间件、文件监听、[控制台](/guide/console)；`cormi.yml` 与本地插件热重载 |
 | `cormi build` | 构建客户端（以及服务端）bundle，然后退出 |
 | `cormi preview` | 运行构建产物 |
 | `cormi setup` | 只写入 `src/.cormi` 下的生成文件，然后退出 |

@@ -52,4 +52,4 @@ umi 是 Cormi 的能力清单：一个全栈框架该有的东西，Cormi 基本
 
 已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载；exportStatic、MPA、legacy；dev、build、preview、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件。umi 没有内置的联邦应用（federation）也已提供。
 
-尚未覆盖：access 与 locale 插件。webpack、mako、mfsu 这类与打包器绑定的功能有意不做——Cormi 只用 Vite。
+尚未覆盖：access 与 locale 插件。mfsu 这类与某个打包器深度绑定的功能有意不做；打包器可选 Vite 或 Rsbuild，见 [打包器与 UI 框架](/guide/stack)。

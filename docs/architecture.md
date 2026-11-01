@@ -1,6 +1,6 @@
 # Cormi 架构
 
-Cormi 是一个以 Cordis 4 为宿主的前端全栈框架。它不是 umi 的克隆：umi 只作为「全栈框架该有哪些能力」的清单，API 形态完全遵循 cordis / koishi 的哲学。打包器与 UI 框架也是插件：目前的实现是 Vite（`@cormi/vite`）与 React（`@cormi/react`），设计见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
+Cormi 是一个以 Cordis 4 为宿主的前端全栈框架。它不是 umi 的克隆：umi 只作为「全栈框架该有哪些能力」的清单，API 形态完全遵循 cordis / koishi 的哲学。打包器与 UI 框架也是插件：打包器有 Vite（`@cormi/vite`）与 Rsbuild（`@cormi/rsbuild`），UI 框架有 React（`@cormi/react`）与 Vue（`@cormi/vue`），设计见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
 
 ## 原则
 
@@ -57,10 +57,11 @@ cormi dev | build | preview | setup
 | `ctx.router` | `@cormi/core` | `route(route)`、`layout(file, options?)`、`patch(fn)`、`extension(...exts)` |
 | `ctx.html` | `@cormi/core` | `head(tag)`、`body(tag)`、`transform(fn)` |
 | `ctx.app` | `@cormi/core` | `entry(module, config?)`、`import(source)`、`file(path, content)`、`server(key, file)` |
-| `ctx.bundler` | 打包器（`@cormi/vite`） | `plugin({ [打包器]: 插件 })`、`input(name, file)`；`assets(file)`、`loadServerEntry()`、`build()` 等由页面服务器与命令使用 |
-| `ctx.renderer` | UI 框架（`@cormi/react`） | —（标记当前的 UI 框架，生成 `entry.*`、`server.*` 等文件） |
+| `ctx.bundler` | 打包器（`@cormi/vite`、`@cormi/rsbuild`） | `plugin({ [打包器]: 插件 })`、`input(name, file)`；`assets(file)`、`loadServerEntry()`、`hotAccept()`、`build()` 等由页面服务器、渲染器与命令使用 |
+| `ctx.renderer` | UI 框架（`@cormi/react`、`@cormi/vue`） | —（标记当前的 UI 框架，生成 `entry.*`、`server.*` 等文件；`routeExports()` 读取非脚本路由模块的导出） |
 | `ctx.vite` | `@cormi/vite` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
-| `ctx.react` | `@cormi/react` | — |
+| `ctx.rsbuild` | `@cormi/rsbuild` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
+| `ctx.react`、`ctx.vue` | `@cormi/react`、`@cormi/vue` | — |
 | `ctx.server` | `@cordisjs/plugin-server` | `get/post/all(path, mw)`、`use(mw)`、`ws(path)` |
 
 `ctx.bundler` 与 `ctx.renderer` 是两个接缝（契约在 `@cormi/core` 的 `bundler.ts`）：与打包器、UI 框架无关的插件只用它们；只适用于某个实现的插件 `inject: ['vite']` 或 `inject: ['react']`，换掉实现时自动转入 pending。打包器插件不能通用，`ctx.bundler.plugin({ vite, rsbuild })` 为每个打包器各给一个，键的类型由打包器包以声明合并加入 `Bundler.Plugins`；没有当前打包器的一项时抛出错误。React 渲染器、文件约定、tailwindcss、unocss、styled-components 都这样注册打包器插件，修改打包配置也写成插件（Vite 插件的 `config` 钩子）。
@@ -268,4 +269,6 @@ pnpm typecheck:client  # 插件的浏览器端代码
 pnpm test              # 单元测试
 pnpm e2e               # 构建并 preview 每个示例，在浏览器中断言
 pnpm e2e:dev           # 同上，使用 dev server
+pnpm e2e --bundler rsbuild      # 支持 Rsbuild 的示例改用它运行
+pnpm e2e:dev --bundler rsbuild
 ```
