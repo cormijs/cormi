@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import tailwindcss from '@tailwindcss/vite'
-import { type Context, Schema, winPath } from 'cormi'
+import { type Context, importPeer, Schema, winPath } from 'cormi'
+import type {} from '@cormi/rsbuild'
 import type {} from '@cormi/vite'
 
 export const name = 'tailwindcss'
@@ -19,9 +19,29 @@ export const Config: Schema<Config> = Schema.object({
   css: Schema.string().description('your own stylesheet with @import "tailwindcss"'),
 })
 
-/** Tailwind CSS v4 through the plugin of the bundler; the stylesheet is imported before the app starts. */
+/**
+ * Tailwind CSS v4: `@tailwindcss/vite` with Vite, `@tailwindcss/postcss`
+ * with Rsbuild, which the app installs; the stylesheet is imported before
+ * the app starts.
+ */
 export function apply(ctx: Context, config: Config) {
-  ctx.bundler.plugin({ vite: () => tailwindcss() })
+  ctx.bundler.plugin({
+    vite: async () => {
+      const { default: tailwindcss } = await importPeer('@tailwindcss/vite', '@cormi/plugin-tailwindcss with vite', () => import('@tailwindcss/vite'))
+      return tailwindcss()
+    },
+    rsbuild: async () => {
+      const { default: tailwindcss } = await importPeer('@tailwindcss/postcss', '@cormi/plugin-tailwindcss with rsbuild', () => import('@tailwindcss/postcss'))
+      return {
+        name: 'cormi:tailwindcss',
+        setup(api) {
+          api.modifyRsbuildConfig((config, { mergeRsbuildConfig }) => mergeRsbuildConfig(config, {
+            tools: { postcss: (_, { addPlugins }) => addPlugins(tailwindcss()) },
+          }))
+        },
+      }
+    },
+  })
   if (config.css) {
     ctx.app.import(ctx.cormi.resolve(config.css))
     return

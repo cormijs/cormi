@@ -25,15 +25,28 @@
     "tailwindcss"
   ],
   "peerDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
     "cormi": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@tailwindcss/postcss": {
+      "optional": true
+    },
+    "@tailwindcss/vite": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "tailwindcss": "^4.3.3",
-    "vite": "^7.3.7"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
-    "cormi": "workspace:*"
+    "@rsbuild/core": "^2.3.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "cormi": "workspace:*",
+    "vite": "^7.3.7"
   }
 }

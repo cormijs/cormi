@@ -26,15 +26,25 @@
     "micro-frontends"
   ],
   "peerDependencies": {
-    "@cormi/vite": "workspace:*",
+    "@module-federation/rsbuild-plugin": "^2.9.2",
+    "@module-federation/vite": "^1.23.7",
     "cormi": "workspace:*"
   },
-  "dependencies": {
-    "@module-federation/vite": "^1.23.7",
-    "vite": "^7.3.7"
+  "peerDependenciesMeta": {
+    "@module-federation/rsbuild-plugin": {
+      "optional": true
+    },
+    "@module-federation/vite": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
-    "cormi": "workspace:*"
+    "@module-federation/rsbuild-plugin": "^2.9.2",
+    "@module-federation/vite": "^1.23.7",
+    "@rsbuild/core": "^2.3.0",
+    "cormi": "workspace:*",
+    "vite": "^7.3.7"
   }
 }
