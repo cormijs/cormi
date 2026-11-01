@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-tailwindcss",
   "description": "Tailwind CSS v4 for Cormi apps",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -48,7 +48,7 @@
   "peerDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@tailwindcss/postcss": {
@@ -70,7 +70,7 @@
     "@rsbuild/core": "^2.3.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "vite": "^7.3.7"
   }
 }

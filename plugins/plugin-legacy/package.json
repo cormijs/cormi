@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-legacy",
   "description": "Legacy browsers for Cormi apps, with @vitejs/plugin-legacy",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -46,7 +46,7 @@
   },
   "peerDependencies": {
     "@cormijs/vite": "workspace:*",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   },
   "dependencies": {
     "@vitejs/plugin-legacy": "^7.2.1",
@@ -59,6 +59,6 @@
     "@cormijs/rsbuild": "workspace:*",
     "@cormijs/vite": "workspace:*",
     "@cormijs/vue": "workspace:*",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   }
 }

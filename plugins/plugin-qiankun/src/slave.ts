@@ -1,4 +1,4 @@
-import { type Context, readJSON, Schema } from 'cormi'
+import { type Context, readJSON, Schema } from '@cormijs/cormi'
 import { toQiankunDocument } from './document.ts'
 import type {} from '@cormijs/vite'
 

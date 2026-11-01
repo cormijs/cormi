@@ -1,4 +1,4 @@
-import type { Route } from 'cormi'
+import type { Route } from '@cormijs/cormi'
 import { describe, expect, it } from 'vitest'
 import { getShared, toContainerName, toManifestRoutes } from '../src/shared.ts'
 

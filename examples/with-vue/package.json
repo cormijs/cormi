@@ -15,7 +15,7 @@
     "@cormijs/vue": "workspace:*",
     "@rsbuild/plugin-vue": "^2.0.1",
     "@vitejs/plugin-vue": "^6.0.10",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "vue": "^3.5.44"
   },
   "devDependencies": {

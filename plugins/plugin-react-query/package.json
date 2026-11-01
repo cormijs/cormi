@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-react-query",
   "description": "TanStack Query for Cormi apps",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -49,7 +49,7 @@
   "peerDependencies": {
     "@cormijs/react": "workspace:*",
     "@tanstack/react-query": "^5",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": ">=19"
   },
   "dependencies": {
@@ -64,7 +64,7 @@
     "@cormijs/vue": "workspace:*",
     "@tanstack/react-query": "^5.105.0",
     "@types/react": "^19.3.0",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1"
   }
 }

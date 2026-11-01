@@ -13,7 +13,7 @@
     "@cormijs/plugin-request": "workspace:*",
     "@cormijs/preset-react": "workspace:*",
     "@cormijs/react": "workspace:*",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

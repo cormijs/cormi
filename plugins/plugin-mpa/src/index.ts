@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import { watch } from 'chokidar'
-import { type App, type Context, expandExtensions, readJSON, Schema, tryPaths, winPath } from 'cormi'
+import { type App, type Context, expandExtensions, readJSON, Schema, tryPaths, winPath } from '@cormijs/cormi'
 import type {} from '@cormijs/react'
 
 export const name = 'mpa'

@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-layout",
   "description": "A layout with a menu built from the routes, for Cormi apps, with Ant Design",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -51,7 +51,7 @@
   "peerDependencies": {
     "@cormijs/react": "workspace:*",
     "antd": ">=6",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": ">=19"
   },
   "dependencies": {
@@ -65,7 +65,7 @@
     "@cormijs/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "antd": "^6.6.8",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1"
   }
 }

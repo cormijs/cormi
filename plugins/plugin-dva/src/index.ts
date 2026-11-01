@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from 'node:fs'
 import { basename, extname, join, relative } from 'node:path'
 import { watch } from 'chokidar'
-import { type Context, Schema, winPath } from 'cormi'
+import { type Context, Schema, winPath } from '@cormijs/cormi'
 import type { ClientConfig } from './types.ts'
 
 export type * from './types.ts'

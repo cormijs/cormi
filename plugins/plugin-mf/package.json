@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-mf",
   "description": "Module federation for Cormi apps, with @module-federation/vite",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -54,7 +54,7 @@
   "peerDependencies": {
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@module-federation/rsbuild-plugin": {
@@ -73,7 +73,7 @@
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",
     "@rsbuild/core": "^2.3.0",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "vite": "^7.3.7"
   }
 }

@@ -18,7 +18,7 @@
     "@rsbuild/plugin-react": "^2.1.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

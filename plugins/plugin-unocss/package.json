@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-unocss",
   "description": "UnoCSS for Cormi apps",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -45,7 +45,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   },
   "dependencies": {
     "unocss": "^66.12.0",
@@ -57,6 +57,6 @@
     "@cormijs/rsbuild": "workspace:*",
     "@cormijs/vite": "workspace:*",
     "@cormijs/vue": "workspace:*",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   }
 }

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 import { type Preset, presetMini, presetWind3, presetWind4 } from 'unocss'
 import UnoCSS from 'unocss/vite'
 import type {} from '@cormijs/vite'

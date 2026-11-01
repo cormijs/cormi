@@ -8,7 +8,7 @@ export function Generators(ctx: Context) {
     description: 'an API route: src/api/<name>.ts',
     async run(name) {
       return [await createFile(join(ctx.cormi.paths.src, 'api', `${name}.ts`), [
-        `import type { ApiHandler } from 'cormi'`,
+        `import type { ApiHandler } from '@cormijs/cormi'`,
         '',
         `export const GET: ApiHandler = (request, { params }) => {`,
         `  return { params }`,

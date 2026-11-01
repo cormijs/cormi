@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as mf from '@cormijs/plugin-mf'
-import { type Context, readJSON, Schema } from 'cormi'
+import { type Context, readJSON, Schema } from '@cormijs/cormi'
 import { checkShared, getShared, REGISTRY_FILE, REMOTE_ENTRY, toContainerName } from './shared.ts'
 
 export const name = 'federation-host'

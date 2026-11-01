@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-analytics",
   "description": "Google Analytics 4 and Baidu Tongji for Cormi apps, including client navigations",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -44,7 +44,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   },
   "devDependencies": {
     "@cormijs/preset": "workspace:*",
@@ -52,6 +52,6 @@
     "@cormijs/rsbuild": "workspace:*",
     "@cormijs/vite": "workspace:*",
     "@cormijs/vue": "workspace:*",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   }
 }

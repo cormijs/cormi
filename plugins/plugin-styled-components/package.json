@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-styled-components",
   "description": "styled-components for Cormi apps: theme and server-rendered styles",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -51,7 +51,7 @@
   },
   "peerDependencies": {
     "@cormijs/react": "workspace:*",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": ">=19",
     "styled-components": "^6"
   },
@@ -62,7 +62,7 @@
     "@cormijs/vite": "workspace:*",
     "@cormijs/vue": "workspace:*",
     "@types/react": "^19.3.0",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1",
     "styled-components": "^6.6.0"
   }

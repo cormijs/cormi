@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { type Context, importPeer, Schema } from 'cormi'
+import { type Context, importPeer, Schema } from '@cormijs/cormi'
 import type {} from '@cormijs/rsbuild'
 import type {} from '@cormijs/vite'
 

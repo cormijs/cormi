@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-antd",
   "description": "Ant Design for Cormi apps: theme, locale, and server-rendered styles",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -50,7 +50,7 @@
     "@ant-design/cssinjs": "^2.1.2",
     "@cormijs/react": "workspace:*",
     "antd": ">=6",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": ">=19"
   },
   "devDependencies": {
@@ -62,7 +62,7 @@
     "@cormijs/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "antd": "^6.6.8",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1"
   }
 }

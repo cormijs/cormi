@@ -1,4 +1,4 @@
-import { type Context, Schema, tryResolveModule } from 'cormi'
+import { type Context, Schema, tryResolveModule } from '@cormijs/cormi'
 import type { ClientConfig } from './types.ts'
 
 export type * from './types.ts'

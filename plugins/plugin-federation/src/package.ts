@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import * as mf from '@cormijs/plugin-mf'
-import { type App, type Context, readJSON, type Route, Schema, winPath } from 'cormi'
+import { type App, type Context, readJSON, type Route, Schema, winPath } from '@cormijs/cormi'
 import { checkShared, getShared, MANIFEST_FILE, type Manifest, REMOTE_ENTRY, toContainerName, toManifestRoutes } from './shared.ts'
 import type {} from '@cormijs/vite'
 

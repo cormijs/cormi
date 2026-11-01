@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { type Context, type Route, Schema } from 'cormi'
+import { type Context, type Route, Schema } from '@cormijs/cormi'
 
 export const name = 'export-static'
 export const inject = ['app', 'router', 'html', 'bundler']

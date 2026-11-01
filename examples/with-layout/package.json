@@ -16,7 +16,7 @@
     "@cormijs/preset-react": "workspace:*",
     "@cormijs/react": "workspace:*",
     "antd": "^6.6.8",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

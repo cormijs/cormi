@@ -1,4 +1,4 @@
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 import type { ClientConfig } from './types.ts'
 import type {} from '@cormijs/vite'
 

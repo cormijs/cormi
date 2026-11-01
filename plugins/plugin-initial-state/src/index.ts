@@ -1,4 +1,4 @@
-import type { Context } from 'cormi'
+import type { Context } from '@cormijs/cormi'
 
 export const name = 'initial-state'
 export const inject = ['app', 'react']

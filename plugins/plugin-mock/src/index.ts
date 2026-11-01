@@ -2,7 +2,7 @@ import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { watch } from 'chokidar'
-import { type Context, createFile, Schema, send, toRequest } from 'cormi'
+import { type Context, createFile, Schema, send, toRequest } from '@cormijs/cormi'
 import { match, type MatchFunction } from 'path-to-regexp'
 
 export const name = 'mock'

@@ -1,4 +1,4 @@
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormijs/cormi/client'
 import type { ClientConfig } from '../src/types.ts'
 
 declare global {

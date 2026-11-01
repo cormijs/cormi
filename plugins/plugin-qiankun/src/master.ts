@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 import type { MasterClientConfig, MicroAppConfig, SandboxConfig } from './types.ts'
 
 export type * from './types.ts'

@@ -1,4 +1,4 @@
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 
 export const name = 'valtio'
 export const inject = ['app', 'react']

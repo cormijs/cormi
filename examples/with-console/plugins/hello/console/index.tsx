@@ -1,5 +1,5 @@
-import type { Context } from 'cormi/client'
-import { useData } from 'cormi/console'
+import type { Context } from '@cormijs/cormi/client'
+import { useData } from '@cormijs/cormi/console'
 
 function HelloPage() {
   const hello = useData<{ greeting: string; loadedAt: string }>('hello')

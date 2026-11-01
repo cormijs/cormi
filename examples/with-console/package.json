@@ -15,7 +15,7 @@
     "@cormijs/vite": "workspace:*",
     "@rsbuild/plugin-react": "^2.1.1",
     "@vitejs/plugin-react": "^5.2.0",
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

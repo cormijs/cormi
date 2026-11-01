@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import js from '@eslint/js'
-import { CommandError, type Context, Schema } from 'cormi'
+import { CommandError, type Context, Schema } from '@cormijs/cormi'
 import { ESLint, type Linter } from 'eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import globals from 'globals'

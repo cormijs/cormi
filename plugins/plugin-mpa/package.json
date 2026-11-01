@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-mpa",
   "description": "Multi-page Cormi apps: every src/pages/<name>/index.tsx is a page of its own",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -46,7 +46,7 @@
   },
   "peerDependencies": {
     "@cormijs/react": "workspace:*",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   },
   "dependencies": {
     "chokidar": "^4.0.3"
@@ -57,6 +57,6 @@
     "@cormijs/rsbuild": "workspace:*",
     "@cormijs/vite": "workspace:*",
     "@cormijs/vue": "workspace:*",
-    "cormi": "workspace:*"
+    "@cormijs/cormi": "workspace:*"
   }
 }

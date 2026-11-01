@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { type Context, importPeer, Schema, winPath } from 'cormi'
+import { type Context, importPeer, Schema, winPath } from '@cormijs/cormi'
 import type {} from '@cormijs/rsbuild'
 import type {} from '@cormijs/vite'
 

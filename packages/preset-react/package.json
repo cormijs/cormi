@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/preset-react",
   "description": "A React app bundled by Vite: @cormijs/preset, @cormijs/vite and @cormijs/react with one flat config",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -68,7 +68,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "cormi": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
     "react": ">=19",
     "react-dom": ">=19"
   },
