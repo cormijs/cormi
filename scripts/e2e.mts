@@ -68,6 +68,41 @@ async function serveStatic(dir: string, port: number) {
   return server
 }
 
+/**
+ * A registry with a few plugins for the market of the console: their search
+ * results have the keywords that mirror their manifests.
+ */
+const REGISTRY_PORT = 8399
+const REGISTRY = `http://localhost:${REGISTRY_PORT}`
+const MARKET: { name: string; version: string; description: string; keywords: string[]; versions?: Record<string, object> }[] = [
+  { name: 'cormi-plugin-anywhere', version: '1.0.0', description: 'works in any app', keywords: ['cormi-plugin', 'bundler:*', 'renderer:*'] },
+  {
+    name: 'cormi-plugin-vue-only',
+    version: '2.0.0',
+    description: 'Vue only since 2.0',
+    keywords: ['cormi-plugin', 'bundler:*', 'renderer:vue'],
+    versions: { '1.0.0': { cormi: { renderer: ['react'] } }, '2.0.0': { cormi: { renderer: ['vue'] } } },
+  },
+  { name: 'cormi-plugin-undeclared', version: '0.1.0', description: 'declares nothing', keywords: ['cormi-plugin'] },
+  { name: 'cormi-plugin-webpack', version: '1.0.0', description: 'a bundler', keywords: ['cormi-plugin', 'bundler:webpack', 'renderer:*', 'impl:bundler', 'impl:webpack'] },
+]
+
+function serveRegistry() {
+  const server = createServer((req, res) => {
+    const url = new URL(req.url!, REGISTRY)
+    if (url.pathname === '/-/v1/search') {
+      const objects = MARKET.map(({ versions, ...pkg }) => ({ package: { ...pkg, links: {} } }))
+      return res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ objects }))
+    }
+    const pkg = MARKET.find(pkg => pkg.name === decodeURIComponent(url.pathname.slice(1)))
+    if (!pkg) return res.writeHead(404).end()
+    const versions = Object.fromEntries(Object.entries(pkg.versions ?? { [pkg.version]: {} }).map(([version, meta]) => [version, { name: pkg.name, version, ...meta }]))
+    res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ 'name': pkg.name, 'dist-tags': { latest: pkg.version }, versions }))
+  })
+  server.listen(REGISTRY_PORT)
+  return server
+}
+
 async function waitFor(condition: () => boolean | Promise<boolean>, timeout = 10000) {
   const start = Date.now()
   while (!await condition()) {
@@ -342,6 +377,7 @@ const examples: Record<string, Example> = {
 
   'with-console': {
     bundlers: ['vite', 'rsbuild'],
+    servers: [{ dir: 'with-console', env: () => ({ npm_config_registry: REGISTRY }) }],
     async check(page, base) {
       // a workspace plugin, loaded from its sources by package name
       const greetings: string[] = []
@@ -412,6 +448,25 @@ const examples: Record<string, Example> = {
         await page.waitForSelector('.cc-codeline >> text=cormi-plugin-hello/client')
         // the plugins of the app's bundler, those of the renderer included
         await page.waitForSelector('.cc-pills >> text=cormi:route-exports')
+
+        // the market tells what works in this app, from the keywords of the search results
+        await page.click('.cc-nav-item >> text=市场')
+        const item = (name: string) => page.locator('.cc-package', { has: page.locator(`.cc-package-name:text-is("${name}")`) })
+        await item('cormi-plugin-anywhere').locator('text=通用').waitFor()
+        await item('cormi-plugin-undeclared').locator('text=未声明兼容性').waitFor()
+        // the Vue plugin is hidden until asked for; its older version works here
+        assert.equal(await item('cormi-plugin-vue-only').count(), 0)
+        await page.click('text=显示它们')
+        const vue = item('cormi-plugin-vue-only')
+        await vue.locator('text=只支持 Vue，当前应用的 UI 框架是 React').waitFor()
+        await vue.locator('button:text-is("仍要安装")').click()
+        await vue.locator('.cc-confirm').waitFor()
+        await vue.locator('text=查找兼容的版本').click()
+        await vue.locator('button:text-is("安装 1.0.0（兼容）")').waitFor()
+        // a bundler: what switching to it would change
+        const webpack = item('cormi-plugin-webpack')
+        await webpack.locator('text=启用它会把打包器换成 webpack').waitFor()
+        await webpack.locator(`code:text-is("@cormi/${bundler}")`).waitFor()
       } finally {
         await writeFile(file, config)
         await rm(`${dir}/plugins/e2e`, { recursive: true, force: true })
@@ -519,6 +574,7 @@ const selected = process.argv.slice(2).filter((arg, index, args) => !arg.startsW
 const names = (selected.length ? selected : Object.keys(examples))
   .filter(name => (examples[name].bundlers ?? ['vite']).includes(bundler))
 const browser = await launch()
+const registry = serveRegistry()
 let failed = 0
 for (const [index, name] of names.entries()) {
   const example = examples[name]
@@ -569,4 +625,5 @@ for (const [index, name] of names.entries()) {
   }
 }
 await browser.close()
+registry.close()
 process.exit(failed ? 1 : 0)
