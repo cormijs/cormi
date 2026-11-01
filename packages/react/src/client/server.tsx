@@ -4,7 +4,7 @@ import { createStaticHandler, createStaticRouter, isRouteErrorResponse, type Sta
 import { Root } from './app.tsx'
 import type { Context } from './context.ts'
 import { ServerInsertedHTMLContext } from './inserted.tsx'
-import { REDIRECT_HEADER } from '@cormi/runtime'
+import { REDIRECT_HEADER } from '@cormijs/runtime'
 
 export interface RenderResult {
   status: number

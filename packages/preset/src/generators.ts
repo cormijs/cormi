@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { createFile } from '@cormi/core'
+import { createFile } from '@cormijs/core'
 import { Context } from 'cordis'
 
 /** Generators of `cormi generate` that every app has: API routes. The UI framework adds pages and components. */

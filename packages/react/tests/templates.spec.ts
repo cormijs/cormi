@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { getPackageName, toSpecifier, transformExports } from '@cormi/core'
+import { getPackageName, toSpecifier, transformExports } from '@cormijs/core'
 import { renderEntry, renderRoutes } from '../src/node/index.ts'
 
 describe('templates', () => {
   it('keeps package specifiers and relativizes files', () => {
     expect(toSpecifier('/app/src/.cormi', '/app/src/pages/index.tsx')).toBe('../pages/index.tsx')
     expect(toSpecifier('/app/src/.cormi', '/app/src/.cormi/api.ts')).toBe('./api.ts')
-    expect(toSpecifier('/app/src/.cormi', '@cormi/plugin-antd/client')).toBe('@cormi/plugin-antd/client')
-    expect(getPackageName('@cormi/plugin-antd/client')).toBe('@cormi/plugin-antd')
+    expect(toSpecifier('/app/src/.cormi', '@cormijs/plugin-antd/client')).toBe('@cormijs/plugin-antd/client')
+    expect(getPackageName('@cormijs/plugin-antd/client')).toBe('@cormijs/plugin-antd')
     expect(getPackageName('foo/client')).toBe('foo')
     expect(getPackageName('/abs/file.ts')).toBeUndefined()
   })
@@ -23,7 +23,7 @@ describe('templates', () => {
   it('strips server loaders and the code only they use', () => {
     const code = [
       `import { readFile } from 'node:fs/promises'`,
-      `import { useLoaderData } from '@cormi/react/client'`,
+      `import { useLoaderData } from '@cormijs/react/client'`,
       `export async function loader() { return readFile('x', 'utf8') }`,
       `export default function Page() { return useLoaderData() }`,
     ].join('\n')

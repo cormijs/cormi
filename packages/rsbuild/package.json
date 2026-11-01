@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/rsbuild",
+  "name": "@cormijs/rsbuild",
   "description": "The Rsbuild service of Cormi: dev server on ctx.server, client and server bundles",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,12 +18,26 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/rsbuild#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/rsbuild"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cordis",
     "rsbuild",
     "rspack",
-    "plugin"
+    "plugin",
+    "cormi-plugin",
+    "bundler:rsbuild",
+    "renderer:*",
+    "impl:bundler",
+    "impl:rsbuild"
   ],
   "cormi": {
     "bundler": [
@@ -36,9 +50,12 @@
       ]
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/core": "workspace:*",
+    "@cormijs/core": "workspace:*",
     "@rsbuild/core": "^2.3.0",
     "cordis": "4.0.0-rc.12",
     "cosmokit": "^1.8.1"

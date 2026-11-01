@@ -1,4 +1,4 @@
-import { Context as BaseContext } from '@cormi/runtime'
+import { Context as BaseContext } from '@cormijs/runtime'
 import { AppService } from './app.ts'
 import { RouterService, type RouterOptions } from './router.ts'
 

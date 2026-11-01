@@ -17,8 +17,8 @@ export function toAliases(alias: Dict<string>): Alias[] {
       : { find: new RegExp(`^${escapeRegExp(find)}(?=/|$)`), replacement })
 }
 
-export type { EntryAssets } from '@cormi/core'
-import type { EntryAssets } from '@cormi/core'
+export type { EntryAssets } from '@cormijs/core'
+import type { EntryAssets } from '@cormijs/core'
 
 function withBase(base: string, file: string) {
   return `${base.endsWith('/') ? base : base + '/'}${file}`

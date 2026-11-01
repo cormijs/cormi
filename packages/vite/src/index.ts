@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {} from '@cordisjs/plugin-server'
-import { type Bundler, idle, Refresher, Schema, winPath, type Workspace } from '@cormi/core'
+import { type Bundler, idle, Refresher, Schema, winPath, type Workspace } from '@cormijs/core'
 import { Context, Service } from 'cordis'
 import { Awaitable, Dict } from 'cosmokit'
 import { build, createServer, type InlineConfig, type Manifest, mergeConfig, type PluginOption, version, type ViteDevServer } from 'vite'
@@ -374,7 +374,7 @@ export function toBuildTarget(targets: Vite.Config['targets']) {
   return list.length ? list : undefined
 }
 
-declare module '@cormi/core' {
+declare module '@cormijs/core' {
   namespace Bundler {
     interface Plugins {
       vite: Vite.PluginInput

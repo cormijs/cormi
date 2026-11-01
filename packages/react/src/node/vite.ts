@@ -1,4 +1,4 @@
-import { importPeer, stripServerExports } from '@cormi/core'
+import { importPeer, stripServerExports } from '@cormijs/core'
 import type { PluginOption } from 'vite'
 
 /**
@@ -6,7 +6,7 @@ import type { PluginOption } from 'vite'
  * runtime plugins of packages (`packages()`) bundled into the server entry.
  */
 export async function viteReact(packages: () => string[]): Promise<PluginOption[]> {
-  const { default: react } = await importPeer('@vitejs/plugin-react', '@cormi/react with vite', () => import('@vitejs/plugin-react'))
+  const { default: react } = await importPeer('@vitejs/plugin-react', '@cormijs/react with vite', () => import('@vitejs/plugin-react'))
   return [react(), {
     name: 'cormi:react',
     config: () => ({
@@ -15,7 +15,7 @@ export async function viteReact(packages: () => string[]): Promise<PluginOption[
       optimizeDeps: { include: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom', 'react-dom/client'] },
       ssr: {
         // one instance of the React API, shared by the server entry, the pages and the runtime plugins
-        external: ['@cormi/react', '@cormi/runtime'],
+        external: ['@cormijs/react', '@cormijs/runtime'],
         // runtime plugins of packages may ship TypeScript sources
         noExternal: packages(),
       },

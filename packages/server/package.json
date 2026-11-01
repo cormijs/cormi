@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/server",
+  "name": "@cormijs/server",
   "description": "Request handling of Cormi on ctx.server: pages (SSR), server loaders, API routes and static files",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,16 +18,28 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/server#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/server"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cordis",
     "server",
     "ssr"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/core": "workspace:*",
-    "@cormi/runtime": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/runtime": "workspace:*",
     "chokidar": "^4.0.3",
     "cordis": "4.0.0-rc.12",
     "path-to-regexp": "^8.3.0"

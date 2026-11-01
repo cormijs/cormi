@@ -1,4 +1,4 @@
-import { AppService as BaseAppService } from '@cormi/runtime'
+import { AppService as BaseAppService } from '@cormijs/runtime'
 import type { Context as CordisContext } from 'cordis'
 import { type App, type Component, defineComponent, h, inject, type InjectionKey, onScopeDispose, type Plugin, type ShallowRef, shallowRef, type VNode } from 'vue'
 import { RouterView } from 'vue-router'

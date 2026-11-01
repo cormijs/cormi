@@ -1,4 +1,4 @@
-import { fetchLoader, type RouteData, RouterService as BaseRouterService, type RouterOptions as BaseRouterOptions } from '@cormi/runtime'
+import { fetchLoader, type RouteData, RouterService as BaseRouterService, type RouterOptions as BaseRouterOptions } from '@cormijs/runtime'
 import type { Context as CordisContext } from 'cordis'
 import type { ComponentType } from 'react'
 import { type DataRouter, matchRoutes, type NavigateOptions, Outlet, redirect, type RouteObject, type To } from 'react-router'
@@ -7,7 +7,7 @@ import type { RouteModule } from './types.ts'
 /** Route module exports that react-router reads lazily. */
 const LAZY_KEYS = ['ErrorBoundary', 'HydrateFallback', 'handle', 'shouldRevalidate'] as const
 
-export type { HistoryType } from '@cormi/runtime'
+export type { HistoryType } from '@cormijs/runtime'
 
 export interface RouterOptions extends BaseRouterOptions<RouteModule> {
   /** rendered while the first routes of a client-rendered app load (`src/loading`) */

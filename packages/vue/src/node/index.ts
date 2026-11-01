@@ -1,4 +1,4 @@
-import { type Renderer as RendererContract, Schema } from '@cormi/core'
+import { type Renderer as RendererContract, Schema } from '@cormijs/core'
 import { createRequire } from 'node:module'
 import { Context, Service } from 'cordis'
 import { getSfcExports } from './exports.ts'
@@ -23,7 +23,7 @@ declare module 'cordis' {
  * the server entry with `vue/server-renderer`. Plugins that only work with
  * Vue inject `vue`.
  *
- * The browser API of the app is `@cormi/vue/client`.
+ * The browser API of the app is `@cormijs/vue/client`.
  */
 export class Vue extends Service implements RendererContract {
   static inject = ['app', 'router']

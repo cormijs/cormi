@@ -1,4 +1,4 @@
-import { importPeer } from '@cormi/core'
+import { importPeer } from '@cormijs/core'
 import type { PluginOption } from 'vite'
 import { stripRouteModule } from './exports.ts'
 
@@ -7,7 +7,7 @@ import { stripRouteModule } from './exports.ts'
  * plugins of packages (`packages()`) bundled into the server entry.
  */
 export async function viteVue(packages: () => string[]): Promise<PluginOption[]> {
-  const { default: vue } = await importPeer('@vitejs/plugin-vue', '@cormi/vue with vite', () => import('@vitejs/plugin-vue'))
+  const { default: vue } = await importPeer('@vitejs/plugin-vue', '@cormijs/vue with vite', () => import('@vitejs/plugin-vue'))
   return [vue(), {
     name: 'cormi:vue',
     config: () => ({
@@ -15,7 +15,7 @@ export async function viteVue(packages: () => string[]): Promise<PluginOption[]>
       optimizeDeps: { include: ['vue'] },
       ssr: {
         // one instance of Vue, shared by the server entry, the pages and the runtime plugins
-        external: ['@cormi/vue', '@cormi/runtime'],
+        external: ['@cormijs/vue', '@cormijs/runtime'],
         // runtime plugins of packages may ship TypeScript sources
         noExternal: packages(),
       },

@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {} from '@cordisjs/plugin-server'
-import { type Bundler, idle, Refresher, Schema, winPath } from '@cormi/core'
+import { type Bundler, idle, Refresher, Schema, winPath } from '@cormijs/core'
 import {
   createRsbuild,
   type ManifestData,
@@ -27,7 +27,7 @@ declare module 'cordis' {
   }
 }
 
-declare module '@cormi/core' {
+declare module '@cormijs/core' {
   namespace Bundler {
     interface Plugins {
       rsbuild: Rsbuild.PluginInput

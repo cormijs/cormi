@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { getModuleExports, stripServerExports } from '@cormi/core'
+import { getModuleExports, stripServerExports } from '@cormijs/core'
 
 /**
  * The exports of a `.vue` route module: its component, and those of its

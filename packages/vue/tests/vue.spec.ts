@@ -13,7 +13,7 @@ const SFC = [
   `</script>`,
   '',
   `<script setup lang="ts">`,
-  `import { useLoaderData } from '@cormi/vue/client'`,
+  `import { useLoaderData } from '@cormijs/vue/client'`,
   `const data = useLoaderData()`,
   `</script>`,
   '',
@@ -36,7 +36,7 @@ describe('route modules', () => {
     expect(result).not.toContain('node:os')
     expect(result).not.toContain('loader()')
     expect(result).toContain('handle')
-    expect(result).toContain(`<script setup lang="ts">\nimport { useLoaderData } from '@cormi/vue/client'`)
+    expect(result).toContain(`<script setup lang="ts">\nimport { useLoaderData } from '@cormijs/vue/client'`)
     expect(await stripRouteModule(SFC.replace(/loader/g, 'other'), '/app/src/pages/about.vue')).toBeUndefined()
   })
 })
@@ -67,7 +67,7 @@ describe('templates', () => {
     const app = { dir: '/app/src/.cormi', entries: new Set([{ file: '/app/src/app.ts' }]), imports: new Set() } as any
     const hotAccept = (imports: [string, string][], callback: string) => `hot(${JSON.stringify(imports)}, ${callback})`
     const code = renderEntry(app, { base: '/', history: 'browser', mountElementId: 'root', hotAccept })
-    expect(code).toContain(`from '@cormi/vue/client'`)
+    expect(code).toContain(`from '@cormijs/vue/client'`)
     expect(code).toContain('hot([["../app.ts","entry0"]], (modules: any[]) => {')
   })
 })

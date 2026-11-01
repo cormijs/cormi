@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/react",
-  "description": "React for Cormi apps: the renderer of the route table, and the browser API (@cormi/react/client) with react-router and server rendering",
-  "version": "0.1.0",
+  "name": "@cormijs/react",
+  "description": "React for Cormi apps: the renderer of the route table, and the browser API (@cormijs/react/client) with react-router and server rendering",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/node/index.js",
   "types": "lib/node/index.d.ts",
@@ -28,6 +28,40 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/react#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cordis",
+    "react",
+    "renderer",
+    "cormi-plugin",
+    "bundler:*",
+    "renderer:react",
+    "impl:renderer",
+    "impl:react"
+  ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ],
+    "service": {
+      "implements": [
+        "renderer",
+        "react"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@rsbuild/plugin-react": "^2.1.1",
     "@vitejs/plugin-react": "^5.2.0",
@@ -43,15 +77,15 @@
     }
   },
   "dependencies": {
-    "@cormi/core": "workspace:*",
-    "@cormi/runtime": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/runtime": "workspace:*",
     "cordis": "4.0.0-rc.12",
     "cosmokit": "^1.8.1",
     "react-router": "^7.18.5"
   },
   "devDependencies": {
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
     "@rsbuild/core": "^2.3.0",
     "@rsbuild/plugin-react": "^2.1.1",
     "@types/react": "^19.3.0",
@@ -60,22 +94,5 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "vite": "^7.3.7"
-  },
-  "keywords": [
-    "cormi",
-    "cordis",
-    "react",
-    "renderer"
-  ],
-  "cormi": {
-    "renderer": [
-      "react"
-    ],
-    "service": {
-      "implements": [
-        "renderer",
-        "react"
-      ]
-    }
   }
 }

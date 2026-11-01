@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { App, Cormi } from '@cormi/core'
+import { App, Cormi } from '@cormijs/core'
 import { Context } from 'cordis'
 import type { Plugin } from 'vite'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'

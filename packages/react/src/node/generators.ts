@@ -1,5 +1,5 @@
 import { basename, join } from 'node:path'
-import { createFile } from '@cormi/core'
+import { createFile } from '@cormijs/core'
 import { Context } from 'cordis'
 
 /** `users/order-list` -> `OrderList` */

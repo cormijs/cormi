@@ -1,7 +1,7 @@
 import Server from '@cordisjs/plugin-server'
-import { Console } from '@cormi/console'
-import { App, Html, Router, Schema } from '@cormi/core'
-import { ApiRoutes, Pages, Proxy, Static } from '@cormi/server'
+import { Console } from '@cormijs/console'
+import { App, Html, Router, Schema } from '@cormijs/core'
+import { ApiRoutes, Pages, Proxy, Static } from '@cormijs/server'
 import { Context } from 'cordis'
 import { Conventions } from './conventions.ts'
 import { Generators } from './generators.ts'
@@ -39,8 +39,8 @@ export const Config: Schema<Config> = Schema.intersect([
  * app services, the file conventions, pages and API routes, and — in dev and
  * preview mode — the HTTP server, with the console in dev mode.
  *
- * Add a bundler (`@cormi/vite`) and a UI framework (`@cormi/react`) next to
- * it in cormi.yml, or use a preset of both, e.g. `@cormi/preset-react`.
+ * Add a bundler (`@cormijs/vite`) and a UI framework (`@cormijs/react`) next to
+ * it in cormi.yml, or use a preset of both, e.g. `@cormijs/preset-react`.
  */
 export function apply(ctx: Context, config: Config) {
   const { mode } = ctx.cormi

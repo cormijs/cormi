@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/preset",
+  "name": "@cormijs/preset",
   "description": "A Cormi app without its bundler and UI framework: the router, html, pages, API routes, the HTTP server and the console",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,10 +18,26 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/preset#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/preset"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cordis",
-    "preset"
+    "preset",
+    "cormi-plugin",
+    "bundler:*",
+    "renderer:*",
+    "impl:router",
+    "impl:html",
+    "impl:app",
+    "impl:server"
   ],
   "cormi": {
     "service": {
@@ -33,18 +49,21 @@
       ]
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/console": "workspace:*",
-    "@cormi/core": "workspace:*",
-    "@cormi/server": "workspace:*",
+    "@cormijs/console": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/server": "workspace:*",
     "chokidar": "^4.0.3",
     "cordis": "4.0.0-rc.12",
     "cosmokit": "^1.8.1",
     "postcss": "^8.5.6"
   },
   "devDependencies": {
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*"
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*"
   }
 }

@@ -1,8 +1,8 @@
 import { basename, extname, join } from 'node:path'
 import { watch } from 'chokidar'
-import { expandExtensions, tryPaths, winPath } from '@cormi/core'
-import type {} from '@cormi/rsbuild'
-import type {} from '@cormi/vite'
+import { expandExtensions, tryPaths, winPath } from '@cormijs/core'
+import type {} from '@cormijs/rsbuild'
+import type {} from '@cormijs/vite'
 import { Context } from 'cordis'
 import postcss from 'postcss'
 

@@ -1,6 +1,6 @@
 import { join, relative } from 'node:path'
 import { watch } from 'chokidar'
-import { getConventionRoutes, Schema, winPath } from '@cormi/core'
+import { getConventionRoutes, Schema, winPath } from '@cormijs/core'
 import { Context } from 'cordis'
 import { match, type MatchFunction } from 'path-to-regexp'
 import { toRequest } from './http.ts'

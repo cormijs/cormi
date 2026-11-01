@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/preset-react",
-  "description": "A React app bundled by Vite: @cormi/preset, @cormi/vite and @cormi/react with one flat config",
-  "version": "0.1.0",
+  "name": "@cormijs/preset-react",
+  "description": "A React app bundled by Vite: @cormijs/preset, @cormijs/vite and @cormijs/react with one flat config",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,11 +18,31 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/preset-react#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/preset-react"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cordis",
     "preset",
-    "react"
+    "react",
+    "cormi-plugin",
+    "bundler:vite",
+    "renderer:react",
+    "impl:router",
+    "impl:html",
+    "impl:app",
+    "impl:server",
+    "impl:bundler",
+    "impl:vite",
+    "impl:renderer",
+    "impl:react"
   ],
   "cormi": {
     "bundler": [
@@ -44,17 +64,20 @@
       ]
     }
   },
-  "dependencies": {
-    "@cormi/core": "workspace:*",
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@vitejs/plugin-react": "^5.2.0",
-    "cordis": "4.0.0-rc.12"
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "cormi": "workspace:*",
     "react": ">=19",
     "react-dom": ">=19"
+  },
+  "dependencies": {
+    "@cormijs/core": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@vitejs/plugin-react": "^5.2.0",
+    "cordis": "4.0.0-rc.12"
   }
 }

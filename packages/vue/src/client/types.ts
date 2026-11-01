@@ -1,7 +1,7 @@
-import type { RouteModule as BaseRouteModule } from '@cormi/runtime'
+import type { RouteModule as BaseRouteModule } from '@cormijs/runtime'
 import type { Component } from 'vue'
 
-export type { HistoryType, RouteData } from '@cormi/runtime'
+export type { HistoryType, RouteData } from '@cormijs/runtime'
 
 /** The arguments of a server `loader`. */
 export interface LoaderArgs {

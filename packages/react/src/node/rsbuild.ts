@@ -1,4 +1,4 @@
-import { importPeer, stripServerExports, winPath } from '@cormi/core'
+import { importPeer, stripServerExports, winPath } from '@cormijs/core'
 import type { RsbuildPlugin } from '@rsbuild/core'
 
 /**
@@ -6,7 +6,7 @@ import type { RsbuildPlugin } from '@rsbuild/core'
  * runtime plugins of packages (`packages()`) bundled into the server entry.
  */
 export async function rsbuildReact(packages: () => string[]): Promise<RsbuildPlugin[]> {
-  const { pluginReact } = await importPeer('@rsbuild/plugin-react', '@cormi/react with rsbuild', () => import('@rsbuild/plugin-react'))
+  const { pluginReact } = await importPeer('@rsbuild/plugin-react', '@cormijs/react with rsbuild', () => import('@rsbuild/plugin-react'))
   return [pluginReact(), {
     name: 'cormi:react',
     setup(api) {

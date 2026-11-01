@@ -1,13 +1,13 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { LOADER_ENDPOINT } from '@cormi/runtime/constants'
-import { type Html, Schema } from '@cormi/core'
+import { LOADER_ENDPOINT } from '@cormijs/runtime/constants'
+import { type Html, Schema } from '@cormijs/core'
 import { Context } from 'cordis'
 import { getOrigin, send, type ServerRequest, toRequest } from './http.ts'
 
 type Assets = Pick<Html.RenderOptions, 'scripts' | 'styles' | 'preloads'>
 
-/** What the server entry renders, see `@cormi/react/client/server`. */
+/** What the server entry renders, see `@cormijs/react/client/server`. */
 interface RenderResult {
   status: number
   content: string

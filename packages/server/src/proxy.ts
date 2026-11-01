@@ -1,4 +1,4 @@
-import { Schema } from '@cormi/core'
+import { Schema } from '@cormijs/core'
 import { Context } from 'cordis'
 import { send, toRequest } from './http.ts'
 

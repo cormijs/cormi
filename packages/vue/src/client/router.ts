@@ -1,4 +1,4 @@
-import { fetchLoader, type Location, type RouteData, RouterService as BaseRouterService, type RouterOptions as BaseRouterOptions } from '@cormi/runtime'
+import { fetchLoader, type Location, type RouteData, RouterService as BaseRouterService, type RouterOptions as BaseRouterOptions } from '@cormijs/runtime'
 import type { Context as CordisContext } from 'cordis'
 import { computed, type ComputedRef, inject, type InjectionKey } from 'vue'
 import {
@@ -13,7 +13,7 @@ import {
 } from 'vue-router'
 import type { RouteModule } from './types.ts'
 
-export type { HistoryType } from '@cormi/runtime'
+export type { HistoryType } from '@cormijs/runtime'
 
 export interface RouterOptions extends BaseRouterOptions<RouteModule> {}
 

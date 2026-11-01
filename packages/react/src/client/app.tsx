@@ -1,4 +1,4 @@
-import { AppService as BaseAppService } from '@cormi/runtime'
+import { AppService as BaseAppService } from '@cormijs/runtime'
 import type { Context as CordisContext } from 'cordis'
 import React, { type ComponentType, type ReactNode, useEffect, useState, useSyncExternalStore } from 'react'
 import type { Context } from './context.ts'

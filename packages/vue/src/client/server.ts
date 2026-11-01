@@ -1,4 +1,4 @@
-import { REDIRECT_HEADER } from '@cormi/runtime'
+import { REDIRECT_HEADER } from '@cormijs/runtime'
 import { shallowReactive } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { createMemoryHistory, createRouter, type Router } from 'vue-router'

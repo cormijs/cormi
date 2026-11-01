@@ -1,4 +1,4 @@
-import type { Location, NavigationType } from '@cormi/runtime'
+import type { Location, NavigationType } from '@cormijs/runtime'
 import { type App, createApp, createSSRApp, shallowReactive } from 'vue'
 import { createMemoryHistory, createWebHashHistory, createWebHistory, type RouteLocationNormalized } from 'vue-router'
 import { cordisKey, createRoot } from './app.ts'

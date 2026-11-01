@@ -1,10 +1,10 @@
-import { type App, MODULE_TYPINGS, renderEntries, renderRoutes as renderRouteManifest, type Route, toSpecifier } from '@cormi/core'
+import { type App, MODULE_TYPINGS, renderEntries, renderRoutes as renderRouteManifest, type Route, toSpecifier } from '@cormijs/core'
 import type { Dict } from 'cosmokit'
 
 const json = (value: unknown) => JSON.stringify(value ?? null)
 
 export function renderRoutes(dir: string, routes: Dict<Route>) {
-  return renderRouteManifest(dir, routes, '@cormi/react/client')
+  return renderRouteManifest(dir, routes, '@cormijs/react/client')
 }
 
 export interface ContextOptions {
@@ -23,7 +23,7 @@ export function renderEntry(app: App, options: EntryOptions) {
   const entries = renderEntries(app.dir, app.entries)
   return [
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
-    `import { Context, render, type RenderOptions, unwrapExports } from '@cormi/react/client'`,
+    `import { Context, render, type RenderOptions, unwrapExports } from '@cormijs/react/client'`,
     `import { routeModules, routes } from './routes'`,
     ...options.loading ? [`import loading from ${json(toSpecifier(app.dir, options.loading))}`] : [],
     ...entries.imports,
@@ -70,8 +70,8 @@ export function renderServer(app: App, options: ContextOptions) {
   return [
     // global stylesheets and polyfills are part of what the server renders
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
-    `import { Context, unwrapExports } from '@cormi/react/client'`,
-    `import { createRequestHandler } from '@cormi/react/client/server'`,
+    `import { Context, unwrapExports } from '@cormijs/react/client'`,
+    `import { createRequestHandler } from '@cormijs/react/client/server'`,
     `import { routeModules, routes } from './routes'`,
     ...entries.imports,
     ...servers.map(([, file], index) => `import * as server${index} from ${json(toSpecifier(app.dir, file))}`),

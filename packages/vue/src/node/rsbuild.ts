@@ -1,4 +1,4 @@
-import { importPeer, winPath } from '@cormi/core'
+import { importPeer, winPath } from '@cormijs/core'
 import type { RsbuildPlugin } from '@rsbuild/core'
 import { stripRouteModule } from './exports.ts'
 
@@ -7,7 +7,7 @@ import { stripRouteModule } from './exports.ts'
  * runtime plugins of packages (`packages()`) bundled into the server entry.
  */
 export async function rsbuildVue(packages: () => string[]): Promise<RsbuildPlugin[]> {
-  const { pluginVue } = await importPeer('@rsbuild/plugin-vue', '@cormi/vue with rsbuild', () => import('@rsbuild/plugin-vue'))
+  const { pluginVue } = await importPeer('@rsbuild/plugin-vue', '@cormijs/vue with rsbuild', () => import('@rsbuild/plugin-vue'))
   return [pluginVue(), {
     name: 'cormi:vue',
     setup(api) {

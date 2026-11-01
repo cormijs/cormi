@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/vue",
-  "description": "Vue for Cormi apps: the renderer of the route table, and the browser API (@cormi/vue/client) with Vue Router and server rendering",
-  "version": "0.1.0",
+  "name": "@cormijs/vue",
+  "description": "Vue for Cormi apps: the renderer of the route table, and the browser API (@cormijs/vue/client) with Vue Router and server rendering",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/node/index.js",
   "types": "lib/node/index.d.ts",
@@ -28,6 +28,40 @@
     "src"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/vue#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cordis",
+    "vue",
+    "renderer",
+    "cormi-plugin",
+    "bundler:*",
+    "renderer:vue",
+    "impl:renderer",
+    "impl:vue"
+  ],
+  "cormi": {
+    "renderer": [
+      "vue"
+    ],
+    "service": {
+      "implements": [
+        "renderer",
+        "vue"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@rsbuild/plugin-vue": "^2.0.1",
     "@vitejs/plugin-vue": "^6.0.10",
@@ -42,36 +76,19 @@
     }
   },
   "dependencies": {
-    "@cormi/core": "workspace:*",
-    "@cormi/runtime": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/runtime": "workspace:*",
     "cordis": "4.0.0-rc.12",
     "cosmokit": "^1.8.1",
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
     "@rsbuild/core": "^2.3.0",
     "@rsbuild/plugin-vue": "^2.0.1",
     "@vitejs/plugin-vue": "^6.0.10",
     "vite": "^7.3.7",
     "vue": "^3.5.44"
-  },
-  "keywords": [
-    "cormi",
-    "cordis",
-    "vue",
-    "renderer"
-  ],
-  "cormi": {
-    "renderer": [
-      "vue"
-    ],
-    "service": {
-      "implements": [
-        "renderer",
-        "vue"
-      ]
-    }
   }
 }

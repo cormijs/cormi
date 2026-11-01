@@ -1,8 +1,8 @@
-import type { EntryAssets, Workspace } from '@cormi/core'
+import type { EntryAssets, Workspace } from '@cormijs/core'
 import type { ManifestData } from '@rsbuild/core'
 import type { Dict } from 'cosmokit'
 
-export type { EntryAssets } from '@cormi/core'
+export type { EntryAssets } from '@cormijs/core'
 
 /**
  * `{ foo: 'bar' }` matches `foo` and `foo/*` in Rspack too; a trailing `$`

@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/runtime",
+  "name": "@cormijs/runtime",
   "description": "The browser runtime of Cormi without a UI framework: the cordis context, the app's lifecycle, the route table and the loader protocol",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,9 +18,28 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cordis", "runtime"],
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/runtime#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/runtime"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cordis",
+    "runtime"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "cordis": "4.0.0-rc.12",
     "cosmokit": "^1.8.1"

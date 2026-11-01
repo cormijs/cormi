@@ -1,4 +1,4 @@
-import { type Renderer as RendererContract, Schema } from '@cormi/core'
+import { type Renderer as RendererContract, Schema } from '@cormijs/core'
 import { createRequire } from 'node:module'
 import { Context, Service } from 'cordis'
 import { Generators } from './generators.ts'
@@ -20,7 +20,7 @@ declare module 'cordis' {
  * route table with react-router and the server entry renders it with
  * `react-dom/server`. Plugins that only work with React inject `react`.
  *
- * The browser API of the app is `@cormi/react/client`.
+ * The browser API of the app is `@cormijs/react/client`.
  */
 export class React extends Service implements RendererContract {
   static inject = ['app', 'router']
