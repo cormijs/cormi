@@ -1,6 +1,6 @@
 # 设计：插件市场与兼容性
 
-> 状态：设计已定，第 1 阶段（声明与匹配）已完成。本页记录决策与理由。
+> 状态：设计已定，第 1、2 阶段（声明与匹配、控制台）已完成。本页记录决策与理由。
 
 目标：用户在控制台的市场里在线安装插件之前，就能知道它支持哪些打包器、哪些 UI 框架，以及是否适用于当前的应用；装上之后，不兼容的原因也说得清楚。
 
@@ -66,7 +66,7 @@ interface Manifest {
 | `exports["./slave"]` | `@cormi/plugin-qiankun/slave` 这一个插件的声明，逐个键覆盖包级的（没写的键沿用包级的） |
 | `peerDependencies.cormi` | 支持的 Cormi 版本，市场与应用的版本比较 |
 
-打包器与 UI 框架的实现也声明自己：`@cormi/rsbuild` 写 `"service": { "implements": ["bundler", "rsbuild"] }`，`@cormi/vue` 写 `["renderer", "vue"]`。市场因此可以把“此插件需要 Rsbuild”接上“安装 `@cormi/rsbuild`”，与 koishi 市场对缺失服务列出“可由下列插件实现”相同。
+打包器与 UI 框架的实现也声明自己：`@cormi/rsbuild` 写 `"bundler": ["rsbuild"], "service": { "implements": ["bundler", "rsbuild"] }`，`@cormi/vue` 写 `"renderer": ["vue"]` 与 `["renderer", "vue"]`。规则是：实现了 `bundler`（或 `renderer`）、且这一维度只列出一个名称的包，提供的就是那个打包器（`providedStack()`）；匹配时这一维度不判断——装上它是替换，而不是不兼容。市场因此可以把“此插件需要 Rsbuild”接上“安装 `@cormi/rsbuild`”，并在换上它之前列出受影响的插件，与 koishi 市场对缺失服务列出“可由下列插件实现”相同。
 
 ## 关键词
 
@@ -152,6 +152,6 @@ rsbuild     ✗ rsbuild  ✗ rsbuild
 ## 实施阶段
 
 1. **声明与匹配**（已完成）：`Manifest`、`conclude()`、`forExport()`、`checkCompat()`、`manifestKeywords()` 进入 `@cormi/core`；官方插件、打包器与 UI 框架的包写上声明；`cormi g plugin` 的模板带上 `cormi` 字段。
-2. **控制台**：市场的徽章、筛选、详情与安装提示；插件页的不兼容原因；切换技术栈前的检查。
+2. **控制台**（已完成）：市场的徽章、筛选（默认只看兼容的）、“仍要安装”与查找兼容的版本；插件页与工作区页的声明与不兼容原因；换上打包器或 UI 框架之前列出受影响的插件。registry 默认与包管理器相同（`npm_config_registry`）；e2e 用一个本地的假 registry 检查市场。
 3. **`cormi plugin check`**：组合矩阵、推断、`--write` 与关键词生成，官方插件在 CI 中运行。
 4. **索引服务**。

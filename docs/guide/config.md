@@ -61,7 +61,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 | `port` | `8000`（或 `PORT`） | dev 与 preview 服务器的端口，被占用时顺延 |
 | `proxy` | — | 转发请求到其他服务器，见 [代理](/guide/server#代理) |
 
-| `console` | `{}` | dev 模式下的 [控制台](/guide/console)：`{ path, title, registry }`，或 `false` 关闭 |
+| `console` | `{}` | dev 模式下的 [控制台](/guide/console)：`{ path, title, registry }`（`registry` 默认与包管理器相同），或 `false` 关闭 |
 
 命令行的 `--port`、`--host` 优先于配置。
 
