@@ -39,7 +39,6 @@
     "@babel/types": "^7.29.0",
     "@cormi/core": "workspace:*",
     "@cormi/runtime": "workspace:*",
-    "@cormi/vite": "workspace:*",
     "@vitejs/plugin-react": "^5.2.0",
     "babel-dead-code-elimination": "^2.0.0",
     "cordis": "4.0.0-rc.12",
@@ -48,6 +47,7 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
+    "@cormi/vite": "workspace:*",
     "@types/babel__generator": "^7.27.0",
     "@types/babel__traverse": "^7.28.0",
     "@types/react": "^19.3.0",
