@@ -1,0 +1,66 @@
+{
+  "name": "@cormi/vue",
+  "description": "Vue for Cormi apps: the renderer of the route table, and the browser API (@cormi/vue/client) with Vue Router and server rendering",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/node/index.js",
+  "types": "lib/node/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/node/index.ts",
+      "types": "./lib/node/index.d.ts",
+      "default": "./lib/node/index.js"
+    },
+    "./client": {
+      "source": "./src/client/index.ts",
+      "types": "./lib/client/index.d.ts",
+      "default": "./lib/client/index.js"
+    },
+    "./client/server": {
+      "source": "./src/client/server.ts",
+      "types": "./lib/client/server.d.ts",
+      "default": "./lib/client/server.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@rsbuild/plugin-vue": "^2.0.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@rsbuild/plugin-vue": {
+      "optional": true
+    },
+    "@vitejs/plugin-vue": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@cormi/core": "workspace:*",
+    "@cormi/runtime": "workspace:*",
+    "cordis": "4.0.0-rc.12",
+    "cosmokit": "^1.8.1",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@rsbuild/core": "^2.3.0",
+    "@rsbuild/plugin-vue": "^2.0.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "vite": "^7.3.7",
+    "vue": "^3.5.44"
+  },
+  "keywords": [
+    "cormi",
+    "cordis",
+    "vue",
+    "renderer"
+  ]
+}
