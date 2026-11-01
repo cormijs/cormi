@@ -1,4 +1,4 @@
-import { Link } from '@cormi/react/client'
+import { Link } from '@cormijs/react/client'
 import { useState } from 'react'
 import type { MarketPackage, MarketResolution, PluginInfo } from '../../src/builtin.ts'
 import { CompatReasons, CompatTags, label, StackSwitch } from '../compat.tsx'
@@ -21,7 +21,7 @@ export default function MarketPage() {
       <header className="cc-page-head">
         <h1>市场</h1>
         <p>
-          npm 上带有 <code>cormi-plugin</code> 关键字的插件。安装使用应用自己的包管理器，然后添加到 cormi.yml。
+          npm 上带有 <code>cormi-plugin</code> 关键字的插件，由 Cormi registry 每天同步并检查兼容性。安装使用应用自己的包管理器，然后添加到 cormi.yml。
           {stack?.bundler && stack.renderer && <> 当前应用使用 {label(stack.bundler.name)} 与 {label(stack.renderer.name)}。</>}
         </p>
       </header>
@@ -51,6 +51,10 @@ export default function MarketPage() {
   )
 }
 
+function formatCount(count: number) {
+  return count >= 10000 ? `${(count / 10000).toFixed(1)} 万` : String(count)
+}
+
 function MarketItem(props: { pkg: MarketPackage }) {
   const { pkg } = props
   const plugins = useData<PluginInfo[]>('plugins') ?? []
@@ -71,8 +75,14 @@ function MarketItem(props: { pkg: MarketPackage }) {
         <Tag>{pkg.version}</Tag>
         {' '}
         <CompatTags compat={pkg.compat} />
+        {pkg.official && <Tag tone="leaf">官方</Tag>}
+        {pkg.verified === 'matches' && <Tag tone="leaf">已验证</Tag>}
+        {pkg.verified === 'differs' && <Tag tone="amber">声明与检查不一致</Tag>}
         {installed && <Tag tone="leaf">已安装</Tag>}
-        <p className="cc-muted">{pkg.description}</p>
+        <p className="cc-muted">
+          {pkg.description}
+          {pkg.downloads !== undefined && <> · 月下载 {formatCount(pkg.downloads)}</>}
+        </p>
         <CompatReasons compat={pkg.compat} />
       </div>
       <div className="cc-actions">

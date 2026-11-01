@@ -1,4 +1,4 @@
-import { Link } from '@cormi/react/client'
+import { Link } from '@cormijs/react/client'
 import { useState } from 'react'
 import type { PackageInfo, PluginInfo } from '../../src/builtin.ts'
 import { useAction } from '../hooks.ts'

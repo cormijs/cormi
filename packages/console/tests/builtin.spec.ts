@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { settle, start, stop } from '@cormi/core'
+import { settle, start, stop } from '@cormijs/core'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { detectPackageManager, getPlugins, getServices } from '../src/builtin.ts'
 

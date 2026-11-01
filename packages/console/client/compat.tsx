@@ -1,4 +1,4 @@
-import type { CompatReason } from '@cormi/core'
+import type { CompatReason } from '@cormijs/core'
 import type { CompatInfo, PluginInfo } from '../src/builtin.ts'
 import type { OverviewData } from './builtin/overview.tsx'
 import { Tag } from './ui.tsx'

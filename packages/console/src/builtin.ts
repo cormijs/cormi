@@ -2,9 +2,9 @@ import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import type { Entry, EntryGroup, EntryTree } from '@cordisjs/plugin-loader'
-import { checkCompat, type CompatResult, conclude, type Dimension, forExport, getPackageName, type Manifest, providedStack, readJSON, resolvePackageDir, type Stack, winPath } from '@cormi/core'
-import type {} from '@cormi/rsbuild'
-import type {} from '@cormi/vite'
+import { checkCompat, type CompatResult, conclude, type Dimension, forExport, getPackageName, type Manifest, providedStack, readJSON, type RegistryIndex, type RegistryObject, resolvePackageDir, type Stack, winPath } from '@cormijs/core'
+import type {} from '@cormijs/rsbuild'
+import type {} from '@cormijs/vite'
 import { type Context, type Fiber, Logger, type Message } from 'cordis'
 import { compare, prerelease, rcompare, valid } from 'semver'
 import { type Console, getServerUrl } from './index.ts'
@@ -73,9 +73,17 @@ export interface MarketPackage {
   date?: string
   links?: { npm?: string; homepage?: string; repository?: string }
   installed?: string
-  /** from the keywords of the search result */
+  /** from the manifest of the index, or the keywords of a search result */
   compat: CompatInfo
+  /** published by the Cormi project */
+  official?: boolean
+  downloads?: number
+  /** the registry checked it: whether it declares what the check infers */
+  verified?: 'matches' | 'differs'
 }
+
+/** The index of the market: cormijs/registry, synced daily from npm. */
+export const MARKET_INDEX = 'https://cdn.jsdelivr.net/gh/cormijs/registry@dist/index.json'
 
 /** A package of the registry, resolved for the app: its latest version, and the newest one that works if that does not. */
 export interface MarketResolution {
@@ -330,7 +338,7 @@ export function Builtin(ctx: Context, config: Console.Config) {
   // plugins the app could add: its dependencies that are cormi plugins, and the workspace packages
   ctx.console.method('plugin/candidates', () => {
     const dependencies = Object.keys({ ...app.dependencies, ...app.devDependencies })
-    const pattern = /^(@cormi\/plugin-|cormi-plugin-|@[^/]+\/cormi-plugin-)/
+    const pattern = /^(@cormijs\/plugin-|cormi-plugin-|@[^/]+\/cormi-plugin-)/
     return [
       ...Object.values(localPackages(ctx)).map(pkg => ({ name: pkg.name, description: pkg.description, local: true })),
       ...dependencies.filter(name => pattern.test(name)).map(name => ({ name, description: packageOf(ctx, name).package?.description, local: false })),
@@ -366,12 +374,47 @@ export function Builtin(ctx: Context, config: Console.Config) {
   // the registry of the app's package manager, e.g. a mirror, unless the console is given one
   const registry = (config.registry || process.env.npm_config_registry || 'https://registry.npmjs.org').replace(/\/$/, '')
 
+  // the index of the market, read again after some time; the registry is searched without it
+  const market = config.market ?? process.env.CORMI_MARKET ?? MARKET_INDEX
+  let index: { time: number; data: Promise<RegistryIndex> } | undefined
+  const loadIndex = () => {
+    if (!index || Date.now() - index.time > 10 * 60 * 1000) {
+      index = { time: Date.now(), data: fetch(market).then(response => response.ok ? response.json() : Promise.reject(new Error(`the index answered ${response.status}`))) }
+    }
+    return index.data
+  }
+  const fromIndex = (object: RegistryObject, stack: Stack, installed: Record<string, string>): MarketPackage => ({
+    name: object.name,
+    version: object.version,
+    description: object.description,
+    date: object.date,
+    links: object.links,
+    installed: installed[object.name],
+    compat: toCompat(object.manifest, stack),
+    official: object.official || undefined,
+    downloads: object.downloads?.lastMonth,
+    verified: object.verified ? object.verified.matches ? 'matches' : 'differs' : undefined,
+  })
+
   ctx.console.method('market/search', async (query: string = '') => {
+    const installed: Record<string, string> = { ...app.dependencies, ...app.devDependencies }
+    if (market) {
+      try {
+        const { objects } = await loadIndex()
+        const words = query.toLowerCase().split(/\s+/).filter(Boolean)
+        const stack = getStack(ctx)
+        return objects
+          .filter(object => words.every(word => [object.name, object.description ?? '', ...object.keywords].some(text => text.toLowerCase().includes(word))))
+          .map(object => fromIndex(object, stack, installed))
+      } catch (error) {
+        index = undefined
+        ctx.logger('market').warn('cannot read the index of the market, searching %s: %s', registry, (error as Error).message)
+      }
+    }
     const text = ['keywords:cormi-plugin', query].filter(Boolean).join(' ')
     const response = await fetch(`${registry}/-/v1/search?text=${encodeURIComponent(text)}&size=100`)
     if (!response.ok) throw new Error(`the registry answered ${response.status}`)
     const result = await response.json() as { objects: { package: Omit<MarketPackage, 'compat'> & { keywords?: string[] } }[] }
-    const installed: Record<string, string> = { ...app.dependencies, ...app.devDependencies }
     const stack = getStack(ctx)
     return result.objects.map(({ package: pkg }): MarketPackage => ({
       name: pkg.name,

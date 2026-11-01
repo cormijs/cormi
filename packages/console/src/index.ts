@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import type {} from '@cordisjs/plugin-loader'
 import type {} from '@cordisjs/plugin-server'
-import { type App, Refresher, Schema, winPath } from '@cormi/core'
+import { type App, Refresher, Schema, winPath } from '@cormijs/core'
 import { Context, Service } from 'cordis'
 import { Awaitable } from 'cosmokit'
 import { Builtin } from './builtin.ts'
@@ -240,14 +240,17 @@ export namespace Console {
     path: string
     /** title of the console's document */
     title: string
-    /** the registry the market searches; by default the package manager's (`npm_config_registry`) */
+    /** the registry the market installs from and searches without an index; by default the package manager's (`npm_config_registry`) */
     registry?: string
+    /** the index of the market (cormijs/registry, synced daily); the registry is searched when it is empty or unreachable */
+    market?: string
   }
 
   export const Config: Schema<Config> = Schema.object({
     path: Schema.string().default('/__cormi/').description('where the console is served'),
     title: Schema.string().default('Cormi Console'),
-    registry: Schema.string().description('the registry the market searches, by default the package manager\'s'),
+    registry: Schema.string().description('the registry the market installs from, by default the package manager\'s'),
+    market: Schema.string().description('the index of the market, by default that of cormijs/registry'),
   })
 
   export interface Source {

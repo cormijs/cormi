@@ -1,7 +1,7 @@
 {
-  "name": "@cormi/console",
+  "name": "@cormijs/console",
   "description": "The console of a Cormi app in dev mode: the plugin tree, the app's internals, logs, the workspace and the market",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,17 +21,29 @@
     "client"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/console#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/console"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
   "keywords": [
     "cormi",
     "cordis",
     "console",
     "devtools"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@cordisjs/plugin-loader": "1.0.0-rc.9",
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/core": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "@fontsource-variable/recursive": "^5.3.0",
     "@vitejs/plugin-react": "^5.2.0",
     "cordis": "4.0.0-rc.12",
@@ -43,8 +55,8 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/semver": "^7.7.0"

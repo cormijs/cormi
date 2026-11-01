@@ -1,4 +1,4 @@
-import { useSearchParams } from '@cormi/react/client'
+import { useSearchParams } from '@cormijs/react/client'
 import { useEffect, useMemo, useState } from 'react'
 import type { PluginInfo } from '../../src/builtin.ts'
 import { reviveSchema, SchemaForm } from '../form.tsx'
@@ -63,7 +63,7 @@ function EntryRow(props: { plugin: PluginInfo; selected: boolean; onSelect(): vo
           disabled={toggle.pending}
           aria-label={`${plugin.disabled ? '启用' : '停用'} ${plugin.name}`}
           onChange={(event) => {
-            if (!event.target.checked && plugin.name === '@cormi/preset-react' && !confirm('停用 preset 会卸载应用的服务，控制台也会随之断开。确定停用吗？')) return
+            if (!event.target.checked && plugin.name === '@cormijs/preset-react' && !confirm('停用 preset 会卸载应用的服务，控制台也会随之断开。确定停用吗？')) return
             void toggle.run(!event.target.checked)
           }}
         />
@@ -93,7 +93,7 @@ function AddPlugin(props: { onAdded(id: string): void }) {
         className="cc-input"
         list="cc-candidates"
         value={name}
-        placeholder="包名或本地路径，如 @cormi/plugin-mock"
+        placeholder="包名或本地路径，如 @cormijs/plugin-mock"
         onChange={event => setName(event.target.value)}
         autoFocus
       />

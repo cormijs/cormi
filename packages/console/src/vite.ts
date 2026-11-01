@@ -1,7 +1,7 @@
 import type { Server } from 'node:http'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { winPath, type Workspace } from '@cormi/core'
+import { winPath, type Workspace } from '@cormijs/core'
 import react from '@vitejs/plugin-react'
 import { createServer, type ViteDevServer } from 'vite'
 

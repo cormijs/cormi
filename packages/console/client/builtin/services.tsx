@@ -1,4 +1,4 @@
-import { Link } from '@cormi/react/client'
+import { Link } from '@cormijs/react/client'
 import type { PluginInfo, ServiceInfo } from '../../src/builtin.ts'
 import { useData } from '../index.tsx'
 import { Empty, Tag } from '../ui.tsx'

@@ -1,4 +1,4 @@
-import { useCordis } from '@cormi/react/client'
+import { useCordis } from '@cormijs/react/client'
 import type { ReactNode } from 'react'
 
 /** The state lamp of a plugin, as on the website: green active, amber waiting, hollow off. */

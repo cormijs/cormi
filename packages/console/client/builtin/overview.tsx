@@ -1,4 +1,4 @@
-import { Link } from '@cormi/react/client'
+import { Link } from '@cormijs/react/client'
 import type { PluginInfo, ServiceInfo } from '../../src/builtin.ts'
 import { describeReason, label } from '../compat.tsx'
 import { formatTime, useLogs } from '../hooks.ts'
@@ -74,11 +74,11 @@ export default function Overview() {
         <dl className="cc-kv">
           <div data-stack="bundler">
             <dt>打包器</dt>
-            <dd><Stack item={overview?.stack.bundler} missing="未配置：在 cormi.yml 中加入 @cormi/vite 或 @cormi/rsbuild" /></dd>
+            <dd><Stack item={overview?.stack.bundler} missing="未配置：在 cormi.yml 中加入 @cormijs/vite 或 @cormijs/rsbuild" /></dd>
           </div>
           <div data-stack="renderer">
             <dt>UI 框架</dt>
-            <dd><Stack item={overview?.stack.renderer} missing="未配置：在 cormi.yml 中加入 @cormi/react 或 @cormi/vue" /></dd>
+            <dd><Stack item={overview?.stack.renderer} missing="未配置：在 cormi.yml 中加入 @cormijs/react 或 @cormijs/vue" /></dd>
           </div>
         </dl>
       </Section>
