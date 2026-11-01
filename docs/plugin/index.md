@@ -146,7 +146,7 @@ export class I18n extends Service {
 }
 ```
 
-浏览器端用 React 的插件把 `@cormi/react` 写进 `peerDependencies`，从 `@cormi/react/client` 导入；与 UI 框架无关的浏览器插件只从 `cormi/client` 导入类型。
+浏览器端用 React 的插件把 `@cormi/react` 写进 `peerDependencies`，从 `@cormi/react/client` 导入，并在 Node 端声明 `inject: ['react']`——应用换用其他 UI 框架时，插件转入 pending，而不是在浏览器里报错。与 UI 框架无关的浏览器插件只从 `cormi/client` 导入类型。
 
 :::
 

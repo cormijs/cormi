@@ -7,7 +7,7 @@
 | `ctx.router` | `@cormi/preset` | `route()`、`layout()`、`patch()`、`extension()` |
 | `ctx.html` | `@cormi/preset` | `head()`、`body()`、`transform()` |
 | `ctx.app` | `@cormi/preset` | `entry()`、`import()`、`file()`、`server()` |
-| `ctx.bundler` | 打包器，如 `@cormi/vite` | `input()`；构建、开发文档与服务端入口 |
+| `ctx.bundler` | 打包器，如 `@cormi/vite` | `plugin()`、`input()`；构建、开发文档与服务端入口 |
 | `ctx.renderer` | UI 框架，如 `@cormi/react` | — |
 | `ctx.vite` | `@cormi/vite` | `plugin()`、`configure()`、`input()` |
 | `ctx.react` | `@cormi/react` | — |
@@ -16,6 +16,13 @@
 | `ctx.console` | `@cormi/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
 
 只用 `ctx.bundler`、`ctx.renderer` 等通用服务的插件，适用于任何打包器与 UI 框架；需要某个实现的特有能力时，注入它的具名服务——`inject: ['vite']`、`inject: ['react']`。在不支持的组合中，这样的插件会转入 pending，控制台会显示它在等待的服务。
+
+| 插件只用到 | 写法 | 例子 |
+|---|---|---|
+| 通用服务 | `inject: ['app', 'html', 'router', 'bundler']`…… | mock、analytics、export-static、lint |
+| 打包器插件 | `ctx.bundler.plugin({ vite: …, rsbuild: … })`，为支持的每个打包器各给一个 | tailwindcss、unocss |
+| React | 再 `inject: ['react']`，浏览器端从 `@cormi/react/client` 导入 | antd、model、request、layout |
+| Vite 特有的能力 | `inject: ['vite']`，使用 `ctx.vite` | legacy、mf、qiankun 子应用 |
 
 所有注册方法都是 effect：注册属于调用方插件，插件卸载时自动撤回，并返回一个可以提前撤回的函数。
 
@@ -122,11 +129,38 @@ ctx.app.server('foo', ctx.cormi.resolve('src/server/foo.ts'))
 
 应用的打包器，由打包器插件实现（目前是 `@cormi/vite`）。
 
+各个打包器的插件不能通用，所以 `plugin()` 接收一个按打包器名称索引的对象，为插件支持的每个打包器各给一个它自己的插件。当前的打包器取用自己的那一项；没有时抛出错误，插件加载失败，而不是悄悄缺少一部分功能。
+
+```ts
+import tailwindcss from '@tailwindcss/vite'
+import type {} from '@cormi/vite'   // 类型：vite 一项的形式由 @cormi/vite 声明
+
+export const inject = ['app', 'bundler']
+
+export function apply(ctx: Context) {
+  ctx.bundler.plugin({
+    // 与 ctx.vite.plugin() 接收的相同：插件、插件数组，或每次启动、构建时调用的函数
+    vite: () => tailwindcss(),
+  })
+}
+```
+
+修改打包配置也写成打包器的插件，例如 Vite 插件的 `config` 钩子：
+
+```ts
+ctx.bundler.plugin({
+  vite: { name: 'my-plugin', config: () => ({ ssr: { noExternal: ['some-package'] } }) },
+})
+```
+
+用 [unplugin](https://unplugin.unjs.io) 写的插件一份实现覆盖多个打包器，把它的各个变体放进对象：`{ vite: () => plugin.vite(options), rspack: () => plugin.rspack(options) }`。
+
 | 成员 | 说明 |
 |---|---|
 | `name` | 实现的名称，如 `vite` |
 | `config` | 各打包器共有的构建配置：`publicPath`、`outDir`、`alias`、`define`、`sourcemap` |
 | `outDir` | 构建输出目录的绝对路径 |
+| `plugin(plugins)` | 加一个打包器插件：`{ [打包器]: 插件 }`，取当前打包器的一项 |
 | `input(name, file)` | 客户端构建的额外入口 |
 | `assets(file)` | 一个入口的资源：dev 下是模块本身，构建后是它的产物 |
 | `transformDocument(url, html)` | dev 下给文档加上 HMR 客户端等 |
@@ -135,7 +169,7 @@ ctx.app.server('foo', ctx.cormi.resolve('src/server/foo.ts'))
 
 ## ctx.vite
 
-Vite 特有的能力。dev 模式下，Vite 开发服务器挂在 `ctx.server` 上，注册变化时自动重启。
+Vite 特有的能力，`ctx.bundler` 在 Vite 下就是它。dev 模式下，Vite 开发服务器挂在 `ctx.server` 上，注册变化时自动重启。只适用于 Vite 的插件 `inject: ['vite']` 后使用它；只是加一个 Vite 插件的话，用 `ctx.bundler.plugin({ vite })` 就够了。
 
 ```ts
 import tailwindcss from '@tailwindcss/vite'
@@ -153,7 +187,7 @@ ctx.vite.input('about', ctx.cormi.resolve('src/pages/about/index.tsx'))
 
 | 成员 | 说明 |
 |---|---|
-| `plugin(plugin)` | 加一个 Vite 插件 |
+| `plugin(plugin)` | 加一个 Vite 插件；也接收 `ctx.bundler.plugin()` 的对象 |
 | `configure(config)` | 合并或修改 Vite 配置，按注册顺序 |
 | `input(name, file)` | 客户端构建的额外入口 |
 | `config` | preset 的构建配置（`publicPath`、`outDir`……） |

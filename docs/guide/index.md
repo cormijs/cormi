@@ -42,11 +42,11 @@ export function apply(ctx: Context, config: { generator: string }) {
 }
 ```
 
-Node 端的服务有 `ctx.router`、`ctx.html`、`ctx.app`、`ctx.vite`、`ctx.server`、`ctx.cli` 等，见 [Node 端服务](/plugin/services)。
+Node 端的服务有 `ctx.router`、`ctx.html`、`ctx.app`、`ctx.bundler`、`ctx.server`、`ctx.cli` 等，见 [Node 端服务](/plugin/services)。
 
 ## 注册即副作用
 
-每个注册方法——`ctx.html.head()`、`ctx.app.entry()`、`ctx.vite.plugin()`……——都是调用方插件的一个 effect：它属于这个插件，并返回一个撤销函数。插件卸载时，它注册过的一切会自动撤回。插件里不需要写清理代码，也不会留下卸载不干净的状态。
+每个注册方法——`ctx.html.head()`、`ctx.app.entry()`、`ctx.bundler.plugin()`……——都是调用方插件的一个 effect：它属于这个插件，并返回一个撤销函数。插件卸载时，它注册过的一切会自动撤回。插件里不需要写清理代码，也不会留下卸载不干净的状态。
 
 ## 响应式，而不是分阶段
 

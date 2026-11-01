@@ -6,7 +6,7 @@ Cormi 是一个以 Cordis 4 为宿主的前端全栈框架。它不是 umi 的�
 
 1. **一切皆插件。** 内置能力和第三方能力用同一种写法：`name`、`Config`（Schema）、`inject`、`apply(ctx, config)`，或一个 `Service` 子类。
 2. **能力是服务。** 能力以 `ctx.<name>` 的形式暴露。插件通过 `inject` 声明依赖，加载顺序由依赖决定，而不是由文件顺序或阶段决定。
-3. **注册即副作用（effect）。** 每个注册方法（`ctx.html.head()`、`ctx.app.entry()`、`ctx.vite.plugin()`……）都属于调用方插件的 fiber，并返回 disposer；插件卸载时，它的贡献会自动撤回。
+3. **注册即副作用（effect）。** 每个注册方法（`ctx.html.head()`、`ctx.app.entry()`、`ctx.bundler.plugin()`……）都属于调用方插件的 fiber，并返回 disposer；插件卸载时，它的贡献会自动撤回。
 4. **响应式而非阶段式。** 没有 umi 的 stage 状态机。服务在注册集合变化时重新计算产物（路由表、生成文件、Vite 配置），所以插件可以在运行中被加载、卸载、重载。
 5. **类型化事件。** 事件通过声明合并（declaration merging）声明，命名为 `namespace/action`，每个事件都写明分发模式。
 6. **浏览器端也是 Cordis。** 浏览器运行时是一个 cordis `Context`（koishi-webui 的模型）。Node 插件通过 `ctx.app.entry(module, config)` 贡献浏览器插件，类似 koishi 的 `ctx.console.addEntry()`。
@@ -57,13 +57,13 @@ cormi dev | build | preview | setup
 | `ctx.router` | `@cormi/core` | `route(route)`、`layout(file, options?)`、`patch(fn)`、`extension(...exts)` |
 | `ctx.html` | `@cormi/core` | `head(tag)`、`body(tag)`、`transform(fn)` |
 | `ctx.app` | `@cormi/core` | `entry(module, config?)`、`import(source)`、`file(path, content)`、`server(key, file)` |
-| `ctx.bundler` | 打包器（`@cormi/vite`） | `input(name, file)`；`assets(file)`、`loadServerEntry()`、`build()` 等由页面服务器与命令使用 |
+| `ctx.bundler` | 打包器（`@cormi/vite`） | `plugin({ [打包器]: 插件 })`、`input(name, file)`；`assets(file)`、`loadServerEntry()`、`build()` 等由页面服务器与命令使用 |
 | `ctx.renderer` | UI 框架（`@cormi/react`） | —（标记当前的 UI 框架，生成 `entry.*`、`server.*` 等文件） |
 | `ctx.vite` | `@cormi/vite` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
 | `ctx.react` | `@cormi/react` | — |
 | `ctx.server` | `@cordisjs/plugin-server` | `get/post/all(path, mw)`、`use(mw)`、`ws(path)` |
 
-`ctx.bundler` 与 `ctx.renderer` 是两个接缝（契约在 `@cormi/core` 的 `bundler.ts`）：与打包器、UI 框架无关的插件只用它们；只适用于某个实现的插件 `inject: ['vite']` 或 `inject: ['react']`，换掉实现时自动转入 pending。
+`ctx.bundler` 与 `ctx.renderer` 是两个接缝（契约在 `@cormi/core` 的 `bundler.ts`）：与打包器、UI 框架无关的插件只用它们；只适用于某个实现的插件 `inject: ['vite']` 或 `inject: ['react']`，换掉实现时自动转入 pending。打包器插件不能通用，`ctx.bundler.plugin({ vite, rsbuild })` 为每个打包器各给一个，键的类型由打包器包以声明合并加入 `Bundler.Plugins`；没有当前打包器的一项时抛出错误。React 渲染器、文件约定、tailwindcss、unocss、styled-components 都这样注册打包器插件，修改打包配置也写成插件（Vite 插件的 `config` 钩子）。
 
 `@cormi/preset` 是一个普通插件，组合 router、html、app 服务，文件约定（`Conventions`），页面与 API 路由（`Pages`、`ApiRoutes`），以及 dev/preview 下的 HTTP 服务（`@cordisjs/plugin-server`）、代理、静态资源（`Static`）与 dev 下的控制台。preset 的配置是扁平的，各部分读取各自的字段。`@cormi/preset-react` 是 `@cormi/preset` + `@cormi/vite` + `@cormi/react` 的简写，三者的配置写在一起。
 
@@ -155,7 +155,7 @@ Node 部分以**包名**注册浏览器入口：`ctx.app.entry('@scope/plugin-fo
 | 插件 | 内容 |
 |---|---|
 | `@cormi/plugin-mock` | dev 下由 `mock/**` 提供 mock 路由（`defineMock({ 'GET /api/me': ... })`），优先于真实 API |
-| `@cormi/plugin-tailwindcss` | Tailwind CSS v4：注册 Vite 插件并在应用启动前导入样式表 |
+| `@cormi/plugin-tailwindcss` | Tailwind CSS v4：注册打包器插件（Vite 下是 `@tailwindcss/vite`）并在应用启动前导入样式表 |
 | `@cormi/plugin-antd` | Ant Design：`ConfigProvider` 主题与语言、SSR 样式抽取（应用需依赖 `@ant-design/cssinjs`） |
 | `@cormi/plugin-model` | `src/models/*` 中的 hook 作为全局模型，`useModel(namespace, selector?)`，类型自动生成 |
 | `@cormi/plugin-initial-state` | 运行时插件监听 `initialState/load`（serial）提供初始状态，组件用 `useInitialState()` 读取 |
