@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useCordis } from '@cormi/client'
+import { NavLink, Outlet, useCordis } from '@cormi/react/client'
 import { useData, useStatus } from './index.tsx'
 import { icons } from './icons.tsx'
 

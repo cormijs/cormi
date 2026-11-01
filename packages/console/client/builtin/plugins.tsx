@@ -1,4 +1,4 @@
-import { useSearchParams } from '@cormi/client'
+import { useSearchParams } from '@cormi/react/client'
 import { useEffect, useMemo, useState } from 'react'
 import type { PluginInfo } from '../../src/builtin.ts'
 import { reviveSchema, SchemaForm } from '../form.tsx'

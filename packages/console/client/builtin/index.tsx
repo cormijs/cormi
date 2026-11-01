@@ -1,4 +1,4 @@
-import type { Context } from '@cormi/client'
+import type { Context } from '@cormi/react/client'
 import type { LogRecord } from '../../src/builtin.ts'
 import { logs } from '../hooks.ts'
 import { icons } from '../icons.tsx'

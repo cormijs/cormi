@@ -74,8 +74,7 @@ export class Console extends Service {
     ctx.server.get(`${base.slice(0, -1)}{/*path}`, async (req, _res, next) => {
       if (!req.headers.get('accept')?.includes('text/html')) return next()
       const script = ctx.vite.config.publicPath + winPath(relative(ctx.cormi.cwd, entry))
-      let html = renderDocument(script, config.title)
-      if (ctx.vite.devServer) html = await ctx.vite.devServer.transformIndexHtml(req.path, html)
+      const html = await ctx.vite.transformDocument(req.path, renderDocument(script, config.title))
       return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } })
     })
 

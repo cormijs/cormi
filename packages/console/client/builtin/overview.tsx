@@ -1,4 +1,4 @@
-import { Link } from '@cormi/client'
+import { Link } from '@cormi/react/client'
 import type { PluginInfo, ServiceInfo } from '../../src/builtin.ts'
 import { formatTime, useLogs } from '../hooks.ts'
 import { useData } from '../index.tsx'

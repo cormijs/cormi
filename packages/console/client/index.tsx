@@ -1,5 +1,5 @@
 import '@fontsource-variable/recursive/full.css'
-import { Context, render, unwrapExports, useCordis } from '@cormi/client'
+import { Context, render, unwrapExports, useCordis } from '@cormi/react/client'
 import { Service } from 'cordis'
 import { type ComponentType, type ReactNode, useCallback, useMemo, useSyncExternalStore } from 'react'
 import { Shell } from './shell.tsx'

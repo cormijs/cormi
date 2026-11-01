@@ -34,8 +34,8 @@
   "dependencies": {
     "@cordisjs/plugin-loader": "1.0.0-rc.9",
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/client": "workspace:*",
     "@cormi/core": "workspace:*",
+    "@cormi/react": "workspace:*",
     "@cormi/vite": "workspace:*",
     "@fontsource-variable/recursive": "^5.3.0",
     "cordis": "4.0.0-rc.12",
