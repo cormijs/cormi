@@ -1,5 +1,6 @@
 import { type Context, readJSON, Schema } from 'cormi'
 import { toQiankunDocument } from './document.ts'
+import type {} from '@cormi/vite'
 
 export { toQiankunDocument } from './document.ts'
 

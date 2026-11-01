@@ -14,10 +14,22 @@
     "./client": "./client/index.ts",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "request", "fetch", "useRequest"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "request",
+    "fetch",
+    "useRequest"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
@@ -26,6 +38,7 @@
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

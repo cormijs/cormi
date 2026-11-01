@@ -13,10 +13,20 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "legacy", "polyfill"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "legacy",
+    "polyfill"
+  ],
   "peerDependencies": {
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {
@@ -25,6 +35,7 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   }
 }

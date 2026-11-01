@@ -1,6 +1,6 @@
 import { useRequest as useAhooksRequest } from 'ahooks'
 import type { Options, Plugin, Result } from 'ahooks/lib/useRequest/src/types'
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 import type { ClientConfig } from '../src/types.ts'
 
 declare module 'cordis' {

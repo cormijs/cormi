@@ -5,6 +5,15 @@
     "outDir": "lib",
     "tsBuildInfoFile": "lib/.tsbuildinfo"
   },
-  "include": ["src"],
-  "references": [{ "path": "../../packages/cormi" }]
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/cormi"
+    },
+    {
+      "path": "../../packages/vite"
+    }
+  ]
 }

@@ -33,7 +33,7 @@ describe('shared modules', () => {
     expect(getShared(['antd'])).toMatchObject({
       'react': { singleton: true },
       'react-router': { singleton: true },
-      'cormi/client': { singleton: true },
+      '@cormi/react/client': { singleton: true },
       'antd': { singleton: true },
     })
   })

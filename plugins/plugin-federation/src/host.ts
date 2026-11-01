@@ -5,7 +5,7 @@ import { type Context, readJSON, Schema } from 'cormi'
 import { checkShared, getShared, REGISTRY_FILE, REMOTE_ENTRY, toContainerName } from './shared.ts'
 
 export const name = 'federation-host'
-export const inject = ['app', 'vite']
+export const inject = ['app', 'bundler']
 
 export interface PackageEntry {
   /** URL the package is deployed at, where its `federation.json` is */
@@ -21,7 +21,7 @@ export interface Config {
   packages: (string | PackageEntry)[]
   /** id of the route the top routes of packages are mounted below; defaults to the top layout */
   parent?: string
-  /** dependencies of one instance for the page, besides react, react-dom, react-router, cordis and cormi/client */
+  /** dependencies of one instance for the page, besides react, react-dom, react-router, cordis and the Cormi runtime */
   shared: string[]
   /** let `localStorage['cormi:packages']` add packages or replace them by name; defaults to dev mode only */
   override?: boolean
@@ -51,7 +51,7 @@ export const Config: Schema<Config> = Schema.object({
 export function apply(ctx: Context, config: Config) {
   const name = config.name ?? toContainerName(readJSON(ctx.cormi.resolve('package.json'))?.name ?? 'host')
   const registry = config.packages.map(entry => typeof entry === 'string' ? { url: entry } : entry)
-  const { publicPath } = ctx.vite.config
+  const { publicPath } = ctx.bundler.config
 
   const shared = getShared(config.shared)
   checkShared(ctx, shared)

@@ -1,6 +1,6 @@
 import { loadRemote, registerRemotes } from '@module-federation/runtime'
 import { Service } from 'cordis'
-import { type Context, matchRoutes, type RouteData, type RouteModules } from 'cormi/client'
+import { type Context, matchRoutes, type RouteData, type RouteModules } from '@cormi/react/client'
 import { OVERRIDE_KEY } from './index.tsx'
 
 declare module 'cordis' {

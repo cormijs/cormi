@@ -28,6 +28,7 @@
     "redux"
   ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
@@ -42,6 +43,7 @@
     "regenerator-runtime": "^0.14.1"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

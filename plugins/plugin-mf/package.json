@@ -13,10 +13,20 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "module-federation", "micro-frontends"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "module-federation",
+    "micro-frontends"
+  ],
   "peerDependencies": {
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {
@@ -24,6 +34,7 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   }
 }

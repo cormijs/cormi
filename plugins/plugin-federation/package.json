@@ -25,10 +25,22 @@
     "./client": "./client/index.tsx",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "module-federation", "micro-frontends"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "module-federation",
+    "micro-frontends"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
@@ -38,6 +50,8 @@
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

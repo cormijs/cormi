@@ -14,10 +14,21 @@
     "./client": "./client/index.tsx",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "model", "state"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "model",
+    "state"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
@@ -25,6 +36,7 @@
     "chokidar": "^4.0.3"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

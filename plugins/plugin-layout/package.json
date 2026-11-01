@@ -15,10 +15,22 @@
     "./icons": "./client/icons.ts",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "layout", "antd", "menu"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "layout",
+    "antd",
+    "menu"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "antd": ">=6",
     "cormi": "workspace:*",
     "react": ">=19"
@@ -27,6 +39,7 @@
     "@ant-design/icons": "^6.3.4"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "@types/react": "^19.3.0",
     "antd": "^6.6.8",
     "cormi": "workspace:*",

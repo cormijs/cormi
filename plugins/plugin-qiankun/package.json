@@ -25,10 +25,22 @@
     "./slave/client": "./client/slave.tsx",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "qiankun", "micro-frontends"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "qiankun",
+    "micro-frontends"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
@@ -36,6 +48,8 @@
     "qiankun": "^2.10.16"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

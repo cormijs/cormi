@@ -14,15 +14,29 @@
     "./client": "./client/index.tsx",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "styled-components", "css-in-js"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "styled-components",
+    "css-in-js"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19",
     "styled-components": "^6"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1",

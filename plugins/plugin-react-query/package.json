@@ -14,10 +14,21 @@
     "./client": "./client/index.tsx",
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src", "client"],
+  "files": [
+    "lib",
+    "src",
+    "client"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "react-query", "tanstack"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "react-query",
+    "tanstack"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "@tanstack/react-query": "^5",
     "cormi": "workspace:*",
     "react": ">=19"
@@ -27,6 +38,7 @@
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "@tanstack/react-query": "^5.105.0",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",

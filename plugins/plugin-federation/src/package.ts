@@ -3,6 +3,7 @@ import { dirname, isAbsolute, join, relative } from 'node:path'
 import * as mf from '@cormi/plugin-mf'
 import { type App, type Context, readJSON, type Route, Schema, winPath } from 'cormi'
 import { checkShared, getShared, MANIFEST_FILE, type Manifest, REMOTE_ENTRY, toContainerName, toManifestRoutes } from './shared.ts'
+import type {} from '@cormi/vite'
 
 export const name = 'federation-package'
 export const inject = ['app', 'router', 'vite']
@@ -19,7 +20,7 @@ export interface Config {
   entries: string[]
   /** modules the host and the other packages import: `{ './Card': './src/components/Card.tsx' }` */
   exposes: Record<string, string>
-  /** dependencies of one instance for the page, besides react, react-dom, react-router, cordis and cormi/client */
+  /** dependencies of one instance for the page, besides react, react-dom, react-router, cordis and the Cormi runtime */
   shared: string[]
 }
 
@@ -48,7 +49,7 @@ function toSpecifier(dir: string, file: string) {
  */
 function renderPlugin(dir: string, routes: Route[], entries: App.Entry[], imports: App.Import[]) {
   return [
-    `import { unwrapExports } from 'cormi/client'`,
+    `import { unwrapExports } from '@cormi/react/client'`,
     ...imports.map(({ source }) => `import ${json(toSpecifier(dir, source))}`),
     ...entries.map((entry, index) => `import * as entry${index} from ${json(toSpecifier(dir, entry.file))}`),
     '',

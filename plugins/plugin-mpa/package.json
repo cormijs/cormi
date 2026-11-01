@@ -13,16 +13,27 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "mpa", "multi-page"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "mpa",
+    "multi-page"
+  ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {
     "chokidar": "^4.0.3"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*"
   }
 }

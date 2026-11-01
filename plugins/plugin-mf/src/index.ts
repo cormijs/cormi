@@ -1,5 +1,6 @@
 import { federation } from '@module-federation/vite'
 import { type Context, Schema } from 'cormi'
+import type {} from '@cormi/vite'
 
 export const name = 'mf'
 export const inject = ['vite']

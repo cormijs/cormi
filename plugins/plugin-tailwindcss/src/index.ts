@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { type Context, Schema, winPath } from 'cormi'
+import type {} from '@cormi/vite'
 
 export const name = 'tailwindcss'
 export const inject = ['app', 'vite']

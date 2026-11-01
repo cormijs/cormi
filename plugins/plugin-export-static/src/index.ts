@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path'
 import { type Context, type Route, Schema } from 'cormi'
 
 export const name = 'export-static'
-export const inject = ['app', 'router', 'html', 'vite']
+export const inject = ['app', 'router', 'html', 'bundler']
 
 export interface Config {
   /** paths rendered besides the static routes, e.g. of dynamic routes: `/users/1` */
@@ -49,7 +49,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.app.server('exportStatic', join(ctx.app.dir, 'plugin-export-static/index.ts'))
 
   ctx.on('build/after', async (result) => {
-    const entry = await ctx.vite.loadServerEntry()
+    const entry = await ctx.bundler.loadServerEntry()
     const origin = 'http://localhost'
     const prefix = (entry.base ?? '/').replace(/\/$/, '')
     const pages = [...new Set([...getStaticPaths(ctx.router.routes), ...config.extraRoutePaths])]

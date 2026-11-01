@@ -1,4 +1,4 @@
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 import { proxy } from 'valtio'
 import { devtools } from 'valtio/utils'
 

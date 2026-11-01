@@ -13,10 +13,20 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "unocss", "atomic-css"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "unocss",
+    "atomic-css"
+  ],
   "peerDependencies": {
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {
@@ -24,6 +34,7 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   }
 }

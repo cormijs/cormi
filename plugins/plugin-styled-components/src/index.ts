@@ -1,5 +1,6 @@
 import { type Context, Schema } from 'cormi'
 import type { ClientConfig } from './types.ts'
+import type {} from '@cormi/vite'
 
 export type * from './types.ts'
 

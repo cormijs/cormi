@@ -1,7 +1,7 @@
 import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs'
 import locale from '@@/plugin-antd/locale'
 import { App, ConfigProvider, theme } from 'antd'
-import { type Context, useServerInsertedHTML } from 'cormi/client'
+import { type Context, useServerInsertedHTML } from '@cormi/react/client'
 import { type ReactNode, useState } from 'react'
 import type { ClientConfig } from '../src/types.ts'
 

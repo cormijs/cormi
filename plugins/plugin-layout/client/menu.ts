@@ -1,4 +1,4 @@
-import type { RouteData } from 'cormi/client'
+import type { RouteData } from '@cormi/react/client'
 
 export interface MenuItem {
   /** route id */

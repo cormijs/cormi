@@ -16,7 +16,7 @@ export default (ctx: Context, config: ClientConfig) => {
       first = false
       return
     }
-    const path = ctx.$router.router!.createHref(location)
+    const path = ctx.$router.href(location)
     if (config.ga) window.gtag?.('event', 'page_view', { page_path: path, page_location: window.location.href })
     if (config.baidu) window._hmt?.push(['_trackPageview', path])
   })

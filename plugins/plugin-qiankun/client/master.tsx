@@ -1,4 +1,4 @@
-import { type Context, useCordis } from 'cormi/client'
+import { type Context, useCordis } from '@cormi/react/client'
 import type { MicroApp as QiankunMicroApp } from 'qiankun'
 import { createContext, type CSSProperties, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import type { MasterClientConfig } from '../src/types.ts'

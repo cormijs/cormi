@@ -27,10 +27,12 @@
     "initial-state"
   ],
   "peerDependencies": {
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19"
   },
   "devDependencies": {
+    "@cormi/react": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

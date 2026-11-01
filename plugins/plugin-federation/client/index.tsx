@@ -1,4 +1,4 @@
-import { useCordis } from 'cormi/client'
+import { useCordis } from '@cormi/react/client'
 import { type ComponentType, lazy, type ReactNode, Suspense } from 'react'
 import type { Federation } from './host.tsx'
 

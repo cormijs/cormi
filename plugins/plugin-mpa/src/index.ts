@@ -3,9 +3,11 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import { watch } from 'chokidar'
 import { type App, type Context, expandExtensions, readJSON, Schema, tryPaths, winPath } from 'cormi'
+import type {} from '@cormi/react'
 
 export const name = 'mpa'
-export const inject = ['app', 'html', 'router', 'vite']
+// the pages are rendered with React
+export const inject = ['app', 'html', 'router', 'bundler', 'react']
 
 export interface Config {
   /** directory of pages: each `<dir>/<name>/index.tsx` is a page */
@@ -38,7 +40,7 @@ export function renderPageEntry(app: App, page: Page, mountElementId: string) {
   const entries = [...app.entries]
   return [
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(dir, source))}`),
-    `import { Context, renderPage, unwrapExports } from 'cormi/client'`,
+    `import { Context, renderPage, unwrapExports } from '@cormi/react/client'`,
     `import Page from ${json(toSpecifier(dir, page.file))}`,
     ...entries.map((entry, index) => `import * as entry${index} from ${json(toSpecifier(dir, entry.file))}`),
     '',
@@ -85,7 +87,7 @@ export function apply(ctx: Context, config: Config) {
     for (const page of pages) {
       if (registered.has(page.name)) continue
       const disposeFile = ctx.app.file(`plugin-mpa/${page.name}.tsx`, () => renderPageEntry(ctx.app, page, mountElementId))
-      const disposeInput = ctx.vite.input(`mpa/${page.name}`, entryOf(page))
+      const disposeInput = ctx.bundler.input(`mpa/${page.name}`, entryOf(page))
       registered.set(page.name, () => {
         disposeInput()
         disposeFile()
@@ -120,11 +122,11 @@ export function apply(ctx: Context, config: Config) {
       const headers = { 'content-type': 'text/html; charset=utf-8' }
       if (!page) return new Response('Not Found', { status: 404, headers })
       if (ctx.cormi.mode !== 'dev') {
-        return new Response(await readFile(join(ctx.vite.outDir, `${page.name}.html`)), { headers })
+        return new Response(await readFile(join(ctx.bundler.outDir, `${page.name}.html`)), { headers })
       }
-      const script = ctx.vite.config.publicPath + winPath(relative(ctx.cormi.cwd, entryOf(page)))
+      const script = ctx.bundler.config.publicPath + winPath(relative(ctx.cormi.cwd, entryOf(page)))
       let html = await ctx.html.render({ url: req.url, title: page.title, scripts: [script] })
-      if (ctx.vite.devServer) html = await ctx.vite.devServer.transformIndexHtml(req.url, html)
+      html = await ctx.bundler.transformDocument(req.url, html)
       return new Response(html, { headers })
     })
   })

@@ -1,6 +1,6 @@
 import icons from '@@/plugin-layout/icons'
 import { Breadcrumb, Layout as AntdLayout, Menu, type MenuProps } from 'antd'
-import { type Context, Link, Outlet, useCordis, useMatches } from 'cormi/client'
+import { type Context, Link, Outlet, useCordis, useMatches } from '@cormi/react/client'
 import { type ComponentType, createContext, createElement, useContext, useMemo, useState } from 'react'
 import type { ClientConfig } from '../src/types.ts'
 import { getBreadcrumb, getMenuItems, type MenuItem } from './menu.ts'
