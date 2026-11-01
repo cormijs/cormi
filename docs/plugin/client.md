@@ -1,9 +1,9 @@
 # 浏览器端
 
-浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormi/react/client` 导入，Vue 应用从 `@cormi/vue/client` 导入（见 [Vue](#vue)）。浏览器插件的形式是：
+浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormijs/react/client` 导入，Vue 应用从 `@cormijs/vue/client` 导入（见 [Vue](#vue)）。浏览器插件的形式是：
 
 ```tsx
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 
 export default (ctx: Context, config: { color: string }) => {
   ctx.wrap(({ children }) => <ThemeContext value={config.color}>{children}</ThemeContext>)
@@ -48,7 +48,7 @@ export default (ctx: Context, config: { color: string }) => {
 用路由清单的 `meta` 生成菜单：
 
 ```tsx
-import { Link, useCordis } from '@cormi/react/client'
+import { Link, useCordis } from '@cormijs/react/client'
 
 export function Menu() {
   const { $router } = useCordis()
@@ -91,7 +91,7 @@ ctx.$router.add(
 | `useServerInsertedHTML(fn)` | SSR 时向 `<head>` 插入 HTML，供 CSS-in-JS 库使用 |
 
 ```tsx
-import { useContext } from '@cormi/react/client'
+import { useContext } from '@cormijs/react/client'
 import { useEffect } from 'react'
 
 function Tracker() {
@@ -106,10 +106,10 @@ function Tracker() {
 
 ## Vue
 
-Vue 应用的浏览器插件与 React 的写法相同，只是从 `@cormi/vue/client` 导入，并多了 `ctx.$app.use()`：
+Vue 应用的浏览器插件与 React 的写法相同，只是从 `@cormijs/vue/client` 导入，并多了 `ctx.$app.use()`：
 
 ```ts
-import type { Context } from '@cormi/vue/client'
+import type { Context } from '@cormijs/vue/client'
 import { createPinia } from 'pinia'
 
 export default (ctx: Context) => {
@@ -126,7 +126,7 @@ Vue 插件无法卸载，所以 `use()` 的注册被撤回时，应用会重新�
 | `useHostProps()` | 宿主传入的 props，一个 ref |
 | `useLoaderData()` | 当前路由组件的 loader 数据，一个 computed ref |
 
-`@cormi/vue/client` 还重新导出了 Vue Router（`RouterLink`、`RouterView`、`useRoute`……）与 `redirect()`。
+`@cormijs/vue/client` 还重新导出了 Vue Router（`RouterLink`、`RouterView`、`useRoute`……）与 `redirect()`。
 
 ## 入口的生命周期
 

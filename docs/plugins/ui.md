@@ -5,7 +5,7 @@
 Ant Design：`ConfigProvider` 的主题与语言、antd 的 `<App>`，服务端渲染时抽取样式写进文档。
 
 ```yaml
-- name: '@cormi/plugin-antd'
+- name: '@cormijs/plugin-antd'
   config:
     locale: zh_CN
     theme:
@@ -29,13 +29,13 @@ Ant Design：`ConfigProvider` 的主题与语言、antd 的 `<App>`，服务端�
 基于 antd 的应用布局：由路由生成侧边或顶部菜单与面包屑。
 
 ```yaml
-- name: '@cormi/plugin-antd'
-- name: '@cormi/plugin-layout'
+- name: '@cormijs/plugin-antd'
+- name: '@cormijs/plugin-layout'
   config:
     title: Cormi Admin
     logo: /logo.svg
     footer: Built with Cormi
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     routes:
       - path: /
@@ -66,14 +66,14 @@ Ant Design：`ConfigProvider` 的主题与语言、antd 的 `<App>`，服务端�
 
 菜单来自路由的 `meta`：`name` 是菜单项文字，`icon` 是 `@ant-design/icons` 的图标名（只打包用到的图标），`hideInMenu` 把路由从菜单中隐藏。设置 `layout: false` 的路由不使用这个布局，例如登录页。
 
-`@cormi/plugin-layout/client` 导出 `Layout` 组件与 `getMenuItems()`、`getBreadcrumb()`，可以自己组合布局。
+`@cormijs/plugin-layout/client` 导出 `Layout` 组件与 `getMenuItems()`、`getBreadcrumb()`，可以自己组合布局。
 
 ## tailwindcss
 
 Tailwind CSS v4，由打包器的插件处理：Vite 下是 `@tailwindcss/vite`，Rsbuild 下是 `@tailwindcss/postcss`，应用安装所用打包器的那一个。
 
 ```yaml
-- name: '@cormi/plugin-tailwindcss'
+- name: '@cormijs/plugin-tailwindcss'
 ```
 
 不配置时，插件生成一个样式表并在应用启动前导入：它导入 tailwindcss（从插件自身解析，应用不必安装），并扫描 `src/` 中用到的类名。需要主题等配置时，写自己的样式表（此时应用需要依赖 `tailwindcss`）：
@@ -91,7 +91,7 @@ Tailwind CSS v4，由打包器的插件处理：Vite 下是 `@tailwindcss/vite`�
 :::
 
 ```yaml
-- name: '@cormi/plugin-tailwindcss'
+- name: '@cormijs/plugin-tailwindcss'
   config:
     css: src/tailwind.css
 ```
@@ -105,7 +105,7 @@ Tailwind CSS v4，由打包器的插件处理：Vite 下是 `@tailwindcss/vite`�
 UnoCSS。应用有 `uno.config.*` 时使用它；没有时使用预设。
 
 ```yaml
-- name: '@cormi/plugin-unocss'
+- name: '@cormijs/plugin-unocss'
   config:
     preset: wind4
 ```
@@ -119,7 +119,7 @@ UnoCSS。应用有 `uno.config.*` 时使用它；没有时使用预设。
 `ThemeProvider` 与服务端渲染的样式抽取。
 
 ```yaml
-- name: '@cormi/plugin-styled-components'
+- name: '@cormijs/plugin-styled-components'
   config:
     theme:
       primary: '#d7336d'

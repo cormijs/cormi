@@ -1,6 +1,6 @@
 # Cormi 架构
 
-Cormi 是一个以 Cordis 4 为宿主的前端全栈框架。它不是 umi 的克隆：umi 只作为「全栈框架该有哪些能力」的清单，API 形态完全遵循 cordis / koishi 的哲学。打包器与 UI 框架也是插件：打包器有 Vite（`@cormi/vite`）与 Rsbuild（`@cormi/rsbuild`），UI 框架有 React（`@cormi/react`）与 Vue（`@cormi/vue`），设计见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
+Cormi 是一个以 Cordis 4 为宿主的前端全栈框架。它不是 umi 的克隆：umi 只作为「全栈框架该有哪些能力」的清单，API 形态完全遵循 cordis / koishi 的哲学。打包器与 UI 框架也是插件：打包器有 Vite（`@cormijs/vite`）与 Rsbuild（`@cormijs/rsbuild`），UI 框架有 React（`@cormijs/react`）与 Vue（`@cormijs/vue`），设计见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
 
 ## 原则
 
@@ -27,13 +27,13 @@ cormi dev | build | preview | setup
 `cormi.yml` 就是插件树。修改一个条目的 `config` 只会重载该插件（`fiber.update`）；新增、删除、`disabled` 条目会挂载或卸载对应插件。`cormi.yml` 中的 TypeScript 插件（如 `./plugin.ts`）通过 tsx 加载。
 
 ```yaml
-- name: '@cormi/preset'      # 应用：路由、HTML、页面、API、服务器
+- name: '@cormijs/preset'      # 应用：路由、HTML、页面、API、服务器
   config:
     title: Cormi
     ssr: true
-- name: '@cormi/vite'        # 打包器：ctx.bundler
-- name: '@cormi/react'       # UI 框架：ctx.renderer
-- name: '@cormi/plugin-antd'
+- name: '@cormijs/vite'        # 打包器：ctx.bundler
+- name: '@cormijs/react'       # UI 框架：ctx.renderer
+- name: '@cormijs/plugin-antd'
   config:
     theme: { token: { colorPrimary: '#6366f1' } }
 - name: ./plugin.ts
@@ -52,21 +52,21 @@ cormi dev | build | preview | setup
 
 | 服务 | 提供方 | 注册方法（均为 effect） |
 |---|---|---|
-| `ctx.cormi` | `@cormi/core`（root） | — |
-| `ctx.cli` | `@cormi/core`（root） | `command(name, command)`、`generator(type, generator)` |
-| `ctx.router` | `@cormi/core` | `route(route)`、`layout(file, options?)`、`patch(fn)`、`extension(...exts)` |
-| `ctx.html` | `@cormi/core` | `head(tag)`、`body(tag)`、`transform(fn)` |
-| `ctx.app` | `@cormi/core` | `entry(module, config?)`、`import(source)`、`file(path, content)`、`server(key, file)` |
-| `ctx.bundler` | 打包器（`@cormi/vite`、`@cormi/rsbuild`） | `plugin({ [打包器]: 插件 })`、`input(name, file)`；`assets(file)`、`loadServerEntry()`、`hotAccept()`、`build()` 等由页面服务器、渲染器与命令使用 |
-| `ctx.renderer` | UI 框架（`@cormi/react`、`@cormi/vue`） | —（标记当前的 UI 框架，生成 `entry.*`、`server.*` 等文件；`routeExports()` 读取非脚本路由模块的导出） |
-| `ctx.vite` | `@cormi/vite` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
-| `ctx.rsbuild` | `@cormi/rsbuild` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
-| `ctx.react`、`ctx.vue` | `@cormi/react`、`@cormi/vue` | — |
+| `ctx.cormi` | `@cormijs/core`（root） | — |
+| `ctx.cli` | `@cormijs/core`（root） | `command(name, command)`、`generator(type, generator)` |
+| `ctx.router` | `@cormijs/core` | `route(route)`、`layout(file, options?)`、`patch(fn)`、`extension(...exts)` |
+| `ctx.html` | `@cormijs/core` | `head(tag)`、`body(tag)`、`transform(fn)` |
+| `ctx.app` | `@cormijs/core` | `entry(module, config?)`、`import(source)`、`file(path, content)`、`server(key, file)` |
+| `ctx.bundler` | 打包器（`@cormijs/vite`、`@cormijs/rsbuild`） | `plugin({ [打包器]: 插件 })`、`input(name, file)`；`assets(file)`、`loadServerEntry()`、`hotAccept()`、`build()` 等由页面服务器、渲染器与命令使用 |
+| `ctx.renderer` | UI 框架（`@cormijs/react`、`@cormijs/vue`） | —（标记当前的 UI 框架，生成 `entry.*`、`server.*` 等文件；`routeExports()` 读取非脚本路由模块的导出） |
+| `ctx.vite` | `@cormijs/vite` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
+| `ctx.rsbuild` | `@cormijs/rsbuild` | `plugin(plugin)`、`configure(config \| fn)`、`input(name, file)` |
+| `ctx.react`、`ctx.vue` | `@cormijs/react`、`@cormijs/vue` | — |
 | `ctx.server` | `@cordisjs/plugin-server` | `get/post/all(path, mw)`、`use(mw)`、`ws(path)` |
 
-`ctx.bundler` 与 `ctx.renderer` 是两个接缝（契约在 `@cormi/core` 的 `bundler.ts`）：与打包器、UI 框架无关的插件只用它们；只适用于某个实现的插件 `inject: ['vite']` 或 `inject: ['react']`，换掉实现时自动转入 pending。打包器插件不能通用，`ctx.bundler.plugin({ vite, rsbuild })` 为每个打包器各给一个，键的类型由打包器包以声明合并加入 `Bundler.Plugins`；没有当前打包器的一项时抛出错误。React 渲染器、文件约定、tailwindcss、unocss、styled-components 都这样注册打包器插件，修改打包配置也写成插件（Vite 插件的 `config` 钩子）。
+`ctx.bundler` 与 `ctx.renderer` 是两个接缝（契约在 `@cormijs/core` 的 `bundler.ts`）：与打包器、UI 框架无关的插件只用它们；只适用于某个实现的插件 `inject: ['vite']` 或 `inject: ['react']`，换掉实现时自动转入 pending。打包器插件不能通用，`ctx.bundler.plugin({ vite, rsbuild })` 为每个打包器各给一个，键的类型由打包器包以声明合并加入 `Bundler.Plugins`；没有当前打包器的一项时抛出错误。React 渲染器、文件约定、tailwindcss、unocss、styled-components 都这样注册打包器插件，修改打包配置也写成插件（Vite 插件的 `config` 钩子）。
 
-`@cormi/preset` 是一个普通插件，组合 router、html、app 服务，文件约定（`Conventions`），页面与 API 路由（`Pages`、`ApiRoutes`），以及 dev/preview 下的 HTTP 服务（`@cordisjs/plugin-server`）、代理、静态资源（`Static`）与 dev 下的控制台。preset 的配置是扁平的，各部分读取各自的字段。`@cormi/preset-react` 是 `@cormi/preset` + `@cormi/vite` + `@cormi/react` 的简写，三者的配置写在一起。
+`@cormijs/preset` 是一个普通插件，组合 router、html、app 服务，文件约定（`Conventions`），页面与 API 路由（`Pages`、`ApiRoutes`），以及 dev/preview 下的 HTTP 服务（`@cordisjs/plugin-server`）、代理、静态资源（`Static`）与 dev 下的控制台。preset 的配置是扁平的，各部分读取各自的字段。`@cormijs/preset-react` 是 `@cormijs/preset` + `@cormijs/vite` + `@cormijs/react` 的简写，三者的配置写在一起。
 
 事件：
 
@@ -77,7 +77,7 @@ cormi dev | build | preview | setup
 | `build/before()` | parallel | 打包器构建开始之前 |
 | `build/after(result)` | parallel | 客户端与服务端 bundle 写入之后 |
 
-preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 preview 下生效，排在 mock 之后）、`crossorigin`；`targets`（umi 的浏览器版本写法或 esbuild 目标）、`alias`、`define`、`publicPath`、`outDir` 是 `@cormi/vite` 的配置。
+preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 preview 下生效，排在 mock 之后）、`crossorigin`；`targets`（umi 的浏览器版本写法或 esbuild 目标）、`alias`、`define`、`publicPath`、`outDir` 是 `@cormijs/vite` 的配置。
 
 ## 文件约定
 
@@ -110,7 +110,7 @@ preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 preview 下
 ## 浏览器端
 
 ```ts
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 
 export default (ctx: Context, config: Config) => {
   ctx.wrap(({ children }) => <Provider value={config}>{children}</Provider>)
@@ -118,7 +118,7 @@ export default (ctx: Context, config: Config) => {
 }
 ```
 
-浏览器端分两层：`@cormi/runtime`（即 `cormi/client`）是与 UI 框架无关的部分——`Context`、`$app`（props 与生命周期事件）、抽象的 `$router`（路由清单、模块加载、`add()`、`href()`、服务端 loader 协议）；`@cormi/react/client` 在其上实现 React Router 数据路由、`ctx.wrap()`、钩子与 SSR。不涉及组件的浏览器插件只依赖前者。
+浏览器端分两层：`@cormijs/runtime`（即 `cormi/client`）是与 UI 框架无关的部分——`Context`、`$app`（props 与生命周期事件）、抽象的 `$router`（路由清单、模块加载、`add()`、`href()`、服务端 loader 协议）；`@cormijs/react/client` 在其上实现 React Router 数据路由、`ctx.wrap()`、钩子与 SSR。不涉及组件的浏览器插件只依赖前者。
 
 - 入口导出 `bootstrap`、`mount(options)`、`update(options)`、`unmount` 生命周期。入口会等运行时插件应用完毕后再挂载；某个插件在 `app/bootstrap`（bail）中返回 `true`，就表示由它接管挂载，例如 qiankun 子应用由加载脚本调用 `mount({ container, basename, origin, props })`。宿主传入的 props 用 `useHostProps()` 读取。
 - 核心服务在 root 上提供，任何运行时插件无需 inject：`ctx.$app`（React 下还是根组件包装器，常用方法以 mixin 暴露为 `ctx.wrap(component, order?)`）、`ctx.$router`（React 下是 React Router 7 数据路由；`ctx.$router.add(routes, modules)` 在运行时添加路由，已渲染时直接修补路由器，插件销毁时移除）。名字带 `$`，与同一应用的 Node 端服务（`ctx.app`、`ctx.router`）在类型上互不冲突——koishi 的客户端也是这样做的。
@@ -155,37 +155,37 @@ Node 部分以**包名**注册浏览器入口：`ctx.app.entry('@scope/plugin-fo
 
 | 插件 | 内容 |
 |---|---|
-| `@cormi/plugin-mock` | dev 下由 `mock/**` 提供 mock 路由（`defineMock({ 'GET /api/me': ... })`），优先于真实 API |
-| `@cormi/plugin-tailwindcss` | Tailwind CSS v4：注册打包器插件（Vite 下是 `@tailwindcss/vite`）并在应用启动前导入样式表 |
-| `@cormi/plugin-antd` | Ant Design：`ConfigProvider` 主题与语言、SSR 样式抽取（应用需依赖 `@ant-design/cssinjs`） |
-| `@cormi/plugin-model` | `src/models/*` 中的 hook 作为全局模型，`useModel(namespace, selector?)`，类型自动生成 |
-| `@cormi/plugin-initial-state` | 运行时插件监听 `initialState/load`（serial）提供初始状态，组件用 `useInitialState()` 读取 |
-| `@cormi/plugin-request` | 基于 fetch 的 `request()` 与基于 ahooks 的 `useRequest()`（可用 `dataField` 解包）；拦截用 `request/fetch`（waterfall），全局错误处理用 `request/error`（bail，返回 `true` 表示已处理） |
-| `@cormi/plugin-qiankun/master` | qiankun 主应用：`<MicroApp name>` 组件，以及挂载子应用的路由；把主应用 props 和子应用的 basename 传给子应用 |
-| `@cormi/plugin-qiankun/slave` | 由 Vite 构建的 qiankun 子应用：文档中的模块脚本会被替换为 qiankun 能执行的加载脚本，由它在主应用容器里（或独立运行时在页面里）挂载应用；同时提供 CORS、资源 URL 处理和 `useMasterProps()` |
-| `@cormi/plugin-export-static` | 构建后用服务端 bundle 预渲染静态路由（及 `extraRoutePaths`）为 HTML，供静态托管，页面会 hydrate |
-| `@cormi/plugin-lint` | `cormi lint [files] [--fix]`：使用应用自己的 `eslint.config.*`，没有时使用 TypeScript 与 React hooks 的默认配置 |
-| `@cormi/plugin-layout` | 基于 antd 的布局：由路由生成菜单与面包屑；配置式路由提供 `name`、`icon`、`hideInMenu`，只打包用到的图标 |
-| `@cormi/plugin-react-query` | 每个渲染的应用一个 `QueryClient`（创建时触发 `reactQuery/client`），dev 下 hydrate 后显示 devtools |
-| `@cormi/plugin-dva` | dva-core + dva-loading（可选 immer），模型来自 `src/models`（与 plugin-model 共用目录，各取所需）；`dva/create` 事件 |
-| `@cormi/plugin-valtio` | valtio 再导出，`defineStore()` 在 dev 下接入 Redux DevTools |
-| `@cormi/plugin-styled-components` | `ThemeProvider` 与 SSR 样式抽取 |
-| `@cormi/plugin-unocss` | UnoCSS：没有 `uno.config.*` 时使用默认预设 |
-| `@cormi/plugin-analytics` | Google Analytics 4 与百度统计；客户端导航通过 `router/change` 上报 |
-| `@cormi/plugin-legacy` | `@vitejs/plugin-legacy` 构建旧浏览器 bundle，并按 manifest 把 nomodule 等标签注入应用的文档 |
-| `@cormi/plugin-mpa` | 多页应用：`src/pages/<name>/index.tsx` 各自成为 `<name>.html`，不带路由，运行时插件同样生效 |
-| `@cormi/plugin-mf` | 模块联邦（`@module-federation/vite`），host 在入口中初始化；服务端渲染时 remote 模块渲染为空 |
-| `@cormi/plugin-federation/host`、`/package` | 联邦应用：各子包单独构建、单独部署，底座通过 URL 汇集成一个应用，基础依赖为全局单例（见下文） |
+| `@cormijs/plugin-mock` | dev 下由 `mock/**` 提供 mock 路由（`defineMock({ 'GET /api/me': ... })`），优先于真实 API |
+| `@cormijs/plugin-tailwindcss` | Tailwind CSS v4：注册打包器插件（Vite 下是 `@tailwindcss/vite`）并在应用启动前导入样式表 |
+| `@cormijs/plugin-antd` | Ant Design：`ConfigProvider` 主题与语言、SSR 样式抽取（应用需依赖 `@ant-design/cssinjs`） |
+| `@cormijs/plugin-model` | `src/models/*` 中的 hook 作为全局模型，`useModel(namespace, selector?)`，类型自动生成 |
+| `@cormijs/plugin-initial-state` | 运行时插件监听 `initialState/load`（serial）提供初始状态，组件用 `useInitialState()` 读取 |
+| `@cormijs/plugin-request` | 基于 fetch 的 `request()` 与基于 ahooks 的 `useRequest()`（可用 `dataField` 解包）；拦截用 `request/fetch`（waterfall），全局错误处理用 `request/error`（bail，返回 `true` 表示已处理） |
+| `@cormijs/plugin-qiankun/master` | qiankun 主应用：`<MicroApp name>` 组件，以及挂载子应用的路由；把主应用 props 和子应用的 basename 传给子应用 |
+| `@cormijs/plugin-qiankun/slave` | 由 Vite 构建的 qiankun 子应用：文档中的模块脚本会被替换为 qiankun 能执行的加载脚本，由它在主应用容器里（或独立运行时在页面里）挂载应用；同时提供 CORS、资源 URL 处理和 `useMasterProps()` |
+| `@cormijs/plugin-export-static` | 构建后用服务端 bundle 预渲染静态路由（及 `extraRoutePaths`）为 HTML，供静态托管，页面会 hydrate |
+| `@cormijs/plugin-lint` | `cormi lint [files] [--fix]`：使用应用自己的 `eslint.config.*`，没有时使用 TypeScript 与 React hooks 的默认配置 |
+| `@cormijs/plugin-layout` | 基于 antd 的布局：由路由生成菜单与面包屑；配置式路由提供 `name`、`icon`、`hideInMenu`，只打包用到的图标 |
+| `@cormijs/plugin-react-query` | 每个渲染的应用一个 `QueryClient`（创建时触发 `reactQuery/client`），dev 下 hydrate 后显示 devtools |
+| `@cormijs/plugin-dva` | dva-core + dva-loading（可选 immer），模型来自 `src/models`（与 plugin-model 共用目录，各取所需）；`dva/create` 事件 |
+| `@cormijs/plugin-valtio` | valtio 再导出，`defineStore()` 在 dev 下接入 Redux DevTools |
+| `@cormijs/plugin-styled-components` | `ThemeProvider` 与 SSR 样式抽取 |
+| `@cormijs/plugin-unocss` | UnoCSS：没有 `uno.config.*` 时使用默认预设 |
+| `@cormijs/plugin-analytics` | Google Analytics 4 与百度统计；客户端导航通过 `router/change` 上报 |
+| `@cormijs/plugin-legacy` | `@vitejs/plugin-legacy` 构建旧浏览器 bundle，并按 manifest 把 nomodule 等标签注入应用的文档 |
+| `@cormijs/plugin-mpa` | 多页应用：`src/pages/<name>/index.tsx` 各自成为 `<name>.html`，不带路由，运行时插件同样生效 |
+| `@cormijs/plugin-mf` | 模块联邦（`@module-federation/vite`），host 在入口中初始化；服务端渲染时 remote 模块渲染为空 |
+| `@cormijs/plugin-federation/host`、`/package` | 联邦应用：各子包单独构建、单独部署，底座通过 URL 汇集成一个应用，基础依赖为全局单例（见下文） |
 
 qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，不在 qiankun 的 JS 沙箱里；Vite 注入到 `document.head` 的样式不受样式隔离约束。这一点与 vite-plugin-qiankun 相同。
 
-## 联邦应用（`@cormi/plugin-federation`）
+## 联邦应用（`@cormijs/plugin-federation`）
 
-适合多个团队用同一技术栈共同维护一个大应用：每个子包（package）是一个独立的 Cormi 应用，可以单独开发、单独构建、单独部署；底座（host）在启动时按 URL 收集子包，把它们的页面接入自己的路由和布局。与 qiankun 不同，子包不是被隔离的另一个应用，而是底座里的 cordis 插件：react、react-dom、react-router、cordis、`cormi/client`、`@cormi/react/client` 以单例共享（可用 `shared` 追加，如 antd 或公共组件库），子包的页面在底座的路由器里渲染，子包之间可以通过 cordis 服务协作。这一设计来自 HZERO（`@hzerojs/plugin-micro`）的“模块联邦微前端”。
+适合多个团队用同一技术栈共同维护一个大应用：每个子包（package）是一个独立的 Cormi 应用，可以单独开发、单独构建、单独部署；底座（host）在启动时按 URL 收集子包，把它们的页面接入自己的路由和布局。与 qiankun 不同，子包不是被隔离的另一个应用，而是底座里的 cordis 插件：react、react-dom、react-router、cordis、`cormi/client`、`@cormijs/react/client` 以单例共享（可用 `shared` 追加，如 antd 或公共组件库），子包的页面在底座的路由器里渲染，子包之间可以通过 cordis 服务协作。这一设计来自 HZERO（`@hzerojs/plugin-micro`）的“模块联邦微前端”。
 
 ```yaml
 # 底座 cormi.yml
-- name: '@cormi/plugin-federation/host'
+- name: '@cormijs/plugin-federation/host'
   config:
     packages:                     # 写入构建产物 packages.json，部署时可直接修改
       - https://cdn.example.com/users/
@@ -195,11 +195,11 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
     parent: '@@/global-layout'    # 子包路由挂在哪个路由下，默认第一个顶层布局
 
 # 子包 cormi.yml
-- name: '@cormi/plugin-federation/package'
+- name: '@cormijs/plugin-federation/package'
   config:
     name: orders                  # 容器名，默认取自 package.json
     eager: false                  # true：随底座启动加载（例如提供服务的子包）
-    entries: ['@cormi/plugin-model/client']   # 随子包进入底座的插件运行时
+    entries: ['@cormijs/plugin-model/client']   # 随子包进入底座的插件运行时
     exposes: { ./CartBadge: ./src/components/CartBadge.tsx }
 ```
 
@@ -219,18 +219,18 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 - 子包页面在浏览器中运行，数据用 `clientLoader` 获取；导出服务端 `loader` 的路由会在构建时警告。底座开启 SSR 时，子包路由由客户端渲染，替换服务端的 404。
 - 懒加载的子包通过 `ctx.wrap()` 添加包装器时会让根组件重新挂载一次；需要全局 Provider 的子包宜设为 `eager`。
 
-`@cormi/react/client` 为此调整了两处：`$router.add()`；渲染时才读取 react-router 的工厂函数——子包独立运行时，共享模块在其模块求值之后才就绪。
+`@cormijs/react/client` 为此调整了两处：`$router.add()`；渲染时才读取 react-router 的工厂函数——子包独立运行时，共享模块在其模块求值之后才就绪。
 
 ## 工作区与控制台
 
-**工作区**（`ctx.workspace`，`@cormi/core`，在加载插件树之前由 `start()` 提供）：应用 `plugins/*` 下的插件包按包名加载，直接运行源码，模型来自 koishi 模板项目的工作区。
+**工作区**（`ctx.workspace`，`@cormijs/core`，在加载插件树之前由 `start()` 提供）：应用 `plugins/*` 下的插件包按包名加载，直接运行源码，模型来自 koishi 模板项目的工作区。
 
 - Node：通过 `module.register()` 注册解析钩子，工作区包名解析到 `exports` 的 `source` 条件（没有时为 `src/index.ts`），再交给 tsx。包增删时经 MessagePort 更新钩子。
 - Vite：`cormi:workspace` 插件在浏览器与 SSR 中做同样的解析。
 - 类型：React 渲染器在生成的 tsconfig 中写入工作区包的 `paths`。
 - `cormi g plugin <name>` 生成插件包（`--console`、`--no-client`）；dev 下监听 `plugins/*/package.json` 的增删。
 
-**控制台**（`@cormi/console`，preset 在 dev 模式下挂载，`console: false` 关闭）：挂在 `/__cormi/`，自带 Vite 与 React，与应用的打包器和 UI 框架无关：一个以中间件模式运行的 Vite 开发服务器，根目录是 `@cormi/console` 包（React 从这里解析，插件的控制台页面也去重到它），HMR 的 WebSocket 以路径与应用的区分。控制台本身是一个浏览器端的 cordis Context：页面是浏览器插件，经 `ctx.console.entry()` 注册（与 `ctx.app.entry()` 同构）；入口是控制台 Vite 的虚拟模块，位于应用根目录下，所以插件的控制台页面按包名从应用解析，入口变化时浏览器重新加载控制台。概览显示 `ctx.bundler`、`ctx.renderer` 的名称与版本（契约中的 `name`、`version`）。数据经 WebSocket：Node 端 `ctx.console.data(name, get)` 推送、`method(name, handler)` 响应调用、`broadcast()` 发事件；浏览器端 `ctx.$console.page()`、`useData()`、`call()`。
+**控制台**（`@cormijs/console`，preset 在 dev 模式下挂载，`console: false` 关闭）：挂在 `/__cormi/`，自带 Vite 与 React，与应用的打包器和 UI 框架无关：一个以中间件模式运行的 Vite 开发服务器，根目录是 `@cormijs/console` 包（React 从这里解析，插件的控制台页面也去重到它），HMR 的 WebSocket 以路径与应用的区分。控制台本身是一个浏览器端的 cordis Context：页面是浏览器插件，经 `ctx.console.entry()` 注册（与 `ctx.app.entry()` 同构）；入口是控制台 Vite 的虚拟模块，位于应用根目录下，所以插件的控制台页面按包名从应用解析，入口变化时浏览器重新加载控制台。概览显示 `ctx.bundler`、`ctx.renderer` 的名称与版本（契约中的 `name`、`version`）。数据经 WebSocket：Node 端 `ctx.console.data(name, get)` 推送、`method(name, handler)` 响应调用、`broadcast()` 发事件；浏览器端 `ctx.$console.page()`、`useData()`、`call()`。
 
 内置页面读取 loader 的 include 子树（顺序与 `cormi.yml` 一致），修改经子树的 `update/create/remove` 写回文件；注册列表来自 `fiber.getEffects()`（含子 fiber），状态变化监听 `internal/status`、`internal/plugin`；服务来自 `ctx.reflect.store`；日志经 `ctx.logger.exporter()`。控制台文档只响应接受 `text/html` 的请求，`/__cormi/loader` 等端点不受影响。
 
@@ -259,7 +259,7 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 
 ## 已知的上游问题
 
-`@cordisjs/plugin-server` 的最新版本（1.7.0）仍在调用 cordis rc.12 中已改名的 `Service.resolveConfig`（现为 `resolveIntercept`）。`@cormi/core` 的 `compat.ts` 为它提供了别名，上游跟进后即可删除。
+`@cordisjs/plugin-server` 的最新版本（1.7.0）仍在调用 cordis rc.12 中已改名的 `Service.resolveConfig`（现为 `resolveIntercept`）。`@cormijs/core` 的 `compat.ts` 为它提供了别名，上游跟进后即可删除。
 
 ## 验证
 

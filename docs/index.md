@@ -38,7 +38,7 @@ export function apply(ctx: Context, config: { generator: string }) {
 <div class="cm-filename"><code>src/app.tsx</code><span>浏览器端，按约定自动挂载</span></div>
 
 ```tsx
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 import { StrictMode } from 'react'
 
 export default (ctx: Context) => {
@@ -103,8 +103,8 @@ export default (ctx: Context) => {
 <div class="vp-doc">
 
 ```sh
-git clone https://github.com/Mahoo12138/cormijs.git
-cd cormijs && pnpm install && pnpm build
+git clone https://github.com/cormijs/cormi.git
+cd cormi && pnpm install && pnpm build
 ```
 
 </div>

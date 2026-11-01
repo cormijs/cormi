@@ -22,11 +22,11 @@ interface Registration {
 
 // a real cormi.yml, and what each of its plugins registers on ctx
 const entries: Entry[] = [
-  { id: 'preset', name: '@cormi/preset', inject: [], provides: ['router', 'html', 'app'] },
-  { id: 'vite', name: '@cormi/vite', inject: ['app'], provides: ['vite'] },
-  { id: 'react', name: '@cormi/react', inject: ['app', 'router', 'vite'] },
-  { id: 'layout', name: '@cormi/plugin-layout', inject: ['router', 'app'] },
-  { id: 'tailwind', name: '@cormi/plugin-tailwindcss', inject: ['vite', 'app'] },
+  { id: 'preset', name: '@cormijs/preset', inject: [], provides: ['router', 'html', 'app'] },
+  { id: 'vite', name: '@cormijs/vite', inject: ['app'], provides: ['vite'] },
+  { id: 'react', name: '@cormijs/react', inject: ['app', 'router', 'vite'] },
+  { id: 'layout', name: '@cormijs/plugin-layout', inject: ['router', 'app'] },
+  { id: 'tailwind', name: '@cormijs/plugin-tailwindcss', inject: ['vite', 'app'] },
   { id: 'local', name: './plugin.ts', inject: ['html'] },
 ]
 
@@ -40,7 +40,7 @@ const registrations: Registration[] = [
   { id: 'tailwind-vite', plugin: 'tailwind', service: 'vite', call: `plugin(tailwindcss())` },
   { id: 'preset-app', plugin: 'preset', service: 'app', call: `entry('src/app.tsx')` },
   { id: 'react-entry', plugin: 'react', service: 'app', call: `file('entry.tsx')` },
-  { id: 'layout-entry', plugin: 'layout', service: 'app', call: `entry('@cormi/plugin-layout/client')` },
+  { id: 'layout-entry', plugin: 'layout', service: 'app', call: `entry('@cormijs/plugin-layout/client')` },
   { id: 'tailwind-css', plugin: 'tailwind', service: 'app', call: `import('tailwindcss')` },
 ]
 
@@ -61,7 +61,7 @@ function stateOf(entry: Entry): State {
 
 const byId = Object.fromEntries(entries.map(entry => [entry.id, entry]))
 const isLive = (registration: Registration) => stateOf(byId[registration.plugin]) === 'active'
-const short = (name: string) => name.replace('@cormi/', '')
+const short = (name: string) => name.replace('@cormijs/', '')
 
 const log = ref('点击 cormi.yml 中的条目，停用或启用一个插件。')
 

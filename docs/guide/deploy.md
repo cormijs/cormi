@@ -27,11 +27,11 @@ cormi preview
 
 - 使用 `history: browser`（默认）时，静态服务器需要把未知路径回退到 `index.html`；不能配置回退时，改用 `history: hash`。
 - 资源不在站点根路径下时，设置 `publicPath`（如 `/app/` 或 CDN 地址）；应用本身挂在子路径下时，设置 `base`。
-- 想让静态托管的页面也带有服务端渲染的内容，用 [`@cormi/plugin-export-static`](/plugins/build#export-static) 在构建后把路由预渲染为 HTML。
+- 想让静态托管的页面也带有服务端渲染的内容，用 [`@cormijs/plugin-export-static`](/plugins/build#export-static) 在构建后把路由预渲染为 HTML。
 
 ## 旧浏览器
 
-`targets` 控制产物的语法目标。需要支持不认识模块脚本的浏览器时，加上 [`@cormi/plugin-legacy`](/plugins/build#legacy)，它会额外构建 legacy bundle，并把对应的 `nomodule` 标签写进文档。
+`targets` 控制产物的语法目标。需要支持不认识模块脚本的浏览器时，加上 [`@cormijs/plugin-legacy`](/plugins/build#legacy)，它会额外构建 legacy bundle，并把对应的 `nomodule` 标签写进文档。
 
 ## 构建中的插件
 
@@ -47,4 +47,4 @@ ctx.on('build/after', async ({ outDir, assets, server }) => {
 })
 ```
 
-`@cormi/plugin-export-static` 在 `build/after` 中用服务端 bundle 渲染页面，`@cormi/plugin-federation` 在其中写出联邦清单。
+`@cormijs/plugin-export-static` 在 `build/after` 中用服务端 bundle 渲染页面，`@cormijs/plugin-federation` 在其中写出联邦清单。

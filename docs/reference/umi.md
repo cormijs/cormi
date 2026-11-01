@@ -34,7 +34,7 @@ umi 是 Cormi 的能力清单：一个全栈框架该有的东西，Cormi 基本
 
 ## 配置项
 
-| umi | Cormi（`@cormi/preset` 的配置，构建项在 `@cormi/vite` 上；用 `@cormi/preset-react` 时写在一起） |
+| umi | Cormi（`@cormijs/preset` 的配置，构建项在 `@cormijs/vite` 上；用 `@cormijs/preset-react` 时写在一起） |
 |---|---|
 | `routes` | `routes` |
 | `base`、`publicPath`、`history.type` | `base`、`publicPath`、`history` |
@@ -42,10 +42,10 @@ umi 是 Cormi 的能力清单：一个全栈框架该有的东西，Cormi 基本
 | `title`、`metas`、`links`、`scripts`、`headScripts`、`styles`、`favicons` | 同名 |
 | `alias`、`define`、`targets`、`outputPath` | `alias`、`define`、`targets`、`outDir` |
 | `proxy` | `proxy` |
-| `mock` | `@cormi/plugin-mock` |
-| `exportStatic` | `@cormi/plugin-export-static` |
-| `mpa` | `@cormi/plugin-mpa` |
-| `legacy` | `@cormi/plugin-legacy` |
+| `mock` | `@cormijs/plugin-mock` |
+| `exportStatic` | `@cormijs/plugin-export-static` |
+| `mpa` | `@cormijs/plugin-mpa` |
+| `legacy` | `@cormijs/plugin-legacy` |
 | `model`、`initialState`、`request`、`antd`、`layout`、`qiankun`、`dva`、`valtio`、`reactQuery`、`analytics`、`tailwindcss` | 同名的官方插件 |
 
 ## 覆盖情况

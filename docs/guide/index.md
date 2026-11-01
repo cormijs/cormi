@@ -9,19 +9,19 @@ Cormi 是一个前端全栈框架，打包器可选 Vite 或 Rsbuild，UI 框架
 应用写在 `cormi.yml` 里，每个条目是一个插件：
 
 ```yaml
-- name: '@cormi/preset'      # 应用：路由、HTML、页面、API、服务器
+- name: '@cormijs/preset'      # 应用：路由、HTML、页面、API、服务器
   config:
     title: My App
     ssr: true
-- name: '@cormi/vite'        # 打包器
-- name: '@cormi/react'       # UI 框架
-- name: '@cormi/plugin-antd'
+- name: '@cormijs/vite'        # 打包器
+- name: '@cormijs/react'       # UI 框架
+- name: '@cormijs/plugin-antd'
   config:
     locale: zh_CN
 - name: ./plugin.ts
 ```
 
-打包器与 UI 框架也只是插件：`@cormi/vite`、`@cormi/rsbuild` 提供 `ctx.bundler`，`@cormi/react`、`@cormi/vue` 提供 `ctx.renderer`，换一个实现就是换掉一行（见 [打包器与 UI 框架](/guide/stack)）。`@cormi/preset-react` 是前三者合在一起的简写。`cormi.yml` 由 cordis 官方的 loader 加载，所以 cordis 生态里的插件同样可以写进来。
+打包器与 UI 框架也只是插件：`@cormijs/vite`、`@cormijs/rsbuild` 提供 `ctx.bundler`，`@cormijs/react`、`@cormijs/vue` 提供 `ctx.renderer`，换一个实现就是换掉一行（见 [打包器与 UI 框架](/guide/stack)）。`@cormijs/preset-react` 是前三者合在一起的简写。`cormi.yml` 由 cordis 官方的 loader 加载，所以 cordis 生态里的插件同样可以写进来。
 
 ## 能力是服务
 

@@ -7,13 +7,13 @@ my-app/
 ├─ cormi.yml            插件树
 ├─ plugin.ts            应用自己的 Node 插件（可选，写进 cormi.yml）
 ├─ plugins/             工作区插件包，按包名加载源码（见“控制台与工作区”）
-├─ mock/                mock 接口（@cormi/plugin-mock）
+├─ mock/                mock 接口（@cormijs/plugin-mock）
 ├─ public/              原样提供的文件
 └─ src/
    ├─ pages/            约定式路由
    ├─ layouts/index.tsx 全局布局
    ├─ api/              API 路由
-   ├─ models/           模型（@cormi/plugin-model、@cormi/plugin-dva）
+   ├─ models/           模型（@cormijs/plugin-model、@cormijs/plugin-dva）
    ├─ app.tsx           应用自己的浏览器插件
    ├─ global.css        全局样式
    └─ .cormi/           生成文件，不要编辑

@@ -3,12 +3,12 @@
 打包器与 UI 框架是 `cormi.yml` 里的两个条目：
 
 ```yaml
-- name: '@cormi/preset'      # 应用：路由、HTML、页面、API、服务器
+- name: '@cormijs/preset'      # 应用：路由、HTML、页面、API、服务器
   config:
     title: My App
     ssr: true
-- name: '@cormi/rsbuild'     # 或 @cormi/vite
-- name: '@cormi/vue'         # 或 @cormi/react
+- name: '@cormijs/rsbuild'     # 或 @cormijs/vite
+- name: '@cormijs/vue'         # 或 @cormijs/react
 ```
 
 换一个打包器或 UI 框架，就是换掉一行，再装上它的依赖。路由表、HTML、页面服务、API 路由、loader、插件树在各种组合下的用法都一样；[控制台](/guide/console) 自带 Vite 与 React，在每种组合下都相同，概览页会显示当前的打包器与 UI 框架。
@@ -19,12 +19,12 @@
 
 | 组合 | 依赖 |
 |---|---|
-| Vite + React | `@cormi/vite`、`@cormi/react`、`@vitejs/plugin-react`、`react`、`react-dom` |
-| Rsbuild + React | `@cormi/rsbuild`、`@cormi/react`、`@rsbuild/plugin-react`、`react`、`react-dom` |
-| Vite + Vue | `@cormi/vite`、`@cormi/vue`、`@vitejs/plugin-vue`、`vue` |
-| Rsbuild + Vue | `@cormi/rsbuild`、`@cormi/vue`、`@rsbuild/plugin-vue`、`vue` |
+| Vite + React | `@cormijs/vite`、`@cormijs/react`、`@vitejs/plugin-react`、`react`、`react-dom` |
+| Rsbuild + React | `@cormijs/rsbuild`、`@cormijs/react`、`@rsbuild/plugin-react`、`react`、`react-dom` |
+| Vite + Vue | `@cormijs/vite`、`@cormijs/vue`、`@vitejs/plugin-vue`、`vue` |
+| Rsbuild + Vue | `@cormijs/rsbuild`、`@cormijs/vue`、`@rsbuild/plugin-vue`、`vue` |
 
-集成包是 `@cormi/react`、`@cormi/vue` 的可选 peer 依赖：只在应用使用对应的打包器时才被导入，所以 Vite 应用不会装上 Rspack，反之亦然。缺少时，启动会报出要安装的包名，例如 `@cormi/react with rsbuild needs @rsbuild/plugin-react: add it to the dependencies of the app`。`@cormi/preset-react`（preset + Vite + React 的简写）自带 `@vitejs/plugin-react`。
+集成包是 `@cormijs/react`、`@cormijs/vue` 的可选 peer 依赖：只在应用使用对应的打包器时才被导入，所以 Vite 应用不会装上 Rspack，反之亦然。缺少时，启动会报出要安装的包名，例如 `@cormijs/react with rsbuild needs @rsbuild/plugin-react: add it to the dependencies of the app`。`@cormijs/preset-react`（preset + Vite + React 的简写）自带 `@vitejs/plugin-react`。
 
 有些官方插件也按打包器适配，例如 tailwindcss 在 Vite 下需要 `@tailwindcss/vite`，在 Rsbuild 下需要 `@tailwindcss/postcss`；只适用于某个 UI 框架或打包器的插件见 [官方插件](/plugins/) 的“要求”一栏。
 
@@ -36,7 +36,7 @@ cormi dev --config cormi.rsbuild.yml
 
 ## 打包器
 
-`@cormi/vite` 与 `@cormi/rsbuild` 的配置项相同：
+`@cormijs/vite` 与 `@cormijs/rsbuild` 的配置项相同：
 
 | 配置 | 默认值 | 说明 |
 |---|---|---|
@@ -64,7 +64,7 @@ Rsbuild 的插件写在一个本地插件里，例如 Less：
 // plugin.ts，写进 cormi.yml
 import { pluginLess } from '@rsbuild/plugin-less'
 import type { Context } from 'cormi'
-import type {} from '@cormi/rsbuild'
+import type {} from '@cormijs/rsbuild'
 
 export const inject = ['rsbuild']
 
@@ -78,7 +78,7 @@ export function apply(ctx: Context) {
 | | React | Vue |
 |---|---|---|
 | 路由模块 | `.tsx`、`.jsx` | `.vue` 单文件组件 |
-| 浏览器端 API | `@cormi/react/client` | `@cormi/vue/client` |
+| 浏览器端 API | `@cormijs/react/client` | `@cormijs/vue/client` |
 | 路由器 | React Router | Vue Router |
 | `loader`、`clientLoader` | 路由模块的导出 | 单文件组件 `<script>` 块的导出 |
 | 读取 loader 数据 | `useLoaderData()` | `useLoaderData()`，返回一个 computed ref |
@@ -102,7 +102,7 @@ export async function loader() {
 </script>
 
 <script setup lang="ts">
-import { useLoaderData } from '@cormi/vue/client'
+import { useLoaderData } from '@cormijs/vue/client'
 
 const data = useLoaderData<Awaited<ReturnType<typeof loader>>>()
 </script>
@@ -112,13 +112,13 @@ const data = useLoaderData<Awaited<ReturnType<typeof loader>>>()
 </template>
 ```
 
-loader 在导航确认之前运行，返回 `redirect('/login')` 时导航被重定向；服务端渲染时变为 302。布局是 `src/layouts/index.vue`，用 `<RouterView />` 渲染子路由；链接用 `RouterLink`。这些都可以从 `@cormi/vue/client` 导入，它重新导出了 Vue Router。
+loader 在导航确认之前运行，返回 `redirect('/login')` 时导航被重定向；服务端渲染时变为 302。布局是 `src/layouts/index.vue`，用 `<RouterView />` 渲染子路由；链接用 `RouterLink`。这些都可以从 `@cormijs/vue/client` 导入，它重新导出了 Vue Router。
 
 ### Vue 的运行时插件
 
 ```ts
 // src/app.ts
-import type { Context } from '@cormi/vue/client'
+import type { Context } from '@cormijs/vue/client'
 import { createPinia } from 'pinia'
 
 export default (ctx: Context) => {

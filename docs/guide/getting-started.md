@@ -1,19 +1,92 @@
 # 快速开始
 
-::: warning Cormi 仍在 0.x
-Cormi 还没有发布到 npm。现在使用它，需要克隆仓库，在仓库的 workspace 里创建应用；发布之后，这里的步骤会更新为从 npm 安装。
+::: warning 候选版本
+Cormi 正处于 0.1 的候选版本（`0.1.0-rc`），以 npm 的 `next` 标签发布，API 在正式版之前还可能调整。
 :::
 
 ## 环境要求
 
 - Node.js 22.12 或更高
-- pnpm 10
+- pnpm 10（npm、yarn 也可以）
+
+## 创建一个应用
+
+```sh
+mkdir my-app && cd my-app
+pnpm init
+pnpm add cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react react react-dom
+pnpm add -D @types/react @types/react-dom typescript
+```
+
+在 package.json 中加上 `"type": "module"` 与脚本：
+
+```json
+{
+  "type": "module",
+  "scripts": {
+    "dev": "cormi dev",
+    "build": "cormi build",
+    "preview": "cormi preview",
+    "setup": "cormi setup"
+  }
+}
+```
+
+`cormi.yml` 列出应用、它的打包器与 UI 框架：
+
+::: code-group
+
+```yaml [cormi.yml]
+- name: '@cormijs/preset'
+  config:
+    title: My App
+- name: '@cormijs/vite'
+- name: '@cormijs/react'
+```
+
+:::
+
+写一个页面，React 的 API 从 `@cormijs/react/client` 导入：
+
+::: code-group
+
+```tsx [src/pages/index.tsx]
+export default function Home() {
+  return <h1>Hello, Cormi</h1>
+}
+```
+
+:::
+
+`tsconfig.json` 继承 Cormi 生成的配置，路径别名（`@/`、`@@/`）和资源类型就都有了：
+
+::: code-group
+
+```json [tsconfig.json]
+{
+  "extends": "./src/.cormi/tsconfig.json"
+}
+```
+
+:::
+
+然后运行：
+
+```sh
+pnpm dev              # http://localhost:8000，控制台在 /__cormi/
+```
+
+`src/.cormi` 是生成目录，应加入 `.gitignore`。类型检查之前可以先运行 `cormi setup`，它只写生成文件，不启动服务。
+
+三行也可以合成一行 `- name: '@cormijs/preset-react'`（依赖换成 `@cormijs/preset-react`，它自带 Vite、React 与 `@vitejs/plugin-react`）。用 Rsbuild 或 Vue 时换掉对应的一行和依赖，见 [打包器与 UI 框架](/guide/stack)。
 
 ## 运行示例
 
+示例在仓库中，依赖仓库里的包：
+
 ```sh
-git clone https://github.com/Mahoo12138/cormijs.git
-cd cormijs
+git clone https://github.com/cormijs/cormi.git
+cd cormi
 pnpm install
 pnpm build          # 编译各个包
 cd examples/basic
@@ -39,89 +112,6 @@ pnpm dev            # http://localhost:8000
 | `with-vue` | Vue：单文件组件的路由与 loader、运行时插件安装 Vue 插件 |
 
 `basic`、`with-tailwind`、`with-vue` 与模块联邦的示例也在 Rsbuild 上运行，见 [打包器与 UI 框架](/guide/stack)。
-
-## 创建一个应用
-
-在仓库的 `examples/` 下新建一个目录（它属于 pnpm workspace，可以直接依赖仓库里的包）：
-
-::: code-group
-
-```json [package.json]
-{
-  "name": "my-app",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "cormi dev",
-    "build": "cormi build",
-    "preview": "cormi preview",
-    "setup": "cormi setup"
-  },
-  "dependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@vitejs/plugin-react": "^5.2.0",
-    "cormi": "workspace:*",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
-  },
-  "devDependencies": {
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0"
-  }
-}
-```
-
-:::
-
-`cormi.yml` 列出应用、它的打包器与 UI 框架：
-
-::: code-group
-
-```yaml [cormi.yml]
-- name: '@cormi/preset'
-  config:
-    title: My App
-- name: '@cormi/vite'
-- name: '@cormi/react'
-```
-
-:::
-
-三行也可以合成一行 `- name: '@cormi/preset-react'`，配置写在一起，效果相同（它自带 `@vitejs/plugin-react`）。用 Rsbuild 或 Vue 时换掉对应的一行和依赖，见 [打包器与 UI 框架](/guide/stack)。
-
-写一个页面，React 的 API 从 `@cormi/react/client` 导入：
-
-::: code-group
-
-```tsx [src/pages/index.tsx]
-export default function Home() {
-  return <h1>Hello, Cormi</h1>
-}
-```
-
-:::
-
-`tsconfig.json` 继承 Cormi 生成的配置，路径别名（`@/`、`@@/`）和资源类型就都有了：
-
-::: code-group
-
-```json [tsconfig.json]
-{
-  "extends": "./src/.cormi/tsconfig.json"
-}
-```
-
-:::
-
-然后在仓库根目录执行 `pnpm install`，回到应用目录运行：
-
-```sh
-pnpm dev
-```
-
-`src/.cormi` 是生成目录，应加入 `.gitignore`。类型检查之前可以先运行 `cormi setup`，它只写生成文件，不启动服务。
 
 ## 接下来
 

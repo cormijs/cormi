@@ -5,7 +5,7 @@
 `mock/**` 下的模块定义 mock 接口。它们优先于应用的 API 路由，修改后下一个请求即生效。
 
 ```yaml
-- name: '@cormi/plugin-mock'
+- name: '@cormijs/plugin-mock'
   config:
     delay: 200
 ```
@@ -13,7 +13,7 @@
 ::: code-group
 
 ```ts [mock/user.ts]
-import { defineMock } from '@cormi/plugin-mock'
+import { defineMock } from '@cormijs/plugin-mock'
 
 export default defineMock({
   'GET /api/me': { name: 'Cormi', role: 'admin' },
@@ -38,7 +38,7 @@ export default defineMock({
 构建之后，用服务端 bundle 把静态路由（以及 `extraRoutePaths`）预渲染为 HTML，供静态托管。页面在浏览器中照常 hydrate。
 
 ```yaml
-- name: '@cormi/plugin-export-static'
+- name: '@cormijs/plugin-export-static'
   config:
     extraRoutePaths: [/users/1, /users/2]
 ```
@@ -56,7 +56,7 @@ export default defineMock({
 用 `@vitejs/plugin-legacy` 额外构建一份 legacy bundle，并把 `nomodule` 等标签写进应用的文档：不支持模块脚本的浏览器加载它。
 
 ```yaml
-- name: '@cormi/plugin-legacy'
+- name: '@cormijs/plugin-legacy'
   config:
     targets: ['defaults', 'not IE 11']
 ```
@@ -73,7 +73,7 @@ export default defineMock({
 多页应用：`src/pages/<name>/index.tsx` 各自成为 `<name>.html`，页面之间是普通链接，不带客户端路由。应用的浏览器插件在每个页面上同样生效。
 
 ```yaml
-- name: '@cormi/plugin-mpa'
+- name: '@cormijs/plugin-mpa'
 ```
 
 ```
@@ -93,7 +93,7 @@ src/pages/
 Google Analytics 4 与百度统计。客户端导航通过 `router/change` 自动上报页面浏览。
 
 ```yaml
-- name: '@cormi/plugin-analytics'
+- name: '@cormijs/plugin-analytics'
   config:
     ga: G-XXXXXXXXXX
     baidu: 0123456789abcdef
@@ -110,7 +110,7 @@ Google Analytics 4 与百度统计。客户端导航通过 `router/change` 自�
 注册 `cormi lint` 命令。使用应用自己的 `eslint.config.*`；没有时使用内置的 TypeScript 与 React hooks 规则。
 
 ```yaml
-- name: '@cormi/plugin-lint'
+- name: '@cormijs/plugin-lint'
 ```
 
 ```sh

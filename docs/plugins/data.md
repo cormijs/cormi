@@ -5,7 +5,7 @@
 `src/models` 下默认导出一个 React hook 的模块就是一个模型。hook 的返回值由所有调用 `useModel(<文件名>)` 的组件共享。
 
 ```yaml
-- name: '@cormi/plugin-model'
+- name: '@cormijs/plugin-model'
 ```
 
 ::: code-group
@@ -23,7 +23,7 @@ export default function useCounter() {
 :::
 
 ```tsx
-import { useModel } from '@cormi/plugin-model/client'
+import { useModel } from '@cormijs/plugin-model/client'
 
 export default function Counter() {
   const { count, increment } = useModel('counter')
@@ -44,16 +44,16 @@ export default function Counter() {
 应用的初始状态（通常是当前用户）。应用的浏览器插件监听 `initialState/load` 提供它：
 
 ```yaml
-- name: '@cormi/plugin-initial-state'
+- name: '@cormijs/plugin-initial-state'
 ```
 
 ::: code-group
 
 ```ts [src/app.ts]
 import type { Context } from 'cormi/client'
-import type {} from '@cormi/plugin-initial-state/client'
+import type {} from '@cormijs/plugin-initial-state/client'
 
-declare module '@cormi/plugin-initial-state/client' {
+declare module '@cormijs/plugin-initial-state/client' {
   interface InitialState {
     name: string
     role: string
@@ -72,7 +72,7 @@ export default (ctx: Context) => {
 :::
 
 ```tsx
-import { useInitialState } from '@cormi/plugin-initial-state/client'
+import { useInitialState } from '@cormijs/plugin-initial-state/client'
 
 export default function Profile() {
   const { initialState, loading, error, refresh, setInitialState } = useInitialState()
@@ -89,7 +89,7 @@ export default function Profile() {
 基于 fetch 的请求库：`request()` 发请求，`useRequest()`（ahooks）管理请求状态。
 
 ```yaml
-- name: '@cormi/plugin-request'
+- name: '@cormijs/plugin-request'
   config:
     baseURL: /api
     timeout: 3000
@@ -107,7 +107,7 @@ export default function Profile() {
 | `dataField` | `useRequest()` 返回响应体中的这个字段，如 `data` |
 
 ```tsx
-import { request, useRequest } from '@cormi/plugin-request/client'
+import { request, useRequest } from '@cormijs/plugin-request/client'
 
 const { data, loading, error, run } = useRequest(() => request('/users', { params: { page } }), {
   refreshDeps: [page],
@@ -124,7 +124,7 @@ await request('/users', { method: 'POST', data: { name: 'Alice' } })
 
 ```tsx [src/app.tsx]
 import type { Context } from 'cormi/client'
-import type {} from '@cormi/plugin-request/client'
+import type {} from '@cormijs/plugin-request/client'
 
 export default (ctx: Context) => {
   // waterfall：修改请求，或不调用 next() 直接返回一个 Response
@@ -148,7 +148,7 @@ export default (ctx: Context) => {
 为每个渲染的应用创建一个 `QueryClient`（服务端渲染时每个请求一个），dev 下在应用 hydrate 之后显示 devtools。
 
 ```yaml
-- name: '@cormi/plugin-react-query'
+- name: '@cormijs/plugin-react-query'
   config:
     defaultOptions:
       queries:
@@ -167,7 +167,7 @@ export default (ctx: Context) => {
 dva-core 与 dva-loading。`src/models` 下导出 dva 模型对象的模块是模型，命名空间取文件名。
 
 ```yaml
-- name: '@cormi/plugin-dva'
+- name: '@cormijs/plugin-dva'
   config:
     immer: true
 ```
@@ -192,7 +192,7 @@ export default {
 :::
 
 ```tsx
-import { useDispatch, useSelector } from '@cormi/plugin-dva/client'
+import { useDispatch, useSelector } from '@cormijs/plugin-dva/client'
 
 const count = useSelector((state: any) => state.count)
 const adding = useSelector((state: any) => state.loading.effects['count/addLater'])
@@ -205,20 +205,20 @@ const dispatch = useDispatch()
 | `loading` | `true` | 在 `state.loading` 中跟踪 effect |
 | `immer` | `false` | 用 immer 草稿写 reducer |
 
-`@cormi/plugin-dva/client` 还导出 `connect`、`useStore` 与 `getDvaApp()`；dva 实例创建后触发 `dva/create(app)`。
+`@cormijs/plugin-dva/client` 还导出 `connect`、`useStore` 与 `getDvaApp()`；dva 实例创建后触发 `dva/create(app)`。
 
 ## valtio
 
 重新导出 valtio 与 `valtio/utils`，并提供 `defineStore()`：dev 下自动接入 Redux DevTools。
 
 ```yaml
-- name: '@cormi/plugin-valtio'
+- name: '@cormijs/plugin-valtio'
 ```
 
 ::: code-group
 
 ```ts [src/stores/settings.ts]
-import { defineStore } from '@cormi/plugin-valtio/client'
+import { defineStore } from '@cormijs/plugin-valtio/client'
 
 export const settings = defineStore('settings', { compact: false })
 ```
@@ -226,7 +226,7 @@ export const settings = defineStore('settings', { compact: false })
 :::
 
 ```tsx
-import { useSnapshot } from '@cormi/plugin-valtio/client'
+import { useSnapshot } from '@cormijs/plugin-valtio/client'
 import { settings } from '../stores/settings'
 
 const { compact } = useSnapshot(settings)

@@ -1,6 +1,6 @@
 # 路由与数据
 
-路由表与 loader 协议与 UI 框架无关；在 React 应用中，路由运行在 React Router 7 的数据路由上。`@cormi/react/client` 重新导出了 React Router 的全部 API（`useParams`、`useLoaderData`、`useNavigate`、`redirect`……），页面和插件都从这里导入。约定式路由的扩展名由 UI 框架注册：React 是 `.tsx` 与 `.jsx`，此外 `.ts`、`.js` 总是可用。
+路由表与 loader 协议与 UI 框架无关；在 React 应用中，路由运行在 React Router 7 的数据路由上。`@cormijs/react/client` 重新导出了 React Router 的全部 API（`useParams`、`useLoaderData`、`useNavigate`、`redirect`……），页面和插件都从这里导入。约定式路由的扩展名由 UI 框架注册：React 是 `.tsx` 与 `.jsx`，此外 `.ts`、`.js` 总是可用。
 
 ## 约定式路由
 
@@ -27,7 +27,7 @@ dev 模式下，新增或删除页面文件，路由表会随即更新。
 ::: code-group
 
 ```tsx [src/layouts/index.tsx]
-import { Link, Outlet } from '@cormi/react/client'
+import { Link, Outlet } from '@cormijs/react/client'
 
 export default function Layout() {
   return (
@@ -51,7 +51,7 @@ export default function Layout() {
 在 preset 配置中写 `routes`，就不再扫描 `src/pages`：
 
 ```yaml
-- name: '@cormi/preset'
+- name: '@cormijs/preset'
   config:
     routes:
       - path: /
@@ -71,7 +71,7 @@ export default function Layout() {
         layout: false               # 不使用全局布局
 ```
 
-`name`、`icon`、`hideInMenu` 会作为路由的 `meta` 发送到浏览器，[`@cormi/plugin-layout`](/plugins/ui#layout) 用它们生成菜单和面包屑。插件也可以在运行时用 `ctx.router.route()`、`ctx.router.patch()` 增改路由，见 [Node 端服务](/plugin/services#ctx-router)。
+`name`、`icon`、`hideInMenu` 会作为路由的 `meta` 发送到浏览器，[`@cormijs/plugin-layout`](/plugins/ui#layout) 用它们生成菜单和面包屑。插件也可以在运行时用 `ctx.router.route()`、`ctx.router.patch()` 增改路由，见 [Node 端服务](/plugin/services#ctx-router)。
 
 ## 路由模块
 
@@ -94,7 +94,7 @@ export function shouldRevalidate() {}                             // 控制导�
 ::: code-group
 
 ```tsx [src/pages/about.tsx]
-import { useLoaderData } from '@cormi/react/client'
+import { useLoaderData } from '@cormijs/react/client'
 
 export async function loader() {
   const { platform } = await import('node:os')
@@ -124,7 +124,7 @@ export async function clientLoader({ serverLoader }) {
 
 ## 链接与预加载
 
-`@cormi/react/client` 的 `<Link>` 是 React Router 的 `<Link>`，额外支持 `prefetch`，提前加载目标路由的模块：
+`@cormijs/react/client` 的 `<Link>` 是 React Router 的 `<Link>`，额外支持 `prefetch`，提前加载目标路由的模块：
 
 | `prefetch` | 时机 |
 |---|---|

@@ -60,7 +60,7 @@ ctx.on('build/after', async ({ outDir }) => {
 
 ```ts [src/app.tsx]
 import type { Context } from 'cormi/client'
-import type {} from '@cormi/plugin-request/client'
+import type {} from '@cormijs/plugin-request/client'
 
 export default (ctx: Context) => {
   ctx.on('request/fetch', async (url, init, config, next) => {

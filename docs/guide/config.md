@@ -3,25 +3,25 @@
 `cormi.yml` 是应用的插件树，由 cordis 官方的 [`@cordisjs/plugin-loader`](https://github.com/cordiverse/cordis) 加载。文件是一个列表，每个条目是一个插件：
 
 ```yaml
-- name: '@cormi/preset'           # 包名
+- name: '@cormijs/preset'           # 包名
   config:
     title: My App
     ssr: true
-- name: '@cormi/vite'
-- name: '@cormi/react'
-- name: '@cormi/plugin-request'
+- name: '@cormijs/vite'
+- name: '@cormijs/react'
+- name: '@cormijs/plugin-request'
   config:
     timeout: 3000
 - name: ./plugin.ts               # 应用自己的插件，TypeScript 由 tsx 加载
   config:
     generator: cormi
-- name: '@cormi/plugin-mock'
+- name: '@cormijs/plugin-mock'
   disabled: true                  # 保留配置，但不加载
 ```
 
 | 字段 | 含义 |
 |---|---|
-| `name` | 插件模块：包名、包的子路径（`@cormi/plugin-qiankun/master`）或相对路径的本地文件 |
+| `name` | 插件模块：包名、包的子路径（`@cormijs/plugin-qiankun/master`）或相对路径的本地文件 |
 | `config` | 插件的配置。加载前先经插件的 `Config`（Schema）校验，并填充默认值 |
 | `disabled` | 为 `true` 时不加载该插件 |
 
@@ -40,7 +40,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 以 `!!js` 标记的值是 JavaScript 表达式，常用来读取环境变量：
 
 ```yaml
-- name: '@cormi/plugin-mf'
+- name: '@cormijs/plugin-mf'
   config:
     name: host
     remotes:
@@ -51,7 +51,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 
 ## 应用、打包器与 UI 框架的配置
 
-服务器、路由、渲染与 HTML 的配置写在 `@cormi/preset` 上，构建的配置写在打包器 `@cormi/vite` 上，`@cormi/react` 没有配置。用 `@cormi/preset-react` 时，这些配置写在一起，各部分读取各自的字段。
+服务器、路由、渲染与 HTML 的配置写在 `@cormijs/preset` 上，构建的配置写在打包器 `@cormijs/vite` 上，`@cormijs/react` 没有配置。用 `@cormijs/preset-react` 时，这些配置写在一起，各部分读取各自的字段。
 
 ### 服务器
 
@@ -61,7 +61,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 | `port` | `8000`（或 `PORT`） | dev 与 preview 服务器的端口，被占用时顺延 |
 | `proxy` | — | 转发请求到其他服务器，见 [代理](/guide/server#代理) |
 
-| `console` | `{}` | dev 模式下的 [控制台](/guide/console)：`{ path, title, registry }`（`registry` 默认与包管理器相同），或 `false` 关闭 |
+| `console` | `{}` | dev 模式下的 [控制台](/guide/console)：`{ path, title, registry, market }`（`registry` 默认与包管理器相同，`market` 默认是 Cormi registry 的索引），或 `false` 关闭 |
 
 命令行的 `--port`、`--host` 优先于配置。
 
@@ -91,7 +91,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 | `scripts` | `[]` | `<body>` 末尾的脚本 |
 | `crossorigin` | `false` | 入口脚本、样式和预加载的 `crossorigin`，资源由 CDN 提供时使用 |
 
-### 构建（`@cormi/vite`、`@cormi/rsbuild`）
+### 构建（`@cormijs/vite`、`@cormijs/rsbuild`）
 
 | 配置 | 默认值 | 说明 |
 |---|---|---|

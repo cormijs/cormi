@@ -33,14 +33,14 @@ export const GET: ApiHandler = (request, { params }) => {
 - 模块没有导出请求方法对应的处理器时，返回 405。
 - API 模块会被打包进服务端入口，所以 `cormi preview` 运行构建产物时同样可用。
 
-开发阶段需要假数据时，用 [`@cormi/plugin-mock`](/plugins/build#mock)，它的路由优先于真实的 API。
+开发阶段需要假数据时，用 [`@cormijs/plugin-mock`](/plugins/build#mock)，它的路由优先于真实的 API。
 
 ## 代理
 
 `proxy` 把请求转发到其他服务器，在 dev 与 preview 下生效（排在 mock 之后）：
 
 ```yaml
-- name: '@cormi/preset'
+- name: '@cormijs/preset'
   config:
     proxy:
       /api:
@@ -64,7 +64,7 @@ export const GET: ApiHandler = (request, { params }) => {
 ## 服务端渲染
 
 ```yaml
-- name: '@cormi/preset'
+- name: '@cormijs/preset'
   config:
     ssr: true
 ```
@@ -73,7 +73,7 @@ export const GET: ApiHandler = (request, { params }) => {
 
 - 服务端也会挂载应用的浏览器插件（`ctx.app.entry()` 注册的模块与 `src/app.tsx`），所以插件中只能在浏览器运行的代码要放进事件或 effect 里，或判断 `typeof window`。
 - 访问 `window`、`document` 的组件代码同样要放进 `useEffect`。
-- CSS-in-JS 库通过 `useServerInsertedHTML()` 把样式插入 `<head>`；`@cormi/plugin-antd` 与 `@cormi/plugin-styled-components` 已经这样做了。
+- CSS-in-JS 库通过 `useServerInsertedHTML()` 把样式插入 `<head>`；`@cormijs/plugin-antd` 与 `@cormijs/plugin-styled-components` 已经这样做了。
 - 服务端渲染的状态码来自路由：未匹配的路径返回 404。
 
 不开启 SSR 时，服务器为所有页面请求返回同一个文档，由浏览器渲染；首屏路由加载期间显示 `src/loading.tsx`。

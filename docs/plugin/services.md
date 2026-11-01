@@ -4,18 +4,18 @@
 |---|---|---|
 | `ctx.cormi` | `cormi`（根上提供，无需 inject） | — |
 | `ctx.cli` | `cormi`（根上提供，无需 inject） | `command()`、`generator()` |
-| `ctx.router` | `@cormi/preset` | `route()`、`layout()`、`patch()`、`extension()` |
-| `ctx.html` | `@cormi/preset` | `head()`、`body()`、`transform()` |
-| `ctx.app` | `@cormi/preset` | `entry()`、`import()`、`file()`、`server()` |
-| `ctx.bundler` | 打包器：`@cormi/vite` 或 `@cormi/rsbuild` | `plugin()`、`input()`；构建、开发文档与服务端入口 |
-| `ctx.renderer` | UI 框架：`@cormi/react` 或 `@cormi/vue` | — |
-| `ctx.vite` | `@cormi/vite` | `plugin()`、`configure()`、`input()` |
-| `ctx.rsbuild` | `@cormi/rsbuild` | `plugin()`、`configure()`、`input()` |
-| `ctx.react` | `@cormi/react` | — |
-| `ctx.vue` | `@cormi/vue` | — |
+| `ctx.router` | `@cormijs/preset` | `route()`、`layout()`、`patch()`、`extension()` |
+| `ctx.html` | `@cormijs/preset` | `head()`、`body()`、`transform()` |
+| `ctx.app` | `@cormijs/preset` | `entry()`、`import()`、`file()`、`server()` |
+| `ctx.bundler` | 打包器：`@cormijs/vite` 或 `@cormijs/rsbuild` | `plugin()`、`input()`；构建、开发文档与服务端入口 |
+| `ctx.renderer` | UI 框架：`@cormijs/react` 或 `@cormijs/vue` | — |
+| `ctx.vite` | `@cormijs/vite` | `plugin()`、`configure()`、`input()` |
+| `ctx.rsbuild` | `@cormijs/rsbuild` | `plugin()`、`configure()`、`input()` |
+| `ctx.react` | `@cormijs/react` | — |
+| `ctx.vue` | `@cormijs/vue` | — |
 | `ctx.server` | `@cordisjs/plugin-server`（dev 与 preview） | `get()`、`post()`、`all()`、`use()`、`ws()` |
 | `ctx.workspace` | `cormi`（根上提供） | `create()` |
-| `ctx.console` | `@cormi/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
+| `ctx.console` | `@cormijs/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
 
 只用 `ctx.bundler`、`ctx.renderer` 等通用服务的插件，适用于任何打包器与 UI 框架；需要某个实现的特有能力时，注入它的具名服务——`inject: ['vite']`、`inject: ['react']`。在不支持的组合中，这样的插件会转入 pending，控制台会显示它在等待的服务。
 
@@ -23,7 +23,7 @@
 |---|---|---|
 | 通用服务 | `inject: ['app', 'html', 'router', 'bundler']`…… | mock、analytics、export-static、lint |
 | 打包器插件 | `ctx.bundler.plugin({ vite: …, rsbuild: … })`，为支持的每个打包器各给一个 | tailwindcss、mf |
-| React | 再 `inject: ['react']`，浏览器端从 `@cormi/react/client` 导入 | antd、model、request、layout |
+| React | 再 `inject: ['react']`，浏览器端从 `@cormijs/react/client` 导入 | antd、model、request、layout |
 | Vite 特有的能力 | `inject: ['vite']`，使用 `ctx.vite` | legacy、qiankun 子应用 |
 
 所有注册方法都是 effect：注册属于调用方插件，插件卸载时自动撤回，并返回一个可以提前撤回的函数。
@@ -129,14 +129,14 @@ ctx.app.server('foo', ctx.cormi.resolve('src/server/foo.ts'))
 
 ## ctx.bundler
 
-应用的打包器，由打包器插件实现（目前是 `@cormi/vite`）。
+应用的打包器，由打包器插件实现（目前是 `@cormijs/vite`）。
 
 各个打包器的插件不能通用，所以 `plugin()` 接收一个按打包器名称索引的对象，为插件支持的每个打包器各给一个它自己的插件。当前的打包器取用自己的那一项；没有时抛出错误，插件加载失败，而不是悄悄缺少一部分功能。
 
 ```ts
 import { type Context, importPeer } from 'cormi'
-import type {} from '@cormi/rsbuild'   // 类型：rsbuild 一项的形式由 @cormi/rsbuild 声明
-import type {} from '@cormi/vite'
+import type {} from '@cormijs/rsbuild'   // 类型：rsbuild 一项的形式由 @cormijs/rsbuild 声明
+import type {} from '@cormijs/vite'
 
 export const inject = ['app', 'bundler']
 
@@ -160,7 +160,7 @@ ctx.bundler.plugin({
 })
 ```
 
-用 [unplugin](https://unplugin.unjs.io) 写的插件一份实现覆盖多个打包器，把它的各个变体放进对象：`{ vite: () => plugin.vite(options), rspack: () => plugin.rspack(options) }`——`@cormi/rsbuild` 没有 `rsbuild` 一项时使用 `rspack` 一项。
+用 [unplugin](https://unplugin.unjs.io) 写的插件一份实现覆盖多个打包器，把它的各个变体放进对象：`{ vite: () => plugin.vite(options), rspack: () => plugin.rspack(options) }`——`@cormijs/rsbuild` 没有 `rsbuild` 一项时使用 `rspack` 一项。
 
 | 成员 | 说明 |
 |---|---|

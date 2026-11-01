@@ -19,8 +19,8 @@ federation 建立在 mf 的 Vite 实现之上，目前要求 Vite 与 React：�
 ### 底座
 
 ```yaml
-- name: '@cormi/preset-react'
-- name: '@cormi/plugin-federation/host'
+- name: '@cormijs/preset-react'
+- name: '@cormijs/plugin-federation/host'
   config:
     packages:
       - https://cdn.example.com/users/
@@ -42,7 +42,7 @@ federation 建立在 mf 的 Vite 实现之上，目前要求 Vite 与 React：�
 ### 子包
 
 ```yaml
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     routes:
       - path: /orders
@@ -51,11 +51,11 @@ federation 建立在 mf 的 Vite 实现之上，目前要求 Vite 与 React：�
       - path: /orders/:id
         component: orders/detail
         hideInMenu: true
-- name: '@cormi/plugin-model'
-- name: '@cormi/plugin-federation/package'
+- name: '@cormijs/plugin-model'
+- name: '@cormijs/plugin-federation/package'
   config:
     name: orders
-    entries: ['@cormi/plugin-model/client']
+    entries: ['@cormijs/plugin-model/client']
     exposes:
       ./CartBadge: ./src/components/CartBadge.tsx
 ```
@@ -64,7 +64,7 @@ federation 建立在 mf 的 Vite 实现之上，目前要求 Vite 与 React：�
 |---|---|---|
 | `name` | 包名 | 容器名，底座以 `<name>/<expose>` 导入它的模块 |
 | `eager` | `false` | 随底座启动加载，而不是在访问其路由时加载 |
-| `entries` | `[]` | 随子包一起进入底座的插件运行时，如 `@cormi/plugin-model/client` |
+| `entries` | `[]` | 随子包一起进入底座的插件运行时，如 `@cormijs/plugin-model/client` |
 | `exposes` | `{}` | 底座和其他子包可以导入的模块 |
 | `shared` | `[]` | 默认单例之外的共享依赖，需与底座一致 |
 
@@ -80,11 +80,11 @@ federation 建立在 mf 的 Vite 实现之上，目前要求 Vite 与 React：�
 
 ### 共享
 
-react、react-dom、react-router、cordis、`cormi/client` 与 `@cormi/react/client` 默认以单例共享，`shared` 可以追加。子包之间的协作有两种方式：
+react、react-dom、react-router、cordis、`cormi/client` 与 `@cormijs/react/client` 默认以单例共享，`shared` 可以追加。子包之间的协作有两种方式：
 
 ```tsx
 // 1. 渲染其他子包暴露的组件，它所属的子包会先加载
-import { RemoteComponent } from '@cormi/plugin-federation/client'
+import { RemoteComponent } from '@cormijs/plugin-federation/client'
 
 <RemoteComponent id="orders/CartBadge" fallback={<span>…</span>} />
 ```
@@ -124,14 +124,14 @@ localStorage.setItem('cormi:packages', JSON.stringify(['http://localhost:8011/']
 
 ```yaml
 # remote：暴露模块
-- name: '@cormi/plugin-mf'
+- name: '@cormijs/plugin-mf'
   config:
     name: remote
     exposes:
       ./Greeting: ./src/components/Greeting.tsx
 
 # host：导入模块
-- name: '@cormi/plugin-mf'
+- name: '@cormijs/plugin-mf'
   config:
     name: host
     remotes:
@@ -160,7 +160,7 @@ host 在应用入口中初始化（Cormi 的应用没有 index.html；Rsbuild �
 ### 主应用
 
 ```yaml
-- name: '@cormi/plugin-qiankun/master'
+- name: '@cormijs/plugin-qiankun/master'
   config:
     apps:
       - name: app1
@@ -182,7 +182,7 @@ host 在应用入口中初始化（Cormi 的应用没有 index.html；Rsbuild �
 不通过路由时，用组件渲染子应用：
 
 ```tsx
-import { MicroApp } from '@cormi/plugin-qiankun/master/client'
+import { MicroApp } from '@cormijs/plugin-qiankun/master/client'
 
 <MicroApp name="app1" base="/app1" />
 ```
@@ -192,13 +192,13 @@ import { MicroApp } from '@cormi/plugin-qiankun/master/client'
 由 Vite 构建的 Cormi 应用作为 qiankun 子应用。文档中的模块脚本会被替换为 qiankun 能执行的加载脚本，由它在主应用的容器里——或独立运行时在页面里——挂载应用。
 
 ```yaml
-- name: '@cormi/plugin-qiankun/slave'
+- name: '@cormijs/plugin-qiankun/slave'
   config:
     name: app1
 ```
 
 ```tsx
-import { useInQiankun, useMasterProps } from '@cormi/plugin-qiankun/slave/client'
+import { useInQiankun, useMasterProps } from '@cormijs/plugin-qiankun/slave/client'
 
 const inQiankun = useInQiankun()
 const { from } = useMasterProps()

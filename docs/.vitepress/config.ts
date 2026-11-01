@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress'
 
-const repo = 'https://github.com/Mahoo12138/cormijs'
+const repo = 'https://github.com/cormijs/cormi'
 
 export default defineConfig({
   lang: 'zh-CN',

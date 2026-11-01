@@ -12,7 +12,7 @@ cormi <command> [options]
 | `cormi setup` | 只写入 `src/.cormi` 下的生成文件，然后退出 |
 | `cormi generate <type> <name>` | 由生成器创建文件，别名 `g` |
 | `cormi config [name]` | 列出插件树，或打印匹配插件解析后的配置 |
-| `cormi plugin check [--write]` | 在插件包中运行：用每个打包器与 UI 框架加载插件，推断它支持什么，与 package.json 的声明比较（见 [声明兼容性](/plugin/#声明兼容性)） |
+| `cormi plugin check [--write] [--json]` | 在插件包中运行：用每个打包器与 UI 框架加载插件，推断它支持什么，与 package.json 的声明比较（见 [声明兼容性](/plugin/#声明兼容性)） |
 | `cormi help` | 列出所有命令，包括插件注册的命令 |
 
 | 选项 | 作用 |
@@ -33,7 +33,7 @@ cormi <command> [options]
 cormi g page users/detail     # src/pages/users/detail.tsx 及其 CSS module
 cormi g component UserCard    # src/components/UserCard/index.tsx
 cormi g api users             # src/api/users.ts
-cormi g mock users            # mock/users.ts，需要 @cormi/plugin-mock
+cormi g mock users            # mock/users.ts，需要 @cormijs/plugin-mock
 cormi g plugin hello          # 工作区插件包 plugins/hello/（--console、--no-client）
 ```
 
@@ -43,12 +43,12 @@ cormi g plugin hello          # 工作区插件包 plugins/hello/（--console、
 
 ```sh
 cormi config
-# @cormi/preset-react                  active    xyz123
-# @cormi/plugin-antd                   active    abc456
-# @cormi/plugin-mock                   disabled  def789
+# @cormijs/preset-react                  active    xyz123
+# @cormijs/plugin-antd                   active    abc456
+# @cormijs/plugin-mock                   disabled  def789
 
 cormi config antd
-# # @cormi/plugin-antd (active)
+# # @cormijs/plugin-antd (active)
 # {
 #   "theme": {},
 #   "dark": false,
@@ -59,7 +59,7 @@ cormi config antd
 
 ## 插件注册的命令
 
-`dev`、`build`、`preview`、`setup` 之外的命令都由插件注册，执行时以 `setup` 模式加载插件树，然后运行。例如 `@cormi/plugin-lint` 提供了 `cormi lint`：
+`dev`、`build`、`preview`、`setup` 之外的命令都由插件注册，执行时以 `setup` 模式加载插件树，然后运行。例如 `@cormijs/plugin-lint` 提供了 `cormi lint`：
 
 ```sh
 cormi lint            # 检查 src、mock、plugin.ts

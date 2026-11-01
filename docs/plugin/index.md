@@ -76,10 +76,10 @@ export function apply(ctx: Context) {
 
 ## 组合插件
 
-一个插件可以加载其他插件，`@cormi/preset-react` 就是这样由 `@cormi/preset`、`@cormi/vite`、`@cormi/react` 组合出来的：
+一个插件可以加载其他插件，`@cormijs/preset-react` 就是这样由 `@cormijs/preset`、`@cormijs/vite`、`@cormijs/react` 组合出来的：
 
 ```ts
-import * as Mock from '@cormi/plugin-mock'
+import * as Mock from '@cormijs/plugin-mock'
 
 export function apply(ctx: Context, config: Config) {
   ctx.plugin(Mock, { delay: 100 })
@@ -141,12 +141,12 @@ export class I18n extends Service {
   },
   "peerDependencies": {
     "cormi": "*",
-    "@cormi/react": "*"
+    "@cormijs/react": "*"
   }
 }
 ```
 
-浏览器端用 React 的插件把 `@cormi/react` 写进 `peerDependencies`，从 `@cormi/react/client` 导入，并在 Node 端声明 `inject: ['react']`——应用换用其他 UI 框架时，插件转入 pending，而不是在浏览器里报错。与 UI 框架无关的浏览器插件只从 `cormi/client` 导入类型。
+浏览器端用 React 的插件把 `@cormijs/react` 写进 `peerDependencies`，从 `@cormijs/react/client` 导入，并在 Node 端声明 `inject: ['react']`——应用换用其他 UI 框架时，插件转入 pending，而不是在浏览器里报错。与 UI 框架无关的浏览器插件只从 `cormi/client` 导入类型。
 
 :::
 
@@ -162,7 +162,7 @@ export function apply(ctx: Context, config: Config) {
 - `config` 要能序列化为 JSON，它会写进生成的入口，传给浏览器插件。
 - 浏览器端可以直接发布 TypeScript 源码；UI 框架会把注册了入口的包打包进服务端入口（Vite 的 `ssr.noExternal`、Rsbuild 的 `autoExternal.exclude`），服务端渲染时由打包器处理。
 
-按照约定，官方插件命名为 `@cormi/plugin-*`，社区插件命名为 `cormi-plugin-*` 或 `@scope/cormi-plugin-*`。
+按照约定，官方插件命名为 `@cormijs/plugin-*`，社区插件命名为 `cormi-plugin-*` 或 `@scope/cormi-plugin-*`。
 
 ## 声明兼容性
 
@@ -206,15 +206,15 @@ cormi plugin check --write    # 写回 cormi 字段，以及镜像它的关键�
   inferred  bundler: vite   renderer: react
 ```
 
-它对每个组合以 setup 模式启动一个最小的应用（`@cormi/preset`、打包器、UI 框架与这个插件），看插件是加载了、在等待 `react` 这类服务，还是因为缺少当前打包器的一项而失败；打包器的列表来自 `ctx.bundler.plugin()` 的键，UI 框架来自 `inject`。
+它对每个组合以 setup 模式启动一个最小的应用（`@cormijs/preset`、打包器、UI 框架与这个插件），看插件是加载了、在等待 `react` 这类服务，还是因为缺少当前打包器的一项而失败；打包器的列表来自 `ctx.bundler.plugin()` 的键，UI 框架来自 `inject`。
 
-- 组合来自插件包的开发依赖：把 `@cormi/preset`，以及想要检查的打包器与 UI 框架（`@cormi/vite`、`@cormi/rsbuild`、`@cormi/react`、`@cormi/vue`）加入 `devDependencies`。没有安装的组合不检查，也不会被写成不支持。
+- 组合来自插件包的开发依赖：把 `@cormijs/preset`，以及想要检查的打包器与 UI 框架（`@cormijs/vite`、`@cormijs/rsbuild`、`@cormijs/react`、`@cormijs/vue`）加入 `devDependencies`。没有安装的组合不检查，也不会被写成不支持。
 - 打包器或 UI 框架本身缺少集成包（如 `@rsbuild/plugin-react`）时，那个组合标为跳过，不算插件的问题。
 - 一个包导出多个插件时逐个检查，写回 `exports` 中的覆盖；浏览器模块（插件注册的入口，以及 `client`、`console`）不检查。
 - 插件有必填的配置时，在 `cormi.check` 中给出检查用的配置：`"check": { ".": { "name": "example" } }`。
 - 只在 dev 模式下才有的服务（如 `server`）缺少时，不影响结论。
 
-没有 `cormi` 字段的包，市场从它对 `@cormi/react`、`@cormi/vite` 等的 peer 依赖推断，并标为推断。`cormi g plugin` 生成的包已经带上了 `cormi` 字段。设计见 [插件市场与兼容性](/reference/market)。
+没有 `cormi` 字段的包，市场从它对 `@cormijs/react`、`@cormijs/vite` 等的 peer 依赖推断，并标为推断。`cormi g plugin` 生成的包已经带上了 `cormi` 字段。设计见 [插件市场与兼容性](/reference/market)。
 
 ## 下一步
 
