@@ -4,7 +4,6 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type {} from '@cordisjs/plugin-loader'
 import { CommandError, idle, type Mode, settle, start, stop } from '@cormi/core'
-import type {} from '@cormi/vite'
 import type { Context } from 'cordis'
 import parse from 'yargs-parser'
 import { MIN_NODE_VERSION, RESTART_EXIT_CODE } from './constants.ts'
@@ -42,9 +41,9 @@ async function registerTypeScript() {
   register()
 }
 
-function getService<K extends 'vite' | 'app'>(ctx: Context, name: K): Context[K] {
+function getService<K extends 'bundler' | 'app'>(ctx: Context, name: K): Context[K] {
   const service = ctx.get(name)
-  if (!service) throw new CommandError(`service ${name} is not available, is @cormi/preset-react in cormi.yml?`)
+  if (!service) throw new CommandError(`service ${name} is not available: is a bundler (e.g. @cormi/vite) with @cormi/preset, or @cormi/preset-react, in cormi.yml?`)
   return service
 }
 
@@ -153,7 +152,7 @@ export async function run(argv = process.argv.slice(2)) {
     case 'preview':
       return serve(cwd, 'preview')
     case 'build':
-      return once(cwd, 'build', ctx => getService(ctx, 'vite').build())
+      return once(cwd, 'build', ctx => getService(ctx, 'bundler').build())
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())
     default:

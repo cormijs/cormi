@@ -19,11 +19,6 @@
       "types": "./lib/client.d.ts",
       "default": "./lib/client.js"
     },
-    "./client/server": {
-      "source": "./src/client-server.ts",
-      "types": "./lib/client-server.d.ts",
-      "default": "./lib/client-server.js"
-    },
     "./console": "./console.ts",
     "./package.json": "./package.json"
   },
@@ -56,19 +51,13 @@
   "dependencies": {
     "@cordisjs/plugin-loader": "1.0.0-rc.9",
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/client": "workspace:*",
     "@cormi/console": "workspace:*",
     "@cormi/core": "workspace:*",
+    "@cormi/runtime": "workspace:*",
     "@cormi/server": "workspace:*",
-    "@cormi/vite": "workspace:*",
     "cordis": "4.0.0-rc.12",
-    "react-router": "^7.18.5",
     "tsx": "^4.23.15",
     "yargs-parser": "^21.1.1"
-  },
-  "peerDependencies": {
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "devDependencies": {
     "@types/yargs-parser": "^21.0.3"

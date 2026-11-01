@@ -13,16 +13,13 @@
       "path": "../core"
     },
     {
-      "path": "../client"
-    },
-    {
       "path": "../server"
     },
     {
-      "path": "../vite"
+      "path": "../console"
     },
     {
-      "path": "../console"
+      "path": "../runtime"
     }
   ]
 }
