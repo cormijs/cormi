@@ -1,0 +1,7 @@
+# a Vue app on Vite; with @cormi/rsbuild in place of @cormi/vite it runs on Rsbuild
+- name: '@cormi/preset'
+  config:
+    title: Cormi · Vue
+    ssr: true
+- name: '@cormi/vite'
+- name: '@cormi/vue'

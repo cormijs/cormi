@@ -1,0 +1,25 @@
+{
+  "name": "@cormi/example-with-vue",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cormi dev",
+    "build": "cormi build",
+    "preview": "cormi preview",
+    "setup": "cormi setup"
+  },
+  "dependencies": {
+    "@cormi/preset": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
+    "@rsbuild/plugin-vue": "^2.0.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "cormi": "workspace:*",
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vue-tsc": "^3.2.0"
+  }
+}

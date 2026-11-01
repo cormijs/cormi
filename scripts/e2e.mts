@@ -296,6 +296,32 @@ const examples: Record<string, Example> = {
     },
   },
 
+  'with-vue': {
+    bundlers: ['vite', 'rsbuild'],
+    async check(page, base, browser) {
+      // server-rendered with the data of the server loader, and the scoped styles of the layout
+      const noJs = await (await browser.newContext({ javaScriptEnabled: false })).newPage()
+      await noJs.goto(`${base}/about`)
+      assert.match((await text(noJs, '#loader'))!, /^served by \w+ on \d{4}-\d{2}-\d{2}$/)
+      assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('nav')!).display), 'flex')
+      assert.equal(await noJs.evaluate(() => getComputedStyle(document.body).margin), '0px')
+      assert.equal((await fetch(`${base}/nowhere`, { headers: { accept: 'text/html' } })).status, 404)
+
+      // hydrated, with the Vue plugin and the title of the runtime plugin
+      await page.goto(`${base}/`)
+      await page.waitForFunction(() => document.title === 'Cormi · /')
+      assert.equal(await text(page, '#greeting'), 'Hello from a runtime plugin')
+      await clickUntil(page, 'button', 'clicked 1')
+
+      // client navigation fetches the server loader
+      await page.click('text=About')
+      await page.waitForFunction(() => document.querySelector('#loader')?.textContent?.startsWith('served by'))
+      assert.equal(await page.title(), 'Cormi · /about')
+      await page.click('text=User 2')
+      await page.waitForSelector('#user >> text=User 2')
+    },
+  },
+
   mf: {
     bundlers: ['vite', 'rsbuild'],
     servers: [
