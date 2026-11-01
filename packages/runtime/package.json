@@ -1,0 +1,28 @@
+{
+  "name": "@cormi/runtime",
+  "description": "The browser runtime of Cormi without a UI framework: the cordis context, the app's lifecycle, the route table and the loader protocol",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./constants": {
+      "source": "./src/constants.ts",
+      "types": "./lib/constants.d.ts",
+      "default": "./lib/constants.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src"],
+  "license": "MIT",
+  "keywords": ["cormi", "cordis", "runtime"],
+  "dependencies": {
+    "cordis": "4.0.0-rc.12",
+    "cosmokit": "^1.8.1"
+  }
+}

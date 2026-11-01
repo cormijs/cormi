@@ -5,7 +5,10 @@
       "path": "./packages/core"
     },
     {
-      "path": "./packages/client"
+      "path": "./packages/runtime"
+    },
+    {
+      "path": "./packages/react"
     },
     {
       "path": "./packages/vite"
@@ -15,6 +18,9 @@
     },
     {
       "path": "./packages/console"
+    },
+    {
+      "path": "./packages/preset"
     },
     {
       "path": "./packages/preset-react"
