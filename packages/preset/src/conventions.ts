@@ -93,8 +93,8 @@ export function Conventions(ctx: Context) {
   update()
 
   // the selectors of src/overrides are prefixed as the bundler loads it
-  ctx.inject(['vite'], (ctx) => {
-    ctx.vite.plugin({
+  ctx.bundler.plugin({
+    vite: {
       name: 'cormi:overrides',
       enforce: 'pre',
       async transform(code, id) {
@@ -102,7 +102,7 @@ export function Conventions(ctx: Context) {
         if (!overrides || file !== overrides) return
         return extname(file) === '.css' ? prefixSelectors(code, file) : nestInBody(code)
       },
-    })
+    },
   })
 
   if (ctx.cormi.mode === 'dev') {
