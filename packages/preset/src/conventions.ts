@@ -1,6 +1,7 @@
 import { basename, extname, join } from 'node:path'
 import { watch } from 'chokidar'
 import { expandExtensions, tryPaths, winPath } from '@cormi/core'
+import type {} from '@cormi/rsbuild'
 import type {} from '@cormi/vite'
 import { Context } from 'cordis'
 import postcss from 'postcss'
@@ -93,6 +94,7 @@ export function Conventions(ctx: Context) {
   update()
 
   // the selectors of src/overrides are prefixed as the bundler loads it
+  const transformOverrides = (code: string, file: string) => extname(file) === '.css' ? prefixSelectors(code, file) : nestInBody(code)
   ctx.bundler.plugin({
     vite: {
       name: 'cormi:overrides',
@@ -100,7 +102,14 @@ export function Conventions(ctx: Context) {
       async transform(code, id) {
         const file = id.split('?')[0]
         if (!overrides || file !== overrides) return
-        return extname(file) === '.css' ? prefixSelectors(code, file) : nestInBody(code)
+        return transformOverrides(code, file)
+      },
+    },
+    rsbuild: {
+      name: 'cormi:overrides',
+      setup(api) {
+        const test = (file: string) => !!overrides && winPath(file) === overrides
+        api.transform({ test, enforce: 'pre' }, ({ code, resourcePath }) => transformOverrides(code, winPath(resourcePath)))
       },
     },
   })
