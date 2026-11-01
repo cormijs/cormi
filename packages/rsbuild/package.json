@@ -25,6 +25,14 @@
     "rspack",
     "plugin"
   ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "bundler",
+        "rsbuild"
+      ]
+    }
+  },
   "dependencies": {
     "@cordisjs/plugin-server": "^1.7.0",
     "@cormi/core": "workspace:*",

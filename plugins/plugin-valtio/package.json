@@ -27,6 +27,11 @@
     "valtio",
     "state"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "cormi": "workspace:*",

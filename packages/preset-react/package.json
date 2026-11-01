@@ -24,6 +24,20 @@
     "preset",
     "react"
   ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "router",
+        "html",
+        "app",
+        "server",
+        "bundler",
+        "vite",
+        "renderer",
+        "react"
+      ]
+    }
+  },
   "dependencies": {
     "@cormi/core": "workspace:*",
     "@cormi/preset": "workspace:*",

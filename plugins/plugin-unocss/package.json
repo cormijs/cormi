@@ -25,6 +25,11 @@
     "unocss",
     "atomic-css"
   ],
+  "cormi": {
+    "bundler": [
+      "vite"
+    ]
+  },
   "peerDependencies": {
     "cormi": "workspace:*"
   },

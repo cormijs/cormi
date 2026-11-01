@@ -27,6 +27,11 @@
     "dva",
     "redux"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "cormi": "workspace:*",

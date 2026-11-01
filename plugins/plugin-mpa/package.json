@@ -25,6 +25,11 @@
     "mpa",
     "multi-page"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "cormi": "workspace:*"

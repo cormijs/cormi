@@ -62,5 +62,13 @@
     "cordis",
     "vue",
     "renderer"
-  ]
+  ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "renderer",
+        "vue"
+      ]
+    }
+  }
 }

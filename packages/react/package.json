@@ -66,5 +66,13 @@
     "cordis",
     "react",
     "renderer"
-  ]
+  ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "renderer",
+        "react"
+      ]
+    }
+  }
 }

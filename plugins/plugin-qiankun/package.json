@@ -38,6 +38,18 @@
     "qiankun",
     "micro-frontends"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ],
+    "exports": {
+      "./slave": {
+        "bundler": [
+          "vite"
+        ]
+      }
+    }
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "@cormi/vite": "workspace:*",

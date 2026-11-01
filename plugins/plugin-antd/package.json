@@ -27,6 +27,11 @@
     "antd",
     "ant-design"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@ant-design/cssinjs": "^2.1.2",
     "@cormi/react": "workspace:*",

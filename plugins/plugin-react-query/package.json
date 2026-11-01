@@ -27,6 +27,11 @@
     "react-query",
     "tanstack"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "@tanstack/react-query": "^5",

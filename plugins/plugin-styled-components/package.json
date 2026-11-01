@@ -27,6 +27,14 @@
     "styled-components",
     "css-in-js"
   ],
+  "cormi": {
+    "bundler": [
+      "vite"
+    ],
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "cormi": "workspace:*",

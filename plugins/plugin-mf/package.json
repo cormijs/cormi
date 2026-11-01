@@ -25,6 +25,12 @@
     "module-federation",
     "micro-frontends"
   ],
+  "cormi": {
+    "bundler": [
+      "vite",
+      "rsbuild"
+    ]
+  },
   "peerDependencies": {
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",

@@ -13,9 +13,19 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "license": "MIT",
-  "keywords": ["cormi", "cormi-plugin", "cordis", "eslint", "lint"],
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "eslint",
+    "lint"
+  ],
+  "cormi": {},
   "peerDependencies": {
     "cormi": "workspace:*"
   },

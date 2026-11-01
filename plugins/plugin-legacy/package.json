@@ -25,6 +25,11 @@
     "legacy",
     "polyfill"
   ],
+  "cormi": {
+    "bundler": [
+      "vite"
+    ]
+  },
   "peerDependencies": {
     "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"

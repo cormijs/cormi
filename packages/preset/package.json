@@ -23,6 +23,16 @@
     "cordis",
     "preset"
   ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "router",
+        "html",
+        "app",
+        "server"
+      ]
+    }
+  },
   "dependencies": {
     "@cordisjs/plugin-server": "^1.7.0",
     "@cormi/console": "workspace:*",

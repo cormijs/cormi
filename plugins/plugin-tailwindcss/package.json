@@ -24,6 +24,12 @@
     "cordis",
     "tailwindcss"
   ],
+  "cormi": {
+    "bundler": [
+      "vite",
+      "rsbuild"
+    ]
+  },
   "peerDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",

@@ -29,6 +29,11 @@
     "antd",
     "menu"
   ],
+  "cormi": {
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "antd": ">=6",

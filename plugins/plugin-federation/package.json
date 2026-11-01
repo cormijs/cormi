@@ -38,6 +38,14 @@
     "module-federation",
     "micro-frontends"
   ],
+  "cormi": {
+    "bundler": [
+      "vite"
+    ],
+    "renderer": [
+      "react"
+    ]
+  },
   "peerDependencies": {
     "@cormi/react": "workspace:*",
     "@cormi/vite": "workspace:*",

@@ -24,6 +24,14 @@
     "vite",
     "plugin"
   ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "bundler",
+        "vite"
+      ]
+    }
+  },
   "dependencies": {
     "@cordisjs/plugin-loader": "1.0.0-rc.9",
     "@cordisjs/plugin-server": "^1.7.0",
