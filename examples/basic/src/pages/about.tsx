@@ -1,4 +1,4 @@
-import { useLoaderData } from 'cormi/client'
+import { useLoaderData } from '@cormi/react/client'
 
 /** Runs on the server only; it is removed from the client bundle. */
 export async function loader() {

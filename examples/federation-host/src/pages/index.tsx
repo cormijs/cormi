@@ -1,5 +1,5 @@
 import { RemoteComponent } from '@cormi/plugin-federation/client'
-import { useCordis } from 'cormi/client'
+import { useCordis } from '@cormi/react/client'
 
 export default function Home() {
   const { $federation } = useCordis()

@@ -13,6 +13,7 @@
     "@ant-design/icons": "^6.3.4",
     "@cormi/plugin-antd": "workspace:*",
     "@cormi/preset-react": "workspace:*",
+    "@cormi/react": "workspace:*",
     "antd": "^6.6.8",
     "cormi": "workspace:*",
     "react": "^19.3.1",

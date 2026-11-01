@@ -1,5 +1,5 @@
 import { useInQiankun } from '@cormi/plugin-qiankun/slave/client'
-import { NavLink, Outlet } from 'cormi/client'
+import { NavLink, Outlet } from '@cormi/react/client'
 
 export default function Layout() {
   const inQiankun = useInQiankun()

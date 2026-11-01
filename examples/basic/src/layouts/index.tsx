@@ -1,4 +1,4 @@
-import { Link, Outlet, useCordis } from 'cormi/client'
+import { Link, Outlet, useCordis } from '@cormi/react/client'
 import './index.css'
 
 export default function Layout() {

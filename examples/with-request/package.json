@@ -12,6 +12,7 @@
     "@cormi/plugin-mock": "workspace:*",
     "@cormi/plugin-request": "workspace:*",
     "@cormi/preset-react": "workspace:*",
+    "@cormi/react": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

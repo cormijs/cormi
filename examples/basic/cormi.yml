@@ -1,4 +1,5 @@
-- name: '@cormi/preset-react'
+# the app, its bundler and its UI framework; @cormi/preset-react is the same in one entry
+- name: '@cormi/preset'
   config:
     title: Cormi Basic
     ssr: true
@@ -8,6 +9,8 @@
         target: !!js "'http://localhost:' + (process.env.CORMI_PORT || 8000) + '/api'"
         pathRewrite:
           ^/proxy: ''
+- name: '@cormi/vite'
+- name: '@cormi/react'
 - name: ./plugin.ts
   config:
     generator: cormi

@@ -1,4 +1,4 @@
-import { Link } from 'cormi/client'
+import { Link } from '@cormi/react/client'
 import { useModel } from '@cormi/plugin-model/client'
 import { orders } from '../../data'
 

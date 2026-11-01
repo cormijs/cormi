@@ -1,4 +1,4 @@
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 import type {} from '@cormi/plugin-initial-state/client'
 
 declare module '@cormi/plugin-initial-state/client' {

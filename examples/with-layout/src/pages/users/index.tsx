@@ -1,5 +1,5 @@
 import { Card } from 'antd'
-import { Link } from 'cormi/client'
+import { Link } from '@cormi/react/client'
 
 const users = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
 

@@ -11,6 +11,7 @@
   "dependencies": {
     "@cormi/plugin-federation": "workspace:*",
     "@cormi/preset-react": "workspace:*",
+    "@cormi/react": "workspace:*",
     "cordis": "4.0.0-rc.12",
     "cormi": "workspace:*",
     "react": "^19.3.1",

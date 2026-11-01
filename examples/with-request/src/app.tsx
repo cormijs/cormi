@@ -1,5 +1,5 @@
 import type {} from '@cormi/plugin-request/client'
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 import { useEffect, useState } from 'react'
 
 const listeners = new Set<(message: string) => void>()

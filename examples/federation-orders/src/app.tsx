@@ -1,4 +1,4 @@
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 
 // the runtime plugin of the package: in the host, it runs when the package loads
 export default (ctx: Context) => {

@@ -1,5 +1,5 @@
 import { Descriptions } from 'antd'
-import { useParams } from 'cormi/client'
+import { useParams } from '@cormi/react/client'
 
 export default function UserDetail() {
   const { id } = useParams()

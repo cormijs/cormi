@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@cormi/plugin-export-static": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

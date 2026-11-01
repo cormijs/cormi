@@ -1,5 +1,5 @@
 import { Layout, Menu } from 'antd'
-import { Outlet, useLocation, useNavigate } from 'cormi/client'
+import { Outlet, useLocation, useNavigate } from '@cormi/react/client'
 
 const items = [
   { key: '/', label: 'Dashboard' },

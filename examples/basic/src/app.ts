@@ -1,4 +1,4 @@
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 
 /** The runtime plugin of the app: it receives the browser context. */
 export default (ctx: Context) => {

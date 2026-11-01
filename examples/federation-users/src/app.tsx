@@ -1,5 +1,5 @@
 import { Service } from 'cordis'
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 
 declare module 'cordis' {
   interface Context {
