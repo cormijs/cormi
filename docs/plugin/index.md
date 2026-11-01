@@ -158,11 +158,36 @@ export function apply(ctx: Context, config: Config) {
 }
 ```
 
-- 使用包名而不是文件路径，生成的入口和用户代码导入的是同一个模块，Vite 只会产生一份模块实例。
+- 使用包名而不是文件路径，生成的入口和用户代码导入的是同一个模块，打包器只会产生一份模块实例。
 - `config` 要能序列化为 JSON，它会写进生成的入口，传给浏览器插件。
-- 浏览器端可以直接发布 TypeScript 源码；Cormi 会把注册了入口的包加入 `ssr.noExternal`，服务端渲染时由 Vite 处理。
+- 浏览器端可以直接发布 TypeScript 源码；UI 框架会把注册了入口的包打包进服务端入口（Vite 的 `ssr.noExternal`、Rsbuild 的 `autoExternal.exclude`），服务端渲染时由打包器处理。
 
 按照约定，官方插件命名为 `@cormi/plugin-*`，社区插件命名为 `cormi-plugin-*` 或 `@scope/cormi-plugin-*`。
+
+## 声明兼容性
+
+控制台的市场在安装之前就要知道插件适用于哪些应用。插件包在 package.json 的 `cormi` 字段中声明它支持的打包器与 UI 框架，名称就是 `ctx.bundler.name`、`ctx.renderer.name`：
+
+```json
+{
+  "name": "@scope/plugin-foo",
+  "keywords": ["cormi-plugin"],
+  "cormi": {
+    "bundler": ["vite", "rsbuild"],
+    "renderer": ["react"]
+  }
+}
+```
+
+| 写法 | 含义 |
+|---|---|
+| 省略 `bundler` / `renderer` | 不限，与打包器、UI 框架无关的插件什么都不用写（`"cormi": {}`） |
+| `["vite", "rsbuild"]` | 只支持这些 |
+| `exports["./slave"]` | 包中一个插件的声明，逐个键覆盖包级的：`@scope/plugin-foo/slave` |
+| `service` | koishi 式的 `required`、`optional`、`implements` |
+| `description` | 市场显示的描述，可以按语言给出：`{ "zh-CN": "…", "en": "…" }` |
+
+声明要与代码一致：`inject: ['react']` 的插件声明 `renderer: ["react"]`，`ctx.bundler.plugin()` 只给了 `vite` 一项的插件声明 `bundler: ["vite"]`。没有 `cormi` 字段的包，市场从它对 `@cormi/react`、`@cormi/vite` 等的 peer 依赖推断，并标为推断。`cormi g plugin` 生成的包已经带上了 `cormi` 字段。设计见 [插件市场与兼容性](/reference/market)。
 
 ## 下一步
 
