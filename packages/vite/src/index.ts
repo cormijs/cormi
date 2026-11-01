@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {} from '@cordisjs/plugin-server'
-import { idle, Refresher, Schema, winPath, type Workspace } from '@cormi/core'
+import { type Bundler, idle, Refresher, Schema, winPath, type Workspace } from '@cormi/core'
 import { Context, Service } from 'cordis'
 import { Awaitable, Dict } from 'cosmokit'
 import { build, createServer, type InlineConfig, type Manifest, mergeConfig, type PluginOption, type ViteDevServer } from 'vite'
@@ -15,24 +15,12 @@ declare module 'cordis' {
   interface Context {
     vite: Vite
   }
-
-  interface Events {
-    /**
-     * The bundles are about to be written.
-     * @mode parallel
-     */
-    'build/before'(): Awaitable<void>
-    /**
-     * The client bundle (and the server bundle, if any) were written.
-     * @mode parallel
-     * @param result output directory and entry assets
-     */
-    'build/after'(result: Vite.BuildResult): Awaitable<void>
-  }
 }
 
+const CSS_RE = /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)$/
+
 /**
- * The bundler of the app (`ctx.vite`).
+ * Vite as the bundler of the app (`ctx.vite`, and `ctx.bundler`).
  *
  * Plugins add Vite plugins with `plugin()` and edit the Vite config with
  * `configure()`; both are effects of the calling plugin. In dev mode the dev
@@ -40,8 +28,10 @@ declare module 'cordis' {
  * `build()` writes the client bundle and, when the app generates a server
  * entry, the server bundle.
  */
-export class Vite extends Service {
+export class Vite extends Service implements Bundler {
   static inject = ['app']
+
+  readonly name = 'vite'
 
   /** the dev server, in dev mode */
   devServer: ViteDevServer | undefined
@@ -53,9 +43,56 @@ export class Vite extends Service {
   private _plugins = new Set<Vite.PluginInput>()
   private _configs = new Set<Vite.ConfigInput>()
   private _restart: Refresher | undefined
+  /** whether registrations changed since the dev server's config was resolved */
+  private _stale = false
 
   constructor(ctx: Context, public config: Vite.Config) {
     super(ctx, 'vite')
+    ctx.provide('bundler', this)
+  }
+
+  /** whether the dev server can serve requests */
+  get ready() {
+    return this.ctx.cormi.mode !== 'dev' || !!this.devServer
+  }
+
+  /** The assets of an entry module: the module itself in dev mode, its built chunks otherwise. */
+  async assets(file: string): Promise<EntryAssets> {
+    const entry = winPath(relative(this.ctx.cormi.cwd, file))
+    if (this.ctx.cormi.mode === 'dev') return { js: [this.config.publicPath + entry], css: [], preload: [] }
+    const manifest: Manifest = JSON.parse(await readFile(join(this.outDir, '.vite/manifest.json'), 'utf8'))
+    return getEntryAssets(manifest, entry, this.config.publicPath)
+  }
+
+  /** Add the HMR client and the preambles of plugins to a document (dev mode); waits for a restarting server. */
+  async transformDocument(url: string, html: string) {
+    const server = await this._devTask
+    return server ? server.transformIndexHtml(url, html) : html
+  }
+
+  /**
+   * Links to the stylesheets imported by the modules the server has rendered
+   * (dev mode). Vite injects styles from JavaScript; linking them in the
+   * document avoids a flash of unstyled content before the app hydrates.
+   */
+  devStyles(entry: string) {
+    const server = this.devServer
+    if (!server) return ''
+    const styles = new Set<string>()
+    const seen = new Set<unknown>()
+    const visit = (module: ReturnType<typeof server.environments.ssr.moduleGraph.getModuleById>) => {
+      if (!module || seen.has(module)) return
+      seen.add(module)
+      if (CSS_RE.test(module.url)) styles.add(module.url)
+      for (const imported of module.importedModules) visit(imported)
+    }
+    visit(server.environments.ssr.moduleGraph.getModuleById(entry))
+    return [...styles].map(url => `<link rel="stylesheet" href="${url}?direct" data-cormi-dev>`).join('\n')
+  }
+
+  /** Point the stack of an error thrown by a server module to its sources. */
+  fixStacktrace(error: Error) {
+    this.devServer?.ssrFixStacktrace(error)
   }
 
   /** absolute path of the build output */
@@ -78,10 +115,10 @@ export class Vite extends Service {
     return this.ctx.effect(() => {
       if (this.inputs.has(name)) throw new Error(`input ${name} is registered twice`)
       this.inputs.set(name, winPath(file))
-      this._restart?.schedule()
+      this._invalidate()
       return () => {
         this.inputs.delete(name)
-        this._restart?.schedule()
+        this._invalidate()
       }
     }, `ctx.vite.input(${JSON.stringify(name)})`)
   }
@@ -170,12 +207,17 @@ export class Vite extends Service {
   private _register<T>(set: Set<T>, value: T, label: string) {
     return this.ctx.effect(() => {
       set.add(value)
-      this._restart?.schedule()
+      this._invalidate()
       return () => {
         set.delete(value)
-        this._restart?.schedule()
+        this._invalidate()
       }
     }, label)
+  }
+
+  private _invalidate() {
+    this._stale = true
+    this._restart?.schedule()
   }
 
   private _defaults(env: Vite.ConfigEnv): InlineConfig {
@@ -198,13 +240,10 @@ export class Vite extends Service {
           { find: /^@@\//, replacement: winPath(paths.tmp) + '/' },
           { find: /^@\//, replacement: winPath(paths.src) + '/' },
         ],
-        // resolved from the app root: only packages the app depends on itself
-        dedupe: ['react', 'react-dom'],
       },
       css: { devSourcemap: true },
       optimizeDeps: {
         entries: [app.clientEntry, ...this.inputs.values()],
-        include: ['react', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-dom', 'react-dom/client'],
       },
       server: { fs: { strict: false } },
       plugins: [workspacePlugin(this.ctx.get('workspace'))],
@@ -223,6 +262,9 @@ export class Vite extends Service {
     let task: Promise<ViteDevServer | undefined> = Promise.resolve(undefined)
 
     const restart = () => this._devTask = task = task.then(async (previous) => {
+      // registrations made while the running server started are in its config
+      if (previous && !this._stale) return previous
+      if (previous) ctx.logger('vite').info('restarting the dev server')
       await previous?.close()
       this.devServer = undefined
       // plugins loading right now may still register Vite plugins
@@ -230,7 +272,7 @@ export class Vite extends Service {
       // the entry must exist when Vite scans it for dependencies
       await ctx.app.flush()
       // the config below includes every registration so far
-      this._restart?.dispose()
+      this._stale = false
       const config = await this.resolveConfig({ command: 'serve' })
       const server = await createServer(mergeConfig(config, {
         appType: 'custom',
@@ -245,7 +287,6 @@ export class Vite extends Service {
 
     ctx.effect(() => {
       this._restart = new Refresher(async () => {
-        ctx.logger('vite').info('restarting the dev server')
         await restart()
       }, 100, error => ctx.logger('vite').error(error))
       void restart()
@@ -318,15 +359,7 @@ export namespace Vite {
   export type PluginInput = PluginOption | ((env: ConfigEnv) => PluginOption)
   export type ConfigInput = InlineConfig | ((config: InlineConfig, env: ConfigEnv) => Awaitable<InlineConfig | void>)
 
-  export interface BuildResult {
-    outDir: string
-    /** assets of the client entry, with `publicPath` */
-    assets: EntryAssets
-    /** assets of the inputs added with `input()`, by name */
-    inputs: Record<string, EntryAssets>
-    /** the server bundle, if the app has a server entry */
-    server?: string
-  }
+  export type BuildResult = Bundler.BuildResult
 
   export interface Config {
     /** URL prefix of the assets */

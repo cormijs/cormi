@@ -17,14 +17,8 @@ export function toAliases(alias: Dict<string>): Alias[] {
       : { find: new RegExp(`^${escapeRegExp(find)}(?=/|$)`), replacement })
 }
 
-export interface EntryAssets {
-  /** entry chunks */
-  js: string[]
-  /** stylesheets of the entry and of its lazy chunks */
-  css: string[]
-  /** statically imported chunks */
-  preload: string[]
-}
+export type { EntryAssets } from '@cormi/core'
+import type { EntryAssets } from '@cormi/core'
 
 function withBase(base: string, file: string) {
   return `${base.endsWith('/') ? base : base + '/'}${file}`
