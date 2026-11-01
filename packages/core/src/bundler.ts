@@ -53,6 +53,13 @@ export interface Bundler {
   input(name: string, file: string): () => void
   /** The assets of an entry module: the module itself in dev mode, its built chunks otherwise. */
   assets(file: string): Promise<EntryAssets>
+  /**
+   * Code that hot-replaces the namespace imports of a generated module, e.g.
+   * the browser plugins of the entry: `imports` are the `[specifier, name]` of
+   * `import * as name from specifier`, and `callback` the source of a function
+   * called with the new module of each import, `undefined` if not updated.
+   */
+  hotAccept(imports: [specifier: string, name: string][], callback: string): string
   /** Prepare a document for the browser in dev mode: the HMR client, preambles of the UI framework. */
   transformDocument(url: string, html: string): Promise<string>
   /** Links to the stylesheets that server-rendered modules import (dev mode), before their scripts inject them. */
