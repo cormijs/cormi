@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/root",
+  "name": "@cormijs/root",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.6.3",
@@ -11,11 +11,13 @@
     "typecheck": "tsc -b",
     "typecheck:client": "node scripts/typecheck-client.mjs",
     "check:plugins": "node scripts/check-plugins.mjs",
+    "bump": "node scripts/version.mjs",
+    "pub": "node scripts/publish.mjs",
     "e2e": "node --import tsx scripts/e2e.mts",
     "e2e:dev": "node --import tsx scripts/e2e.mts --dev",
-    "docs:dev": "pnpm --filter @cormi/docs dev",
-    "docs:build": "pnpm --filter @cormi/docs build",
-    "docs:preview": "pnpm --filter @cormi/docs preview"
+    "docs:dev": "pnpm --filter @cormijs/docs dev",
+    "docs:build": "pnpm --filter @cormijs/docs build",
+    "docs:preview": "pnpm --filter @cormijs/docs preview"
   },
   "engines": {
     "node": ">=22.12.0"

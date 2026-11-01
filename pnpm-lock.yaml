@@ -45,19 +45,19 @@ importers:
 
   examples/basic:
     dependencies:
-      '@cormi/plugin-export-static':
+      '@cormijs/plugin-export-static':
         specifier: workspace:*
         version: link:../../plugins/plugin-export-static
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
       '@rsbuild/plugin-react':
@@ -88,13 +88,13 @@ importers:
 
   examples/federation-host:
     dependencies:
-      '@cormi/plugin-federation':
+      '@cormijs/plugin-federation':
         specifier: workspace:*
         version: link:../../plugins/plugin-federation
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       '@module-federation/vite':
@@ -125,16 +125,16 @@ importers:
 
   examples/federation-orders:
     dependencies:
-      '@cormi/plugin-federation':
+      '@cormijs/plugin-federation':
         specifier: workspace:*
         version: link:../../plugins/plugin-federation
-      '@cormi/plugin-model':
+      '@cormijs/plugin-model':
         specifier: workspace:*
         version: link:../../plugins/plugin-model
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       '@module-federation/vite':
@@ -165,13 +165,13 @@ importers:
 
   examples/federation-users:
     dependencies:
-      '@cormi/plugin-federation':
+      '@cormijs/plugin-federation':
         specifier: workspace:*
         version: link:../../plugins/plugin-federation
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       '@module-federation/vite':
@@ -202,19 +202,19 @@ importers:
 
   examples/mf-host:
     dependencies:
-      '@cormi/plugin-mf':
+      '@cormijs/plugin-mf':
         specifier: workspace:*
         version: link:../../plugins/plugin-mf
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
       '@module-federation/rsbuild-plugin':
@@ -245,19 +245,19 @@ importers:
 
   examples/mf-remote:
     dependencies:
-      '@cormi/plugin-mf':
+      '@cormijs/plugin-mf':
         specifier: workspace:*
         version: link:../../plugins/plugin-mf
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
       '@module-federation/rsbuild-plugin':
@@ -288,13 +288,13 @@ importers:
 
   examples/qiankun-master:
     dependencies:
-      '@cormi/plugin-qiankun':
+      '@cormijs/plugin-qiankun':
         specifier: workspace:*
         version: link:../../plugins/plugin-qiankun
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       cormi:
@@ -316,13 +316,13 @@ importers:
 
   examples/qiankun-slave:
     dependencies:
-      '@cormi/plugin-qiankun':
+      '@cormijs/plugin-qiankun':
         specifier: workspace:*
         version: link:../../plugins/plugin-qiankun
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       cormi:
@@ -350,13 +350,13 @@ importers:
       '@ant-design/icons':
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@cormi/plugin-antd':
+      '@cormijs/plugin-antd':
         specifier: workspace:*
         version: link:../../plugins/plugin-antd
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       antd:
@@ -381,16 +381,16 @@ importers:
 
   examples/with-console:
     dependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
       '@rsbuild/plugin-react':
@@ -418,22 +418,22 @@ importers:
 
   examples/with-data:
     dependencies:
-      '@cormi/plugin-dva':
+      '@cormijs/plugin-dva':
         specifier: workspace:*
         version: link:../../plugins/plugin-dva
-      '@cormi/plugin-mock':
+      '@cormijs/plugin-mock':
         specifier: workspace:*
         version: link:../../plugins/plugin-mock
-      '@cormi/plugin-react-query':
+      '@cormijs/plugin-react-query':
         specifier: workspace:*
         version: link:../../plugins/plugin-react-query
-      '@cormi/plugin-valtio':
+      '@cormijs/plugin-valtio':
         specifier: workspace:*
         version: link:../../plugins/plugin-valtio
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       '@tanstack/react-query':
@@ -461,19 +461,19 @@ importers:
       '@ant-design/cssinjs':
         specifier: ^2.1.2
         version: 2.1.2(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@cormi/plugin-analytics':
+      '@cormijs/plugin-analytics':
         specifier: workspace:*
         version: link:../../plugins/plugin-analytics
-      '@cormi/plugin-antd':
+      '@cormijs/plugin-antd':
         specifier: workspace:*
         version: link:../../plugins/plugin-antd
-      '@cormi/plugin-layout':
+      '@cormijs/plugin-layout':
         specifier: workspace:*
         version: link:../../plugins/plugin-layout
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       antd:
@@ -498,19 +498,19 @@ importers:
 
   examples/with-model:
     dependencies:
-      '@cormi/plugin-initial-state':
+      '@cormijs/plugin-initial-state':
         specifier: workspace:*
         version: link:../../plugins/plugin-initial-state
-      '@cormi/plugin-mock':
+      '@cormijs/plugin-mock':
         specifier: workspace:*
         version: link:../../plugins/plugin-mock
-      '@cormi/plugin-model':
+      '@cormijs/plugin-model':
         specifier: workspace:*
         version: link:../../plugins/plugin-model
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       cormi:
@@ -523,7 +523,7 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
     devDependencies:
-      '@cormi/plugin-lint':
+      '@cormijs/plugin-lint':
         specifier: workspace:*
         version: link:../../plugins/plugin-lint
       '@types/react':
@@ -535,13 +535,13 @@ importers:
 
   examples/with-mpa:
     dependencies:
-      '@cormi/plugin-mpa':
+      '@cormijs/plugin-mpa':
         specifier: workspace:*
         version: link:../../plugins/plugin-mpa
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       cormi:
@@ -563,16 +563,16 @@ importers:
 
   examples/with-request:
     dependencies:
-      '@cormi/plugin-mock':
+      '@cormijs/plugin-mock':
         specifier: workspace:*
         version: link:../../plugins/plugin-mock
-      '@cormi/plugin-request':
+      '@cormijs/plugin-request':
         specifier: workspace:*
         version: link:../../plugins/plugin-request
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       cormi:
@@ -594,16 +594,16 @@ importers:
 
   examples/with-styles:
     dependencies:
-      '@cormi/plugin-styled-components':
+      '@cormijs/plugin-styled-components':
         specifier: workspace:*
         version: link:../../plugins/plugin-styled-components
-      '@cormi/plugin-unocss':
+      '@cormijs/plugin-unocss':
         specifier: workspace:*
         version: link:../../plugins/plugin-unocss
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
       cormi:
@@ -628,22 +628,22 @@ importers:
 
   examples/with-tailwind:
     dependencies:
-      '@cormi/plugin-legacy':
+      '@cormijs/plugin-legacy':
         specifier: workspace:*
         version: link:../../plugins/plugin-legacy
-      '@cormi/plugin-tailwindcss':
+      '@cormijs/plugin-tailwindcss':
         specifier: workspace:*
         version: link:../../plugins/plugin-tailwindcss
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/preset-react':
+      '@cormijs/preset-react':
         specifier: workspace:*
         version: link:../../packages/preset-react
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
       '@rsbuild/plugin-react':
@@ -674,16 +674,16 @@ importers:
 
   examples/with-vue:
     dependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@rsbuild/plugin-vue':
@@ -714,10 +714,10 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../react
       '@fontsource-variable/recursive':
@@ -748,10 +748,10 @@ importers:
         specifier: ^7.3.7
         version: 7.3.7(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
     devDependencies:
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../vite
       '@types/react':
@@ -848,16 +848,16 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
-      '@cormi/console':
+      '@cormijs/console':
         specifier: workspace:*
         version: link:../console
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/runtime':
+      '@cormijs/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@cormi/server':
+      '@cormijs/server':
         specifier: workspace:*
         version: link:../server
       cordis:
@@ -882,13 +882,13 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
-      '@cormi/console':
+      '@cormijs/console':
         specifier: workspace:*
         version: link:../console
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/server':
+      '@cormijs/server':
         specifier: workspace:*
         version: link:../server
       chokidar:
@@ -904,25 +904,25 @@ importers:
         specifier: ^8.5.6
         version: 8.5.32
     devDependencies:
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../vite
 
   packages/preset-react:
     dependencies:
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../react
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../vite
       '@vitejs/plugin-react':
@@ -943,10 +943,10 @@ importers:
 
   packages/react:
     dependencies:
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/runtime':
+      '@cormijs/runtime':
         specifier: workspace:*
         version: link:../runtime
       cordis:
@@ -959,10 +959,10 @@ importers:
         specifier: ^7.18.5
         version: 7.18.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../vite
       '@rsbuild/core':
@@ -995,7 +995,7 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
       '@rsbuild/core':
@@ -1022,10 +1022,10 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/runtime':
+      '@cormijs/runtime':
         specifier: workspace:*
         version: link:../runtime
       chokidar:
@@ -1046,7 +1046,7 @@ importers:
       '@cordisjs/plugin-server':
         specifier: ^1.7.0
         version: 1.7.0(cordis@4.0.0-rc.12)
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
       cordis:
@@ -1061,10 +1061,10 @@ importers:
 
   packages/vue:
     dependencies:
-      '@cormi/core':
+      '@cormijs/core':
         specifier: workspace:*
         version: link:../core
-      '@cormi/runtime':
+      '@cormijs/runtime':
         specifier: workspace:*
         version: link:../runtime
       cordis:
@@ -1077,10 +1077,10 @@ importers:
         specifier: ^5.4.0
         version: 5.4.0(@rsbuild/core@2.3.0(@module-federation/runtime-tools@2.9.2)(core-js@3.51.0))(@rspack/core@2.3.0(@module-federation/runtime-tools@2.9.2)(@swc/helpers@0.5.23))(@vue/compiler-sfc@3.5.44)(esbuild@0.28.2)(rollup@4.66.0)(vite@7.3.7(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
     devDependencies:
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../vite
       '@rsbuild/core':
@@ -1101,19 +1101,19 @@ importers:
 
   plugins/plugin-analytics:
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1125,19 +1125,19 @@ importers:
       '@ant-design/cssinjs':
         specifier: ^2.1.2
         version: 2.1.2(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1180,19 +1180,19 @@ importers:
         specifier: ^0.14.1
         version: 0.14.1
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1207,19 +1207,19 @@ importers:
 
   plugins/plugin-export-static:
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1228,7 +1228,7 @@ importers:
 
   plugins/plugin-federation:
     dependencies:
-      '@cormi/plugin-mf':
+      '@cormijs/plugin-mf':
         specifier: workspace:*
         version: link:../plugin-mf
       '@module-federation/runtime':
@@ -1238,19 +1238,19 @@ importers:
         specifier: 4.0.0-rc.12
         version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1269,19 +1269,19 @@ importers:
         specifier: 4.0.0-rc.12
         version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1300,19 +1300,19 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1340,19 +1340,19 @@ importers:
         specifier: ^7.3.7
         version: 7.3.7(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1377,19 +1377,19 @@ importers:
         specifier: ^8.72.1
         version: 8.72.1(eslint@10.14.0(jiti@2.7.0))(typescript@5.9.3)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1398,19 +1398,19 @@ importers:
 
   plugins/plugin-mf:
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@module-federation/rsbuild-plugin':
@@ -1438,19 +1438,19 @@ importers:
         specifier: ^8.3.0
         version: 8.4.2
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1463,19 +1463,19 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1494,19 +1494,19 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1519,19 +1519,19 @@ importers:
         specifier: ^2.10.16
         version: 2.10.16
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1553,19 +1553,19 @@ importers:
         specifier: 4.0.0-rc.12
         version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@tanstack/react-query':
@@ -1590,19 +1590,19 @@ importers:
         specifier: 4.0.0-rc.12
         version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1617,19 +1617,19 @@ importers:
 
   plugins/plugin-styled-components:
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':
@@ -1651,19 +1651,19 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@rsbuild/core':
@@ -1691,19 +1691,19 @@ importers:
         specifier: ^7.3.7
         version: 7.3.7(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       cormi:
@@ -1716,19 +1716,19 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2(@types/react@19.3.0)(react@19.3.1)
     devDependencies:
-      '@cormi/preset':
+      '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
-      '@cormi/react':
+      '@cormijs/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@cormi/rsbuild':
+      '@cormijs/rsbuild':
         specifier: workspace:*
         version: link:../../packages/rsbuild
-      '@cormi/vite':
+      '@cormijs/vite':
         specifier: workspace:*
         version: link:../../packages/vite
-      '@cormi/vue':
+      '@cormijs/vue':
         specifier: workspace:*
         version: link:../../packages/vue
       '@types/react':

@@ -1,0 +1,86 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Type check the browser code
+        run: pnpm typecheck:client
+      - name: Unit test
+        run: pnpm test
+      - name: Check the declarations of the plugins
+        run: pnpm check:plugins
+      - name: Build the docs
+        run: pnpm docs:build
+
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bundler: [vite, rsbuild]
+        mode: [preview, dev]
+    name: e2e (${{ matrix.bundler }}, ${{ matrix.mode }})
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Install Chromium
+        run: pnpm exec playwright-core install --with-deps chromium-headless-shell
+      - name: Run the examples in a browser
+        run: node --import tsx scripts/e2e.mts --bundler ${{ matrix.bundler }} ${{ matrix.mode == 'dev' && '--dev' || '' }}
+
+  # the packages whose version is not on npm yet: bump them (pnpm bump) and push to main
+  publish:
+    needs: [build, e2e]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Publish
+        run: pnpm pub
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
