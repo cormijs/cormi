@@ -1,14 +1,14 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · data
     ssr: true
-- name: '@cormi/plugin-react-query'
+- name: '@cormijs/plugin-react-query'
   config:
     defaultOptions:
       queries:
         staleTime: 60000
-- name: '@cormi/plugin-valtio'
-- name: '@cormi/plugin-dva'
-- name: '@cormi/plugin-mock'
+- name: '@cormijs/plugin-valtio'
+- name: '@cormijs/plugin-dva'
+- name: '@cormijs/plugin-mock'
   config:
     preview: true

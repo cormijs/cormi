@@ -1,8 +1,8 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · qiankun master
     port: 8000
-- name: '@cormi/plugin-qiankun/master'
+- name: '@cormijs/plugin-qiankun/master'
   config:
     apps:
       - name: app1

@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-data",
+  "name": "@cormijs/example-with-data",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,12 +9,12 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-dva": "workspace:*",
-    "@cormi/plugin-mock": "workspace:*",
-    "@cormi/plugin-react-query": "workspace:*",
-    "@cormi/plugin-valtio": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-dva": "workspace:*",
+    "@cormijs/plugin-mock": "workspace:*",
+    "@cormijs/plugin-react-query": "workspace:*",
+    "@cormijs/plugin-valtio": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "@tanstack/react-query": "^5.105.0",
     "cormi": "workspace:*",
     "react": "^19.3.1",

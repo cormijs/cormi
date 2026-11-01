@@ -5,7 +5,7 @@ export default function About() {
     <Card>
       <Typography.Title level={3}>About</Typography.Title>
       <Typography.Paragraph>
-        <Typography.Text code>@cormi/plugin-antd</Typography.Text> is a node plugin and a browser plugin.
+        <Typography.Text code>@cormijs/plugin-antd</Typography.Text> is a node plugin and a browser plugin.
         The node plugin generates the locale module and registers the browser plugin, which wraps the app
         with <Typography.Text code>ConfigProvider</Typography.Text> and collects the CSS-in-JS styles
         during server rendering.

@@ -1,4 +1,4 @@
-import { type ClientLoaderFunctionArgs, Link, useCordis, useLoaderData } from '@cormi/react/client'
+import { type ClientLoaderFunctionArgs, Link, useCordis, useLoaderData } from '@cormijs/react/client'
 import { orders } from '../../data'
 
 // packages run in the browser of the host: their routes load data with client loaders

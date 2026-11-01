@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-request",
+  "name": "@cormijs/example-with-request",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,10 +9,10 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-mock": "workspace:*",
-    "@cormi/plugin-request": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-mock": "workspace:*",
+    "@cormijs/plugin-request": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

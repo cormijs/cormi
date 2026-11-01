@@ -1,4 +1,4 @@
-import { useMasterProps } from '@cormi/plugin-qiankun/slave/client'
+import { useMasterProps } from '@cormijs/plugin-qiankun/slave/client'
 import { useState } from 'react'
 
 export default function SlaveHome() {

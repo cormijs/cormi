@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-model",
+  "name": "@cormijs/example-with-model",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,17 +10,17 @@
     "lint": "cormi lint"
   },
   "dependencies": {
-    "@cormi/plugin-initial-state": "workspace:*",
-    "@cormi/plugin-mock": "workspace:*",
-    "@cormi/plugin-model": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-initial-state": "workspace:*",
+    "@cormijs/plugin-mock": "workspace:*",
+    "@cormijs/plugin-model": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@cormi/plugin-lint": "workspace:*",
+    "@cormijs/plugin-lint": "workspace:*",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0"
   }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from '@cormi/vue/client'
+import { RouterLink, RouterView } from '@cormijs/vue/client'
 </script>
 
 <template>

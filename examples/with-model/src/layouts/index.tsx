@@ -1,5 +1,5 @@
-import { useModel } from '@cormi/plugin-model/client'
-import { NavLink, Outlet } from '@cormi/react/client'
+import { useModel } from '@cormijs/plugin-model/client'
+import { NavLink, Outlet } from '@cormijs/react/client'
 
 export default function Layout() {
   // a selector: the layout only re-renders when the number of open todos changes

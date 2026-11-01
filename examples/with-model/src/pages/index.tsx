@@ -1,4 +1,4 @@
-import { useInitialState } from '@cormi/plugin-initial-state/client'
+import { useInitialState } from '@cormijs/plugin-initial-state/client'
 
 export default function HomePage() {
   const { initialState, loading, error, refresh } = useInitialState()

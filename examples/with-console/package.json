@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-console",
+  "name": "@cormijs/example-with-console",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,10 +9,10 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
     "@rsbuild/plugin-react": "^2.1.1",
     "@vitejs/plugin-react": "^5.2.0",
     "cormi": "workspace:*",

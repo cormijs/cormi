@@ -1,4 +1,4 @@
-import { useCordis } from '@cormi/react/client'
+import { useCordis } from '@cormijs/react/client'
 
 export default function UsersPage() {
   const { users } = useCordis()

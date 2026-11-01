@@ -1,7 +1,7 @@
-- name: '@cormi/preset'
+- name: '@cormijs/preset'
   config:
     title: Cormi · console
     port: 8020
-- name: '@cormi/vite'
-- name: '@cormi/react'
+- name: '@cormijs/vite'
+- name: '@cormijs/react'
 - name: cormi-plugin-hello

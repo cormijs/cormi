@@ -12,7 +12,7 @@ export default function HomePage() {
     <div className="space-y-6">
       <h1 id="title" className="text-3xl font-bold text-gray-900">Cormi + Tailwind CSS</h1>
       <p className="text-gray-600">
-        Utility classes from <code className="rounded bg-gray-100 px-1.5 py-0.5 text-sm">@cormi/plugin-tailwindcss</code>,
+        Utility classes from <code className="rounded bg-gray-100 px-1.5 py-0.5 text-sm">@cormijs/plugin-tailwindcss</code>,
         a two-line node plugin: a Vite plugin and a stylesheet imported before the app starts.
       </p>
       <button

@@ -1,4 +1,4 @@
-import { useModel } from '@cormi/plugin-model/client'
+import { useModel } from '@cormijs/plugin-model/client'
 
 // exposed to the host and the other packages: `<RemoteComponent id="orders/CartBadge" />`
 export default function CartBadge() {

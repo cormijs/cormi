@@ -1,8 +1,8 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · mf host
     port: 8003
-- name: '@cormi/plugin-mf'
+- name: '@cormijs/plugin-mf'
   config:
     name: host
     remotes:

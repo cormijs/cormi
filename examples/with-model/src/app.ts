@@ -1,7 +1,7 @@
-import type { Context } from '@cormi/react/client'
-import type {} from '@cormi/plugin-initial-state/client'
+import type { Context } from '@cormijs/react/client'
+import type {} from '@cormijs/plugin-initial-state/client'
 
-declare module '@cormi/plugin-initial-state/client' {
+declare module '@cormijs/plugin-initial-state/client' {
   interface InitialState {
     name: string
     role: string

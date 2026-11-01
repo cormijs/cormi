@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from '@cormi/react/client'
+import { NavLink, Outlet } from '@cormijs/react/client'
 
 export default function Layout() {
   return (

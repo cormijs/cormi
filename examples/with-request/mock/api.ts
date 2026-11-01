@@ -1,4 +1,4 @@
-import { defineMock } from '@cormi/plugin-mock'
+import { defineMock } from '@cormijs/plugin-mock'
 
 const users = Array.from({ length: 12 }, (_, index) => ({ id: index + 1, name: `User ${index + 1}` }))
 

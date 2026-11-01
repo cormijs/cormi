@@ -1,3 +1,3 @@
-import { defineStore } from '@cormi/plugin-valtio/client'
+import { defineStore } from '@cormijs/plugin-valtio/client'
 
 export const settings = defineStore('settings', { compact: false })

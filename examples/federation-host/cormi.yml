@@ -1,8 +1,8 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · federation
     port: 8010
-- name: '@cormi/plugin-federation/host'
+- name: '@cormijs/plugin-federation/host'
   config:
     # written to packages.json, which can be edited where the host is deployed
     packages:

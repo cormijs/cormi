@@ -1,4 +1,4 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · layout
     ssr: true
@@ -23,11 +23,11 @@
         component: settings
         name: Settings
         icon: SettingOutlined
-- name: '@cormi/plugin-antd'
-- name: '@cormi/plugin-layout'
+- name: '@cormijs/plugin-antd'
+- name: '@cormijs/plugin-layout'
   config:
     title: Cormi Admin
     footer: Built with Cormi
-- name: '@cormi/plugin-analytics'
+- name: '@cormijs/plugin-analytics'
   config:
     ga: G-CORMI00000

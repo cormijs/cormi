@@ -1,8 +1,8 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · mf remote
     port: 8002
-- name: '@cormi/plugin-mf'
+- name: '@cormijs/plugin-mf'
   config:
     name: remote
     exposes:

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from '@cormi/react/client'
+import { Link } from '@cormijs/react/client'
 
 export default function Users() {
   const [users, setUsers] = useState<{ id: number; name: string }[]>([])

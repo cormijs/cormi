@@ -1,5 +1,5 @@
-# the app, its bundler and its UI framework; @cormi/preset-react is the same in one entry
-- name: '@cormi/preset'
+# the app, its bundler and its UI framework; @cormijs/preset-react is the same in one entry
+- name: '@cormijs/preset'
   config:
     title: Cormi Basic
     ssr: true
@@ -9,12 +9,12 @@
         target: !!js "'http://localhost:' + (process.env.CORMI_PORT || 8000) + '/api'"
         pathRewrite:
           ^/proxy: ''
-- name: '@cormi/vite'
-- name: '@cormi/react'
+- name: '@cormijs/vite'
+- name: '@cormijs/react'
 - name: ./plugin.ts
   config:
     generator: cormi
 # pre-renders the pages into dist/ after builds
-- name: '@cormi/plugin-export-static'
+- name: '@cormijs/plugin-export-static'
   config:
     extraRoutePaths: [/users/1]

@@ -1,5 +1,5 @@
-import { useDispatch, useSelector } from '@cormi/plugin-dva/client'
-import { useSnapshot } from '@cormi/plugin-valtio/client'
+import { useDispatch, useSelector } from '@cormijs/plugin-dva/client'
+import { useSnapshot } from '@cormijs/plugin-valtio/client'
 import { useQuery } from '@tanstack/react-query'
 import { settings } from '../stores/settings'
 

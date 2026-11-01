@@ -1,4 +1,4 @@
-import type { Context } from '@cormi/vue/client'
+import type { Context } from '@cormijs/vue/client'
 
 /** The runtime plugin of the app: it installs a Vue plugin, and titles each page. */
 export default (ctx: Context) => {

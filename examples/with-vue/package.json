@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-vue",
+  "name": "@cormijs/example-with-vue",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,10 +9,10 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/preset": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
-    "@cormi/vite": "workspace:*",
-    "@cormi/vue": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
     "@rsbuild/plugin-vue": "^2.0.1",
     "@vitejs/plugin-vue": "^6.0.10",
     "cormi": "workspace:*",

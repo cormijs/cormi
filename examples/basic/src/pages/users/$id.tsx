@@ -1,4 +1,4 @@
-import { useParams } from '@cormi/react/client'
+import { useParams } from '@cormijs/react/client'
 
 export default function User() {
   const { id } = useParams()

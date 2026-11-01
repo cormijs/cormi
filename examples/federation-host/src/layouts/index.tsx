@@ -1,4 +1,4 @@
-import { Link, Outlet, useCordis } from '@cormi/react/client'
+import { Link, Outlet, useCordis } from '@cormijs/react/client'
 import './index.css'
 
 // the menu lists the routes of every package, from their manifests: their code loads when one is visited

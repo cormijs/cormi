@@ -1,4 +1,4 @@
-import { useModel } from '@cormi/plugin-model/client'
+import { useModel } from '@cormijs/plugin-model/client'
 import { type FormEvent, useState } from 'react'
 
 export default function TodosPage() {

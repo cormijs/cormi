@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-mf-remote",
+  "name": "@cormijs/example-mf-remote",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,11 +9,11 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-mf": "workspace:*",
-    "@cormi/preset": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
+    "@cormijs/plugin-mf": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",
     "@rsbuild/plugin-react": "^2.1.1",

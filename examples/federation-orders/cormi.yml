@@ -1,4 +1,4 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · orders
     port: 8011
@@ -9,12 +9,12 @@
       - path: /orders/:id
         component: orders/detail
         hideInMenu: true
-- name: '@cormi/plugin-model'
-- name: '@cormi/plugin-federation/package'
+- name: '@cormijs/plugin-model'
+- name: '@cormijs/plugin-federation/package'
   config:
     name: orders
     # the models of the package come along with it into the host
     entries:
-      - '@cormi/plugin-model/client'
+      - '@cormijs/plugin-model/client'
     exposes:
       ./CartBadge: ./src/components/CartBadge.tsx

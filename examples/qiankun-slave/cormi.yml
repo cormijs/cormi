@@ -1,8 +1,8 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · qiankun micro app
     port: 8001
     ssr: true
-- name: '@cormi/plugin-qiankun/slave'
+- name: '@cormijs/plugin-qiankun/slave'
   config:
     name: app1

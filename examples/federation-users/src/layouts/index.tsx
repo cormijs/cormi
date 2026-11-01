@@ -1,4 +1,4 @@
-import { Outlet } from '@cormi/react/client'
+import { Outlet } from '@cormijs/react/client'
 
 // the frame of the package when it runs by itself; the host has its own
 export default function Layout() {

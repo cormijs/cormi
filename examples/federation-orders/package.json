@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-federation-orders",
+  "name": "@cormijs/example-federation-orders",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,10 +9,10 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-federation": "workspace:*",
-    "@cormi/plugin-model": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-federation": "workspace:*",
+    "@cormijs/plugin-model": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "@module-federation/vite": "^1.23.7",
     "cordis": "4.0.0-rc.12",
     "cormi": "workspace:*",

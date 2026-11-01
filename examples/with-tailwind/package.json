@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-tailwind",
+  "name": "@cormijs/example-with-tailwind",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,12 +9,12 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-legacy": "workspace:*",
-    "@cormi/plugin-tailwindcss": "workspace:*",
-    "@cormi/preset": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
-    "@cormi/rsbuild": "workspace:*",
+    "@cormijs/plugin-legacy": "workspace:*",
+    "@cormijs/plugin-tailwindcss": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
     "@rsbuild/plugin-react": "^2.1.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",

@@ -1,4 +1,4 @@
-import { defineMock } from '@cormi/plugin-mock'
+import { defineMock } from '@cormijs/plugin-mock'
 
 export default defineMock({
   'GET /api/me': { name: 'Cormi', role: 'admin' },

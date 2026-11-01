@@ -8,7 +8,7 @@ export async function loader() {
 </script>
 
 <script setup lang="ts">
-import { useLoaderData } from '@cormi/vue/client'
+import { useLoaderData } from '@cormijs/vue/client'
 
 const data = useLoaderData<Awaited<ReturnType<typeof loader>>>()
 </script>

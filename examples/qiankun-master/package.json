@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-qiankun-master",
+  "name": "@cormijs/example-qiankun-master",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,9 +9,9 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-qiankun": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-qiankun": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

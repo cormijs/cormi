@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-federation-users",
+  "name": "@cormijs/example-federation-users",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,9 +9,9 @@
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/plugin-federation": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-federation": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "@module-federation/vite": "^1.23.7",
     "cordis": "4.0.0-rc.12",
     "cormi": "workspace:*",

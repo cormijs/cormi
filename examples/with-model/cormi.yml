@@ -1,11 +1,11 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · Models
-- name: '@cormi/plugin-model'
-- name: '@cormi/plugin-initial-state'
-- name: '@cormi/plugin-mock'
+- name: '@cormijs/plugin-model'
+- name: '@cormijs/plugin-initial-state'
+- name: '@cormijs/plugin-mock'
   config:
     delay: 200
     preview: true
 # cormi lint
-- name: '@cormi/plugin-lint'
+- name: '@cormijs/plugin-lint'

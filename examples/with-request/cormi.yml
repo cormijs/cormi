@@ -1,13 +1,13 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · request
-- name: '@cormi/plugin-request'
+- name: '@cormijs/plugin-request'
   config:
     timeout: 3000
     dataField: data
     headers:
       x-app: cormi
-- name: '@cormi/plugin-mock'
+- name: '@cormijs/plugin-mock'
   config:
     delay: 100
     preview: true

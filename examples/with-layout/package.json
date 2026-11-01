@@ -1,5 +1,5 @@
 {
-  "name": "@cormi/example-with-layout",
+  "name": "@cormijs/example-with-layout",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2.1.2",
-    "@cormi/plugin-analytics": "workspace:*",
-    "@cormi/plugin-antd": "workspace:*",
-    "@cormi/plugin-layout": "workspace:*",
-    "@cormi/preset-react": "workspace:*",
-    "@cormi/react": "workspace:*",
+    "@cormijs/plugin-analytics": "workspace:*",
+    "@cormijs/plugin-antd": "workspace:*",
+    "@cormijs/plugin-layout": "workspace:*",
+    "@cormijs/preset-react": "workspace:*",
+    "@cormijs/react": "workspace:*",
     "antd": "^6.6.8",
     "cormi": "workspace:*",
     "react": "^19.3.1",

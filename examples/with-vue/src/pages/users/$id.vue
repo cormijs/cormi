@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRoute } from '@cormi/vue/client'
+import { useRoute } from '@cormijs/vue/client'
 
 const route = useRoute()
 </script>

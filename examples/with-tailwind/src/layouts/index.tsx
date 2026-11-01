@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from '@cormi/react/client'
+import { NavLink, Outlet } from '@cormijs/react/client'
 
 const link = ({ isActive }: { isActive: boolean }) =>
   isActive ? 'text-indigo-600' : 'text-gray-600 hover:text-indigo-600'

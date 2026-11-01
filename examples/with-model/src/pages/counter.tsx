@@ -1,4 +1,4 @@
-import { useModel } from '@cormi/plugin-model/client'
+import { useModel } from '@cormijs/plugin-model/client'
 
 export default function CounterPage() {
   const { count, increment, decrement, reset } = useModel('counter')

@@ -1,4 +1,4 @@
-import { request, useRequest } from '@cormi/plugin-request/client'
+import { request, useRequest } from '@cormijs/plugin-request/client'
 import { useState } from 'react'
 
 interface Page {

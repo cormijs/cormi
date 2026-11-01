@@ -1,8 +1,8 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · Ant Design
     ssr: true
-- name: '@cormi/plugin-antd'
+- name: '@cormijs/plugin-antd'
   config:
     locale: zh_CN
     theme:

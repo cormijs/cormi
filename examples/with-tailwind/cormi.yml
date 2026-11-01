@@ -1,6 +1,6 @@
-- name: '@cormi/preset-react'
+- name: '@cormijs/preset-react'
   config:
     title: Cormi · Tailwind CSS
     crossorigin: anonymous
-- name: '@cormi/plugin-tailwindcss'
-- name: '@cormi/plugin-legacy'
+- name: '@cormijs/plugin-tailwindcss'
+- name: '@cormijs/plugin-legacy'

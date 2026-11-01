@@ -1,4 +1,4 @@
-import type { Context } from '@cormi/react/client'
+import type { Context } from '@cormijs/react/client'
 
 /** Runtime plugins apply to every page. */
 export default (ctx: Context) => {

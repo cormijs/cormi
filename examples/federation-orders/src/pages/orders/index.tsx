@@ -1,5 +1,5 @@
-import { Link } from '@cormi/react/client'
-import { useModel } from '@cormi/plugin-model/client'
+import { Link } from '@cormijs/react/client'
+import { useModel } from '@cormijs/plugin-model/client'
 import { orders } from '../../data'
 
 export default function OrdersPage() {
