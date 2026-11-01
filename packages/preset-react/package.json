@@ -1,6 +1,6 @@
 {
   "name": "@cormi/preset-react",
-  "description": "The React preset of Cormi: router, html, app and vite services, the React renderer, pages, API routes and the HTTP server",
+  "description": "A React app bundled by Vite: @cormi/preset, @cormi/vite and @cormi/react with one flat config",
   "version": "0.1.0",
   "type": "module",
   "main": "lib/index.js",
@@ -25,30 +25,15 @@
     "react"
   ],
   "dependencies": {
-    "@babel/generator": "^7.29.8",
-    "@babel/parser": "^7.29.11",
-    "@babel/traverse": "^7.29.10",
-    "@babel/types": "^7.29.0",
-    "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/console": "workspace:*",
     "@cormi/core": "workspace:*",
-    "@cormi/server": "workspace:*",
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
     "@cormi/vite": "workspace:*",
-    "@vitejs/plugin-react": "^5.2.0",
-    "babel-dead-code-elimination": "^2.0.0",
-    "chokidar": "^4.0.3",
-    "cordis": "4.0.0-rc.12",
-    "cosmokit": "^1.8.1",
-    "postcss": "^8.5.6",
-    "vite": "^7.3.7"
+    "cordis": "4.0.0-rc.12"
   },
   "peerDependencies": {
     "cormi": "workspace:*",
     "react": ">=19",
     "react-dom": ">=19"
-  },
-  "devDependencies": {
-    "@types/babel__generator": "^7.27.0",
-    "@types/babel__traverse": "^7.28.0"
   }
 }

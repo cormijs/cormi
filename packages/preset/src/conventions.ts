@@ -72,7 +72,7 @@ export function Conventions(ctx: Context) {
       files: () => ['ico', 'png', 'svg'].map(ext => join(paths.public, `favicon.${ext}`)),
       register(file) {
         if (ctx.html.config.favicons.length) return () => {}
-        const href = ctx.vite.config.publicPath + basename(file)
+        const href = ctx.bundler.config.publicPath + basename(file)
         return ctx.html.head({ tag: 'link', attrs: { rel: 'icon', href } })
       },
     },
@@ -92,14 +92,17 @@ export function Conventions(ctx: Context) {
   }
   update()
 
-  ctx.vite.plugin({
-    name: 'cormi:overrides',
-    enforce: 'pre',
-    async transform(code, id) {
-      const file = id.split('?')[0]
-      if (!overrides || file !== overrides) return
-      return extname(file) === '.css' ? prefixSelectors(code, file) : nestInBody(code)
-    },
+  // the selectors of src/overrides are prefixed as the bundler loads it
+  ctx.inject(['vite'], (ctx) => {
+    ctx.vite.plugin({
+      name: 'cormi:overrides',
+      enforce: 'pre',
+      async transform(code, id) {
+        const file = id.split('?')[0]
+        if (!overrides || file !== overrides) return
+        return extname(file) === '.css' ? prefixSelectors(code, file) : nestInBody(code)
+      },
+    })
   })
 
   if (ctx.cormi.mode === 'dev') {
@@ -114,5 +117,5 @@ export function Conventions(ctx: Context) {
 }
 
 export namespace Conventions {
-  export const inject = ['app', 'html', 'vite']
+  export const inject = ['app', 'html', 'bundler']
 }

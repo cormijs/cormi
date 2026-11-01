@@ -13,13 +13,13 @@
       "path": "../core"
     },
     {
-      "path": "../server"
+      "path": "../preset"
+    },
+    {
+      "path": "../react"
     },
     {
       "path": "../vite"
-    },
-    {
-      "path": "../console"
     }
   ]
 }
