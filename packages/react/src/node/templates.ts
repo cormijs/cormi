@@ -45,7 +45,7 @@ export function renderRoutes(dir: string, routes: Dict<Route>) {
     .filter(route => route.file)
     .map(route => `  ${json(route.id)}: () => import(${json(toSpecifier(dir, route.file!))}),`)
   return [
-    `import type { RouteData, RouteModules } from 'cormi/client'`,
+    `import type { RouteData, RouteModules } from '@cormi/react/client'`,
     '',
     `export const routes: Record<string, RouteData> = {`,
     ...data.map(route => `  ${json(route.id)}: ${JSON.stringify(route)},`),
@@ -76,7 +76,7 @@ export function renderEntry(app: App, options: ContextOptions & { mountElementId
   const entries = renderEntries(app.dir, app.entries)
   return [
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
-    `import { Context, render, type RenderOptions, unwrapExports } from 'cormi/client'`,
+    `import { Context, render, type RenderOptions, unwrapExports } from '@cormi/react/client'`,
     `import { routeModules, routes } from './routes'`,
     ...options.loading ? [`import loading from ${json(toSpecifier(app.dir, options.loading))}`] : [],
     ...entries.imports,
@@ -123,8 +123,8 @@ export function renderServer(app: App, options: ContextOptions) {
   return [
     // global stylesheets and polyfills are part of what the server renders
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
-    `import { Context, unwrapExports } from 'cormi/client'`,
-    `import { createRequestHandler } from 'cormi/client/server'`,
+    `import { Context, unwrapExports } from '@cormi/react/client'`,
+    `import { createRequestHandler } from '@cormi/react/client/server'`,
     `import { routeModules, routes } from './routes'`,
     ...entries.imports,
     ...servers.map(([, file], index) => `import * as server${index} from ${json(toSpecifier(app.dir, file))}`),

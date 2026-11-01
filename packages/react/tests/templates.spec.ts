@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getPackageName, prefixSelectors, renderEntry, renderRoutes, toSpecifier, transformExports } from '../src/index.ts'
+import { getPackageName, renderEntry, renderRoutes, toSpecifier, transformExports } from '../src/node/index.ts'
 
 describe('templates', () => {
   it('keeps package specifiers and relativizes files', () => {
@@ -22,7 +22,7 @@ describe('templates', () => {
   it('strips server loaders and the code only they use', () => {
     const code = [
       `import { readFile } from 'node:fs/promises'`,
-      `import { useLoaderData } from 'cormi/client'`,
+      `import { useLoaderData } from '@cormi/react/client'`,
       `export async function loader() { return readFile('x', 'utf8') }`,
       `export default function Page() { return useLoaderData() }`,
     ].join('\n')
@@ -41,19 +41,11 @@ describe('templates', () => {
     expect(code).toContain(`void Promise.allSettled(fibers).then(() => ctx.bail('app/bootstrap') || mount())`)
     expect(code).toContain('export async function unmount()')
   })
-
-  it('prefixes the selectors of overrides with body', () => {
-    const css = prefixSelectors('.a, body .b { color: red }\nhtml { margin: 0 }\n@media (min-width: 1px) { .c { color: blue } }\n@keyframes k { from { opacity: 0 } }')
-    expect(css).toContain('body .a, body .b { color: red }')
-    expect(css).toContain('html { margin: 0 }')
-    expect(css).toContain('body .c { color: blue }')
-    expect(css).toContain('from { opacity: 0 }')
-  })
 })
 
 describe('generators', () => {
   it('names components after the last segment', async () => {
-    const { toComponentName } = await import('../src/index.ts')
+    const { toComponentName } = await import('../src/node/index.ts')
     expect(toComponentName('users/order-list')).toBe('OrderList')
     expect(toComponentName('button')).toBe('Button')
   })

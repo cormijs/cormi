@@ -1,6 +1,6 @@
 import { createMemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
-import { Context } from '../src/index.ts'
+import { Context } from '../src/client/index.ts'
 
 const routes = {
   layout: { id: 'layout', path: '/' },

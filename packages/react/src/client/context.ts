@@ -1,4 +1,4 @@
-import * as cordis from 'cordis'
+import { Context as BaseContext } from '@cormi/runtime'
 import { AppService } from './app.tsx'
 import { RouterService, type RouterOptions } from './router.ts'
 
@@ -10,13 +10,14 @@ export interface Context {
 }
 
 /**
- * The cordis context of the app in the browser (and during server rendering).
+ * The cordis context of a React app in the browser (and during server
+ * rendering).
  *
  * Like koishi's client, the core services are provided on the root context,
  * so every runtime plugin reaches them without `inject`. Their names start
  * with `$` so they never collide with the node services of the same app.
  */
-export class Context extends cordis.Context {
+export class Context extends BaseContext {
   constructor(options: Context.Options) {
     super()
     // eslint-disable-next-line no-new
