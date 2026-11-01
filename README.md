@@ -15,7 +15,7 @@
 Cormi 以 npm 的 `next` 标签发布候选版本（`0.1.0-rc`）：
 
 ```sh
-pnpm add @cormijs/cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react react react-dom
+pnpm add @cormijs/cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react@^5 react react-dom
 ```
 
 ```yaml

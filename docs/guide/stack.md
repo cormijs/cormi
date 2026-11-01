@@ -24,7 +24,7 @@
 | Vite + Vue | `@cormijs/vite`、`@cormijs/vue`、`@vitejs/plugin-vue`、`vue` |
 | Rsbuild + Vue | `@cormijs/rsbuild`、`@cormijs/vue`、`@rsbuild/plugin-vue`、`vue` |
 
-集成包是 `@cormijs/react`、`@cormijs/vue` 的可选 peer 依赖：只在应用使用对应的打包器时才被导入，所以 Vite 应用不会装上 Rspack，反之亦然。缺少时，启动会报出要安装的包名，例如 `@cormijs/react with rsbuild needs @rsbuild/plugin-react: add it to the dependencies of the app`。`@cormijs/preset-react`（preset + Vite + React 的简写）自带 `@vitejs/plugin-react`。
+Cormi 使用 Vite 7：安装 `@vitejs/plugin-react@^5`、`@vitejs/plugin-vue@^6`（`@vitejs/plugin-react` 6 需要 Vite 8）。集成包是 `@cormijs/react`、`@cormijs/vue` 的可选 peer 依赖：只在应用使用对应的打包器时才被导入，所以 Vite 应用不会装上 Rspack，反之亦然。缺少时，启动会报出要安装的包名，例如 `@cormijs/react with rsbuild needs @rsbuild/plugin-react: add it to the dependencies of the app`。`@cormijs/preset-react`（preset + Vite + React 的简写）自带 `@vitejs/plugin-react`。
 
 有些官方插件也按打包器适配，例如 tailwindcss 在 Vite 下需要 `@tailwindcss/vite`，在 Rsbuild 下需要 `@tailwindcss/postcss`；只适用于某个 UI 框架或打包器的插件见 [官方插件](/plugins/) 的“要求”一栏。
 
