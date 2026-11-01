@@ -43,6 +43,12 @@ export interface Bundler {
   readonly outDir: string
   /** whether the dev server can serve requests (always true outside dev mode) */
   readonly ready: boolean
+  /**
+   * Add a plugin to the bundler: `spec` has a plugin for each bundler it
+   * supports, by the bundler's name, e.g. `{ vite: () => tailwindcss() }`.
+   * Throws when it has none for this bundler.
+   */
+  plugin(spec: Bundler.Plugin): () => void
   /** Add an input to client builds, e.g. a page of a multi-page app. */
   input(name: string, file: string): () => void
   /** The assets of an entry module: the module itself in dev mode, its built chunks otherwise. */
@@ -60,6 +66,18 @@ export interface Bundler {
 }
 
 export namespace Bundler {
+  /**
+   * What each bundler takes as a plugin, by its name; every bundler package
+   * declares its own: `interface Plugins { vite: Vite.PluginInput }`.
+   */
+  export interface Plugins {}
+
+  /**
+   * A plugin for several bundlers. The variants of an unplugin fit in:
+   * `{ vite: () => plugin.vite(options), rspack: () => plugin.rspack(options) }`.
+   */
+  export type Plugin = { [K in keyof Plugins]?: Plugins[K] }
+
   export interface Config {
     /** URL prefix of the assets */
     publicPath: string
