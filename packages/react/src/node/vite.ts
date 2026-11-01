@@ -1,6 +1,5 @@
-import { importPeer } from '@cormi/core'
+import { importPeer, stripServerExports } from '@cormi/core'
 import type { PluginOption } from 'vite'
-import { stripServerExports } from './route-exports.ts'
 
 /**
  * React in Vite: JSX and Fast Refresh, one instance of React, and the

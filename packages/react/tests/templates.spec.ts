@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { getPackageName, renderEntry, renderRoutes, toSpecifier, transformExports } from '../src/node/index.ts'
+import { getPackageName, toSpecifier, transformExports } from '@cormi/core'
+import { renderEntry, renderRoutes } from '../src/node/index.ts'
 
 describe('templates', () => {
   it('keeps package specifiers and relativizes files', () => {

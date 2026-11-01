@@ -1,6 +1,5 @@
-import { importPeer, winPath } from '@cormi/core'
+import { importPeer, stripServerExports, winPath } from '@cormi/core'
 import type { RsbuildPlugin } from '@rsbuild/core'
-import { stripServerExports } from './route-exports.ts'
 
 /**
  * React in Rsbuild: JSX and Fast Refresh, one instance of React, and the

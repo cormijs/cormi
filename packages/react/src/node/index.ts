@@ -5,7 +5,6 @@ import { Renderer } from './renderer.ts'
 
 export * from './generators.ts'
 export * from './renderer.ts'
-export * from './route-exports.ts'
 export * from './templates.ts'
 
 declare module 'cordis' {

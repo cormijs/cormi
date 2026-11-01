@@ -1,10 +1,10 @@
 import { join } from 'node:path'
-import { expandExtensions, tryPaths } from '@cormi/core'
+import { expandExtensions, getPackageName, getWorkspacePaths, tryPaths } from '@cormi/core'
 import type {} from '@cormi/rsbuild'
 import type {} from '@cormi/vite'
 import { Context } from 'cordis'
 import { rsbuildReact, rsbuildRouteExports } from './rsbuild.ts'
-import { getPackageName, getWorkspacePaths, renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
+import { renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
 import { viteReact, viteRouteExports } from './vite.ts'
 
 /**

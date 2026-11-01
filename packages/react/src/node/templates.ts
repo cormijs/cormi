@@ -1,75 +1,15 @@
-import { isAbsolute, relative } from 'node:path'
-import type { App, Route, Workspace } from '@cormi/core'
-import { resolveExport, winPath } from '@cormi/core'
+import { type App, MODULE_TYPINGS, renderEntries, renderRoutes as renderRouteManifest, type Route, toSpecifier } from '@cormi/core'
 import type { Dict } from 'cosmokit'
 
 const json = (value: unknown) => JSON.stringify(value ?? null)
 
-/** A specifier for a module: files become relative to the generated directory, package specifiers are kept. */
-export function toSpecifier(dir: string, file: string) {
-  if (!isAbsolute(file)) return file
-  const path = winPath(relative(dir, file))
-  return path.startsWith('.') ? path : `./${path}`
-}
-
-/** `@scope/name/client` -> `@scope/name`; `undefined` for files. */
-export function getPackageName(specifier: string) {
-  if (isAbsolute(specifier) || specifier.startsWith('.')) return
-  const parts = specifier.split('/')
-  return specifier.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0]
-}
-
-/** Route props of umi-style configured routes that go to the client's `meta`. */
-const META_KEYS = ['name', 'icon', 'hideInMenu']
-
-function getMeta(route: Route) {
-  const meta: Record<string, unknown> = { ...route.meta }
-  for (const key of META_KEYS) {
-    if (route[key] !== undefined) meta[key] = route[key]
-  }
-  return Object.keys(meta).length ? meta : undefined
-}
-
 export function renderRoutes(dir: string, routes: Dict<Route>) {
-  const data = Object.values(routes).map(route => ({
-    id: route.id,
-    path: route.path,
-    index: route.index || undefined,
-    parentId: route.parentId,
-    isLayout: route.isLayout || undefined,
-    hasLoader: route.exports?.includes('loader') || undefined,
-    hasClientLoader: route.exports?.includes('clientLoader') || undefined,
-    meta: getMeta(route),
-  }))
-  const modules = Object.values(routes)
-    .filter(route => route.file)
-    .map(route => `  ${json(route.id)}: () => import(${json(toSpecifier(dir, route.file!))}),`)
-  return [
-    `import type { RouteData, RouteModules } from '@cormi/react/client'`,
-    '',
-    `export const routes: Record<string, RouteData> = {`,
-    ...data.map(route => `  ${json(route.id)}: ${JSON.stringify(route)},`),
-    `}`,
-    '',
-    `export const routeModules: RouteModules = {`,
-    ...modules,
-    `}`,
-    '',
-  ].join('\n')
+  return renderRouteManifest(dir, routes, '@cormi/react/client')
 }
 
 export interface ContextOptions {
   base: string
   history: string
-}
-
-function renderEntries(dir: string, entries: Iterable<App.Entry>) {
-  const list = [...entries]
-  return {
-    imports: list.map((entry, index) => `import * as entry${index} from ${json(toSpecifier(dir, entry.file))}`),
-    bindings: list.map((entry, index) => [toSpecifier(dir, entry.file), `entry${index}`] as [string, string]),
-    array: `[${list.map((entry, index) => `[entry${index}, ${entry.config === undefined ? 'undefined' : json(entry.config)}]`).join(', ')}]`,
-  }
 }
 
 export interface EntryOptions extends ContextOptions {
@@ -149,17 +89,6 @@ export function renderServer(app: App, options: ContextOptions) {
   ].join('\n')
 }
 
-/** Paths of the workspace packages, relative to the generated directory: their sources are typed like the app's. */
-export function getWorkspacePaths(dir: string, packages: Dict<Workspace.Package>) {
-  const paths: Dict<string[]> = {}
-  for (const pkg of Object.values(packages)) {
-    const main = resolveExport(pkg, '.', ['import'])
-    if (main) paths[pkg.name] = [winPath(relative(dir, main))]
-    paths[`${pkg.name}/*`] = [winPath(relative(dir, pkg.dir)) + '/*']
-  }
-  return paths
-}
-
 export function renderTsconfig(paths: Dict<string[]> = {}) {
   return JSON.stringify({
     compilerOptions: {
@@ -185,32 +114,4 @@ export function renderTsconfig(paths: Dict<string[]> = {}) {
   }, null, 2) + '\n'
 }
 
-const ASSETS = ['svg', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'ico', 'bmp', 'mp4', 'webm', 'ogg', 'mp3', 'wav', 'woff', 'woff2', 'ttf', 'otf', 'txt', 'pdf']
-
-export const TYPINGS = [
-  `interface ImportMetaEnv {`,
-  `  readonly MODE: string`,
-  `  readonly BASE_URL: string`,
-  `  readonly DEV: boolean`,
-  `  readonly PROD: boolean`,
-  `  readonly SSR: boolean`,
-  `  readonly [key: string]: any`,
-  `}`,
-  '',
-  `interface ImportMeta {`,
-  `  readonly env: ImportMetaEnv`,
-  `  readonly hot?: any`,
-  `  readonly webpackHot?: any`,
-  `}`,
-  '',
-  `declare module '*.module.css' { const classes: { readonly [key: string]: string }; export default classes }`,
-  `declare module '*.module.less' { const classes: { readonly [key: string]: string }; export default classes }`,
-  `declare module '*.module.scss' { const classes: { readonly [key: string]: string }; export default classes }`,
-  `declare module '*.css' {}`,
-  `declare module '*.less' {}`,
-  `declare module '*.scss' {}`,
-  ...ASSETS.map(ext => `declare module '*.${ext}' { const src: string; export default src }`),
-  `declare module '*?raw' { const content: string; export default content }`,
-  `declare module '*?url' { const src: string; export default src }`,
-  '',
-].join('\n')
+export const TYPINGS = MODULE_TYPINGS
