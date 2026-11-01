@@ -230,7 +230,7 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 - 类型：React 渲染器在生成的 tsconfig 中写入工作区包的 `paths`。
 - `cormi g plugin <name>` 生成插件包（`--console`、`--no-client`）；dev 下监听 `plugins/*/package.json` 的增删。
 
-**控制台**（`@cormi/console`，preset 在 dev 模式下挂载，`console: false` 关闭）：挂在 `/__cormi/`，由应用自己的 Vite 提供（目前要求 `@cormi/vite` 与 `@cormi/react`）。控制台本身是一个浏览器端的 cordis Context：页面是浏览器插件，经 `ctx.console.entry()` 注册（与 `ctx.app.entry()` 同构），生成的入口在 `src/.cormi/console/entry.tsx`。数据经 WebSocket：Node 端 `ctx.console.data(name, get)` 推送、`method(name, handler)` 响应调用、`broadcast()` 发事件；浏览器端 `ctx.$console.page()`、`useData()`、`call()`。
+**控制台**（`@cormi/console`，preset 在 dev 模式下挂载，`console: false` 关闭）：挂在 `/__cormi/`，自带 Vite 与 React，与应用的打包器和 UI 框架无关：一个以中间件模式运行的 Vite 开发服务器，根目录是 `@cormi/console` 包（React 从这里解析，插件的控制台页面也去重到它），HMR 的 WebSocket 以路径与应用的区分。控制台本身是一个浏览器端的 cordis Context：页面是浏览器插件，经 `ctx.console.entry()` 注册（与 `ctx.app.entry()` 同构）；入口是控制台 Vite 的虚拟模块，位于应用根目录下，所以插件的控制台页面按包名从应用解析，入口变化时浏览器重新加载控制台。概览显示 `ctx.bundler`、`ctx.renderer` 的名称与版本（契约中的 `name`、`version`）。数据经 WebSocket：Node 端 `ctx.console.data(name, get)` 推送、`method(name, handler)` 响应调用、`broadcast()` 发事件；浏览器端 `ctx.$console.page()`、`useData()`、`call()`。
 
 内置页面读取 loader 的 include 子树（顺序与 `cormi.yml` 一致），修改经子树的 `update/create/remove` 写回文件；注册列表来自 `fiber.getEffects()`（含子 fiber），状态变化监听 `internal/status`、`internal/plugin`；服务来自 `ctx.reflect.store`；日志经 `ctx.logger.exporter()`。控制台文档只响应接受 `text/html` 的请求，`/__cormi/loader` 等端点不受影响。
 

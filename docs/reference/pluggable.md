@@ -1,6 +1,6 @@
 # 设计：可选的打包器与 UI 框架
 
-> 状态：设计已定，按阶段实施中（第 1–3 阶段已完成）。本页记录决策与理由。
+> 状态：四个阶段均已完成。本页记录决策与理由。
 
 目标：Vite 与 React 不再是框架的一部分，而是可替换的实现。用户在 `cormi.yml` 里选择打包器与 UI 框架，其余能力（路由表、HTML、页面服务、API、loader、插件树、控制台）保持一致。
 
@@ -93,7 +93,7 @@ interface Renderer {
 | 跨打包器插件 | 按打包器分派的映射，unplugin 的变体可以放进去 | unplugin 一份实现覆盖 Vite、Rollup、Rspack、webpack、esbuild；tailwind、unocss 这类各有适配的工具用映射 |
 | 映射缺少当前打包器 | 抛出错误，插件加载失败 | 不支持的组合要看得见；可有可无的部分用 `ctx.inject(['vite'], …)` |
 | 路由导出的剥离 | 不用 unplugin，在映射中给每个打包器一个实现 | 它只能作用于客户端构建，而 unplugin 的通用钩子分不清客户端与服务端；Vite 用 `transform` 的 `ssr` 参数，Rsbuild 用 `api.transform({ environments })` |
-| 控制台 | 与应用的打包器、UI 框架解耦 | 控制台作为开发工具自带 Vite 与 React，无论应用用什么 |
+| 控制台 | 与应用的打包器、UI 框架解耦 | 控制台作为开发工具自带 Vite 与 React，无论应用用什么；它的 Vite 以路径区分 HMR，与应用的 Vite 共用一个 HTTP 服务也不冲突 |
 | UI 框架 API 的导入路径 | `@cormi/react/client`、`@cormi/vue/client` | UI 集成是应用的直接依赖，与插件的 `/client` 约定一致；`cormi/client` 变为与框架无关的运行时，`cormi` 不再依赖 React |
 | `cormi.yml` 的写法 | 显式组合，保留 preset 简写 | `@cormi/preset`（应用：路由、HTML、页面、API、服务器）+ 打包器 + UI 框架，选择一目了然；`@cormi/preset-react` 保留为等价简写 |
 
@@ -138,4 +138,4 @@ legacy 是 `@vitejs/plugin-legacy` 的封装，Rsbuild 自己按 browserslist �
 1. **无行为变化的拆分**（已完成）：`@cormi/client` 拆为 `@cormi/runtime` 与 `@cormi/react`；preset 中的 React 渲染器移入 `@cormi/react`，与 UI 框架无关的部分成为 `@cormi/preset`；`@cormi/vite` 提供 `bundler`；页面服务中 Vite 特有的逻辑移到 `bundler` 接口之后；core 不再写死 `.tsx`；`cormi` 不再依赖 React 与 Vite。只适用于 Vite 的插件已改用 `ctx.vite` 的类型并以 `@cormi/vite` 为 peer 依赖。
 2. **插件分类与改造**（已完成）：`ctx.bundler.plugin()` 与 `Bundler.Plugins`；React 渲染器、文件约定、tailwindcss、unocss、styled-components 通过它注册打包器插件，不再注入 `vite`；React 插件声明 `inject: ['react']`；plugin-lint 只在 React 应用中启用 hooks 规则。分类见下表。
 3. **第二实现**（已完成）：`@cormi/rsbuild`；React、文件约定、tailwindcss、mf 的 Rsbuild 实现；`@cormi/vue` 与 `with-vue` 示例。e2e 是组合矩阵：Vite 上全部示例，Rsbuild 上 basic、with-tailwind、with-vue 与模块联邦，各自 preview 与 dev。
-4. **控制台解耦**与文档，控制台概览显示当前的打包器与 UI 框架。
+4. **控制台解耦**（已完成）：控制台自带 Vite 与 React，以中间件模式挂在 `/__cormi/`，入口是它自己的虚拟模块，不再写进应用的 `src/.cormi`；概览显示打包器与 UI 框架（契约增加 `version`），“应用”页列出打包器解析出的插件。e2e 中控制台在 Vite、Rsbuild 应用与 Vue 应用里都被检查。

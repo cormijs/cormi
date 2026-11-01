@@ -164,7 +164,7 @@ ctx.bundler.plugin({
 
 | 成员 | 说明 |
 |---|---|
-| `name` | 实现的名称，如 `vite` |
+| `name`、`version` | 实现的名称，如 `vite`，与打包器的版本 |
 | `config` | 各打包器共有的构建配置：`publicPath`、`outDir`、`alias`、`define`、`sourcemap` |
 | `outDir` | 构建输出目录的绝对路径 |
 | `plugin(plugins)` | 加一个打包器插件：`{ [打包器]: 插件 }`，取当前打包器的一项 |

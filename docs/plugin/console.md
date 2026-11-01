@@ -80,7 +80,7 @@ export default (ctx: Context) => {
 | `listen(name, listener)` | 监听服务器广播的事件 |
 | `get(name)` | 读取一项数据的当前值 |
 
-React 钩子从 `cormi/console` 导入：
+控制台页面总是 React 组件——控制台自带 React，即使应用用的是 Vue。React 钩子从 `cormi/console` 导入：
 
 | 钩子 | 说明 |
 |---|---|
