@@ -1,0 +1,35 @@
+{
+  "name": "@cormi/rsbuild",
+  "description": "The Rsbuild service of Cormi: dev server on ctx.server, client and server bundles",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "cormi",
+    "cordis",
+    "rsbuild",
+    "rspack",
+    "plugin"
+  ],
+  "dependencies": {
+    "@cordisjs/plugin-server": "^1.7.0",
+    "@cormi/core": "workspace:*",
+    "@rsbuild/core": "^2.3.0",
+    "cordis": "4.0.0-rc.12",
+    "cosmokit": "^1.8.1"
+  }
+}
