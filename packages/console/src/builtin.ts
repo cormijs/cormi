@@ -3,6 +3,8 @@ import { existsSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import type { Entry, EntryGroup, EntryTree } from '@cordisjs/plugin-loader'
 import { readJSON, resolvePackageDir, winPath } from '@cormi/core'
+import type {} from '@cormi/rsbuild'
+import type {} from '@cormi/vite'
 import { type Context, type Fiber, Logger, type Message } from 'cordis'
 import { type Console, getServerUrl } from './index.ts'
 
@@ -170,19 +172,26 @@ export function Builtin(ctx: Context, config: Console.Config) {
   const { cwd } = ctx.cormi
   const app = readJSON(join(cwd, 'package.json')) ?? {}
 
-  ctx.console.data('overview', () => ({
-    name: app.name ?? 'app',
-    cwd,
-    mode: ctx.cormi.mode,
-    url: getServerUrl(ctx),
-    versions: {
-      cormi: version(cwd, 'cormi'),
-      cordis: version(cwd, 'cordis') ?? version(join(cwd, 'node_modules/cormi'), 'cordis'),
-      react: version(cwd, 'react'),
-      vite: ctx.vite.devServer?.config ? version(cwd, 'vite') ?? version(join(cwd, 'node_modules/cormi'), 'vite') : undefined,
-      node: process.versions.node,
-    },
-  }))
+  const overview = ctx.console.data('overview', () => {
+    const bundler = ctx.get('bundler')
+    const renderer = ctx.get('renderer')
+    return {
+      name: app.name ?? 'app',
+      cwd,
+      mode: ctx.cormi.mode,
+      url: getServerUrl(ctx),
+      // the bundler and the UI framework of the app, which are plugins too
+      stack: {
+        bundler: bundler && { name: bundler.name, version: bundler.version },
+        renderer: renderer && { name: renderer.name, version: renderer.version },
+      },
+      versions: {
+        cormi: version(cwd, 'cormi'),
+        cordis: version(cwd, 'cordis') ?? version(join(cwd, 'node_modules/cormi'), 'cordis'),
+        node: process.versions.node,
+      },
+    }
+  })
 
   // the plugin tree changes with every fiber that loads, fails or unloads
   const plugins = ctx.console.data('plugins', () => getPlugins(ctx))
@@ -190,6 +199,7 @@ export function Builtin(ctx: Context, config: Console.Config) {
   const refreshTree = () => {
     plugins.refresh()
     services.refresh()
+    overview.refresh()
   }
   ctx.on('internal/status', refreshTree)
   ctx.on('internal/plugin', refreshTree)
@@ -286,14 +296,21 @@ export function Builtin(ctx: Context, config: Console.Config) {
     return pkg.name
   })
 
-  ctx.console.method('vite/plugins', async () => {
-    const resolved = await ctx.vite.resolveConfig({ command: 'serve' })
+  // the plugins of the dev server, as the bundler resolves them: those registered with ctx.bundler.plugin() included
+  ctx.console.method('bundler/plugins', async () => {
+    const bundler = ctx.get('vite') ?? ctx.get('rsbuild')
+    if (!bundler) return []
+    const resolved = await bundler.resolveConfig({ command: 'serve' })
     const names: string[] = []
-    const visit = (plugin: any) => {
-      if (Array.isArray(plugin)) return plugin.forEach(visit)
-      if (plugin?.name) names.push(plugin.name)
+    const visit = async (plugin: any): Promise<void> => {
+      plugin = await plugin
+      if (Array.isArray(plugin)) {
+        for (const item of plugin) await visit(item)
+      } else if (plugin?.name) {
+        names.push(plugin.name)
+      }
     }
-    visit(resolved.plugins)
+    await visit(resolved.plugins)
     return names
   })
 
@@ -317,7 +334,7 @@ export function Builtin(ctx: Context, config: Console.Config) {
 }
 
 export namespace Builtin {
-  export const inject = ['console', 'loader', 'router', 'app', 'vite']
+  export const inject = ['console', 'loader', 'router', 'app']
 }
 
 /** Install a package with the app's package manager; its output goes to the logs. */

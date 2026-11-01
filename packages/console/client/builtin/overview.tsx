@@ -5,12 +5,31 @@ import { useData } from '../index.tsx'
 import { Empty, Lamp, Section } from '../ui.tsx'
 import type { AppData } from './app.tsx'
 
+export interface StackItem {
+  name: string
+  version?: string
+}
+
 export interface OverviewData {
   name: string
   cwd: string
   mode: string
   url?: string
+  /** the bundler and the UI framework of the app */
+  stack: { bundler?: StackItem; renderer?: StackItem }
   versions: Record<string, string | undefined>
+}
+
+const LABELS: Record<string, string> = { vite: 'Vite', rsbuild: 'Rsbuild', react: 'React', vue: 'Vue' }
+
+function Stack(props: { item?: StackItem; missing: string }) {
+  if (!props.item) return <span className="cc-muted">{props.missing}</span>
+  return (
+    <>
+      <strong>{LABELS[props.item.name] ?? props.item.name}</strong>
+      {props.item.version && <code>{props.item.version}</code>}
+    </>
+  )
 }
 
 export default function Overview() {
@@ -51,6 +70,19 @@ export default function Overview() {
           <span className="cc-stat-label">浏览器插件</span>
         </Link>
       </div>
+
+      <Section title="技术栈">
+        <dl className="cc-kv">
+          <div data-stack="bundler">
+            <dt>打包器</dt>
+            <dd><Stack item={overview?.stack.bundler} missing="未配置：在 cormi.yml 中加入 @cormi/vite 或 @cormi/rsbuild" /></dd>
+          </div>
+          <div data-stack="renderer">
+            <dt>UI 框架</dt>
+            <dd><Stack item={overview?.stack.renderer} missing="未配置：在 cormi.yml 中加入 @cormi/react 或 @cormi/vue" /></dd>
+          </div>
+        </dl>
+      </Section>
 
       {waiting.length > 0 && (
         <Section title="需要处理的插件">

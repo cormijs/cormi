@@ -1,12 +1,11 @@
-import { join, relative } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import type {} from '@cordisjs/plugin-loader'
 import type {} from '@cordisjs/plugin-server'
-import { type App, Schema, winPath } from '@cormi/core'
-import type {} from '@cormi/vite'
+import { type App, Refresher, Schema, winPath } from '@cormi/core'
 import { Context, Service } from 'cordis'
 import { Awaitable } from 'cosmokit'
 import { Builtin } from './builtin.ts'
+import { CLIENT, type ConsoleServer, createConsoleServer, ENTRY_URL } from './vite.ts'
 
 export * from './builtin.ts'
 
@@ -35,13 +34,15 @@ const OPEN = 1
 
 /**
  * The console of the app in dev mode (`ctx.console`), served at `/__cormi/`
- * by the app's own server and Vite. The console is itself a Cormi app in the
- * browser: its pages are browser plugins, registered by plugins with
- * `entry()` like `ctx.app.entry()`. They read data the server pushes
- * (`data()`) and call methods on the server (`method()`), over a WebSocket.
+ * by the app's server, with a Vite and a React of its own: it works the same
+ * whatever the bundler and the UI framework of the app. The console is
+ * itself a Cormi app in the browser: its pages are browser plugins,
+ * registered by plugins with `entry()` like `ctx.app.entry()`. They read data
+ * the server pushes (`data()`) and call methods on the server (`method()`),
+ * over a WebSocket.
  */
 export class Console extends Service {
-  static inject = ['app', 'vite', 'server', 'loader', 'router']
+  static inject = ['server', 'loader']
 
   /** browser plugins of the console, mounted in registration order */
   entries = new Set<App.Entry>()
@@ -49,32 +50,68 @@ export class Console extends Service {
   private _sources = new Map<string, Console.Source>()
   private _methods = new Map<string, Console.Method>()
   private _sockets = new Set<Socket>()
-  // the context of the console: `this.ctx` is the caller's in methods, which may not inject `app`
+  // the context of the console: `this.ctx` is the caller's in methods
   private _ctx: Context
+  private _server: Promise<ConsoleServer | undefined> = Promise.resolve(undefined)
+  // browsers load the console again when its entry changes; changes in a burst reload once
+  private _reload: Refresher
 
   constructor(ctx: Context, public config: Console.Config) {
     super(ctx, 'console')
     this._ctx = ctx
     const base = this.base
-    const entry = join(ctx.app.dir, 'console/entry.tsx')
+    this._reload = new Refresher(async () => (await this._server)?.reloadEntry(), 50, error => ctx.logger('console').warn(error))
 
-    ctx.app.file('console/entry.tsx', () => renderEntry([...this.entries], {
-      client: CLIENT,
-      base,
-      endpoint: base + 'ws',
-      dir: join(ctx.app.dir, 'console'),
-    }))
-    // the dependencies of the console are pre-bundled with the app's
-    ctx.vite.configure((config) => {
-      const entries = [config.optimizeDeps?.entries ?? []].flat()
-      return { ...config, optimizeDeps: { ...config.optimizeDeps, entries: [...entries, entry] } }
+    ctx.effect(() => {
+      const server = this._server = createConsoleServer({
+        base,
+        cwd: ctx.cormi.cwd,
+        http: ctx.server._http,
+        workspace: ctx.get('workspace'),
+        entry: () => renderEntry([...this.entries], { client: CLIENT, base, endpoint: base + 'ws' }),
+      }).catch((error) => {
+        ctx.logger('console').error(error)
+        return undefined
+      })
+      return async () => {
+        this._reload.dispose()
+        await (await server)?.close()
+      }
+    }, 'console dev server')
+
+    // the modules of the console, below its path; other requests (e.g. to the loaders of the app) go on
+    ctx.server.use(async (req, res, next) => {
+      if (!req.path.startsWith(base)) return next()
+      const server = await this._server
+      if (!server) return next()
+      const response = res._res
+      return new Promise<void>((resolve, reject) => {
+        const done = () => resolve()
+        response.once('finish', done)
+        response.once('close', done)
+        server.middlewares(req._req, response, (error?: unknown) => {
+          response.off('finish', done)
+          response.off('close', done)
+          if (error) return reject(error)
+          next().then(resolve, reject)
+        })
+      })
+    })
+
+    // the HMR socket of the console is accepted by its Vite
+    ctx.on('server/upgrade', (req, next) => {
+      const protocol = req.headers.get('sec-websocket-protocol')
+      if (req.path === base && (protocol === 'vite-hmr' || protocol === 'vite-ping')) return Promise.resolve()
+      return next()
     })
 
     // the document answers page navigations only: endpoints below /__cormi/ (e.g. of loaders) stay reachable
     ctx.server.get(`${base.slice(0, -1)}{/*path}`, async (req, _res, next) => {
       if (!req.headers.get('accept')?.includes('text/html')) return next()
-      const script = ctx.vite.config.publicPath + winPath(relative(ctx.cormi.cwd, entry))
-      const html = await ctx.vite.transformDocument(req.path, renderDocument(script, config.title))
+      const server = await this._server
+      if (!server) return next()
+      // the console's Vite puts its base before the URLs of the document
+      const html = await server.transformIndexHtml(req.path, renderDocument(ENTRY_URL, config.title))
       return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } })
     })
 
@@ -102,10 +139,10 @@ export class Console extends Service {
     const entry: App.Entry = { file: winPath(module), config }
     return this.ctx.effect(() => {
       this.entries.add(entry)
-      this._ctx.app.refresh()
+      this._reload.schedule()
       return () => {
         this.entries.delete(entry)
-        this._ctx.app.refresh()
+        this._reload.schedule()
       }
     }, `ctx.console.entry(${JSON.stringify(entry.file)})`)
   }
@@ -221,12 +258,6 @@ export namespace Console {
   export type Method = (...args: any[]) => Awaitable<unknown>
 }
 
-/**
- * The console's own browser modules, by path: the app depends on the
- * framework, not on this package, so their specifiers would not resolve from it.
- */
-const CLIENT = winPath(fileURLToPath(new URL('../client', import.meta.url)))
-
 /** The URL of the dev server, for links. */
 export function getServerUrl(ctx: Context) {
   const { host, port } = ctx.server
@@ -254,18 +285,15 @@ function renderDocument(script: string, title: string) {
   ].join('\n')
 }
 
-function toSpecifier(dir: string, file: string) {
-  if (!/^[./]|^[a-z]:/i.test(file)) return file
-  const path = winPath(relative(dir, file))
-  return path.startsWith('.') ? path : `./${path}`
-}
-
-/** The browser entry of the console: its plugins, hot-replaced one by one like the app's. */
-function renderEntry(entries: App.Entry[], options: { client: string; base: string; endpoint: string; dir: string }) {
+/**
+ * The browser entry of the console: its plugins, hot-replaced one by one like
+ * the app's. Files are imported by path, packages from the app root.
+ */
+function renderEntry(entries: App.Entry[], options: { client: string; base: string; endpoint: string }) {
   const json = (value: unknown) => JSON.stringify(value ?? null)
-  const specifiers = entries.map(entry => toSpecifier(options.dir, entry.file))
+  const specifiers = entries.map(entry => entry.file)
   return [
-    `import { mountConsole } from ${json(toSpecifier(options.dir, join(options.client, 'index.tsx')))}`,
+    `import { mountConsole } from ${json(`${options.client}/index.tsx`)}`,
     ...specifiers.map((specifier, index) => `import * as entry${index} from ${json(specifier)}`),
     '',
     `const entries: [any, any][] = [${entries.map((entry, index) => `[entry${index}, ${entry.config === undefined ? 'undefined' : json(entry.config)}]`).join(', ')}]`,

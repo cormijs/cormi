@@ -14,7 +14,7 @@ export default function WorkspacePage() {
     <div className="cc-page">
       <header className="cc-page-head">
         <h1>工作区</h1>
-        <p>plugins/ 下的插件包按包名加载，直接运行源码：不需要构建，也不需要安装。修改 Node 端代码只重载这个插件，浏览器端代码由 Vite 热更新。</p>
+        <p>plugins/ 下的插件包按包名加载，直接运行源码：不需要构建，也不需要安装。修改 Node 端代码只重载这个插件，浏览器端代码由应用的打包器热更新。</p>
       </header>
 
       <Section title="插件包">

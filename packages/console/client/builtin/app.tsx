@@ -24,7 +24,7 @@ function fullPath(route: RouteInfo, byId: Map<string, RouteInfo>): string {
 export default function AppPage() {
   const app = useData<AppData>('app')
   const overview = useData<OverviewData>('overview')
-  const vite = useQuery<string[]>('vite/plugins')
+  const bundler = useQuery<string[]>('bundler/plugins')
   if (!app) return <div className="cc-page"><Empty>正在读取应用…</Empty></div>
   const byId = new Map(app.routes.map(route => [route.id, route]))
   const pages = app.routes.filter(route => !route.isLayout)
@@ -34,7 +34,7 @@ export default function AppPage() {
     <div className="cc-page">
       <header className="cc-page-head">
         <h1>应用</h1>
-        <p>ctx.router、ctx.app 与 ctx.vite 此刻的内容：插件注册的一切汇总于此。点击文件在编辑器中打开。</p>
+        <p>ctx.router、ctx.app 与 ctx.bundler 此刻的内容：插件注册的一切汇总于此。点击文件在编辑器中打开。</p>
       </header>
 
       <Section title={`路由 ${pages.length}`}>
@@ -97,9 +97,9 @@ export default function AppPage() {
         </Section>
       </div>
 
-      <Section title={`Vite 插件 ${vite.data?.length ?? ''}`} aside={<button type="button" className="cc-link" onClick={vite.reload}>刷新</button>}>
-        {vite.error && <p className="cc-row-error">{vite.error}</p>}
-        {vite.data && <ul className="cc-pills">{vite.data.map((name, index) => <li key={index}><code>{name}</code></li>)}</ul>}
+      <Section title={`打包器插件 ${bundler.data?.length ?? ''}`} aside={<button type="button" className="cc-link" onClick={bundler.reload}>刷新</button>}>
+        {bundler.error && <p className="cc-row-error">{bundler.error}</p>}
+        {bundler.data && <ul className="cc-pills">{bundler.data.map((name, index) => <li key={index}><code>{name}</code></li>)}</ul>}
       </Section>
     </div>
   )
