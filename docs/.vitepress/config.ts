@@ -1,15 +1,18 @@
 import { defineConfig } from 'vitepress'
 
 const repo = 'https://github.com/cormijs/cormi'
+const base = '/cormi/'
 
 export default defineConfig({
+  base,
   lang: 'zh-CN',
   title: 'Cormi',
   description: '以 Cordis 为插件宿主的前端全栈框架：一份 cormi.yml，就是整个应用。',
   cleanUrls: true,
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', href: '/logo.svg', type: 'image/svg+xml' }],
+    // VitePress does not apply `base` to `head` links, so the favicon is prefixed here
+    ['link', { rel: 'icon', href: `${base}logo.svg`, type: 'image/svg+xml' }],
     ['meta', { name: 'theme-color', content: '#d7336d' }],
   ],
   markdown: {

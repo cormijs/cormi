@@ -87,7 +87,7 @@ export default (ctx: Context) => {
 | `api.onBuildComplete` | `ctx.on('build/after', fn)` |
 | `api.restartServer()` | 不需要：注册一变化，产物就重新计算 |
 
-<p class="cm-more"><a href="/reference/umi">完整对照与覆盖情况</a></p>
+<p class="cm-more"><a href="/cormi/reference/umi">完整对照与覆盖情况</a></p>
 
 </div>
 </section>
@@ -125,7 +125,7 @@ pnpm dev
 <p>dev server 运行时，把 <code>cormi.yml</code> 里 <code>./plugin.ts</code> 的 <code>generator</code> 改成别的值。日志里只有这个插件重载，页面的 meta 标签随之更新。</p>
 </li>
 </ol>
-<p class="cm-more"><a href="/guide/getting-started">阅读快速开始</a></p>
+<p class="cm-more"><a href="/cormi/guide/getting-started">阅读快速开始</a></p>
 </section>
 
 </div>
