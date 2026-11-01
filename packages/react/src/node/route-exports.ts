@@ -4,7 +4,6 @@ import * as babelTraverse from '@babel/traverse'
 import type { NodePath, Visitor } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { deadCodeElimination, findReferencedIdentifiers } from 'babel-dead-code-elimination'
-import type { Plugin } from 'vite'
 
 // `@babel/traverse` is CommonJS: its default export may be wrapped once more
 const traverse = ((babelTraverse as any).default?.default ?? (babelTraverse as any).default) as (ast: t.Node, visitor: Visitor) => void
@@ -93,18 +92,9 @@ export function transformExports(code: string, opts: { remove?: string[]; keep?:
   return generate(ast, { sourceMaps: true, sourceFileName: opts.filename }, code)
 }
 
-/** Strip the server-only exports of route modules from the client bundle, like Remix's route module splitting. */
-export function routeExportsPlugin(opts: { isRouteFile: (file: string) => boolean }): Plugin {
-  return {
-    name: 'cormi:route-exports',
-    enforce: 'pre',
-    transform(code, id, options) {
-      if (options?.ssr) return
-      const [file] = id.split('?')
-      if (!/\.[cm]?[jt]sx?$/.test(file) || !opts.isRouteFile(file)) return
-      if (!SERVER_ONLY_EXPORTS.some(name => code.includes(name))) return
-      const result = transformExports(code, { remove: SERVER_ONLY_EXPORTS, filename: file })
-      if (result) return { code: result.code, map: result.map as any }
-    },
-  }
+/** The code of a route module for the client bundle: without its server-only exports, like Remix's route module splitting. */
+export function stripServerExports(code: string, file: string) {
+  if (!SERVER_ONLY_EXPORTS.some(name => code.includes(name))) return
+  const result = transformExports(code, { remove: SERVER_ONLY_EXPORTS, filename: file })
+  if (result) return { code: result.code, map: result.map as any }
 }

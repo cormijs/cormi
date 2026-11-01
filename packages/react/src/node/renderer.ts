@@ -1,10 +1,11 @@
 import { join } from 'node:path'
 import { expandExtensions, tryPaths } from '@cormi/core'
+import type {} from '@cormi/rsbuild'
 import type {} from '@cormi/vite'
 import { Context } from 'cordis'
-import { routeExportsPlugin } from './route-exports.ts'
+import { rsbuildReact, rsbuildRouteExports } from './rsbuild.ts'
 import { getPackageName, getWorkspacePaths, renderEntry, renderRoutes, renderServer, renderTsconfig, TYPINGS } from './templates.ts'
-import { viteReact } from './vite.ts'
+import { viteReact, viteRouteExports } from './vite.ts'
 
 /**
  * The React renderer. It generates the browser entry (`entry.tsx`) and the
@@ -21,8 +22,15 @@ export function Renderer(ctx: Context) {
   updateRouteFiles()
 
   const packages = () => [...ctx.app.entries].map(entry => getPackageName(entry.file)).filter(Boolean) as string[]
-  ctx.bundler.plugin({ vite: () => viteReact(packages) })
-  ctx.bundler.plugin({ vite: () => routeExportsPlugin({ isRouteFile: file => routeFiles.has(file) }) })
+  const isRouteFile = (file: string) => routeFiles.has(file)
+  ctx.bundler.plugin({
+    vite: () => viteReact(packages),
+    rsbuild: () => rsbuildReact(packages),
+  })
+  ctx.bundler.plugin({
+    vite: () => viteRouteExports(isRouteFile),
+    rsbuild: () => rsbuildRouteExports(isRouteFile),
+  })
 
   ctx.app.file('tsconfig.json', () => renderTsconfig(getWorkspacePaths(ctx.app.dir, ctx.get('workspace')?.packages ?? {})))
   ctx.on('workspace/update', () => ctx.app.refresh())
@@ -33,6 +41,7 @@ export function Renderer(ctx: Context) {
     mountElementId: ctx.html.config.mountElementId,
     // src/loading: rendered while the first routes of a client-rendered app load
     loading: tryPaths(expandExtensions(join(ctx.cormi.paths.src, 'loading'), ['.tsx', '.jsx', '.ts', '.js'])),
+    hotAccept: (imports, callback) => ctx.bundler.hotAccept(imports, callback),
   }))
   ctx.app.file('server.tsx', () => {
     const hasLoader = Object.values(ctx.router.routes).some(route => route.exports?.includes('loader'))

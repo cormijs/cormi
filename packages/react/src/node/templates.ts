@@ -67,12 +67,19 @@ function renderEntries(dir: string, entries: Iterable<App.Entry>) {
   const list = [...entries]
   return {
     imports: list.map((entry, index) => `import * as entry${index} from ${json(toSpecifier(dir, entry.file))}`),
-    specifiers: list.map(entry => toSpecifier(dir, entry.file)),
+    bindings: list.map((entry, index) => [toSpecifier(dir, entry.file), `entry${index}`] as [string, string]),
     array: `[${list.map((entry, index) => `[entry${index}, ${entry.config === undefined ? 'undefined' : json(entry.config)}]`).join(', ')}]`,
   }
 }
 
-export function renderEntry(app: App, options: ContextOptions & { mountElementId: string; loading?: string }) {
+export interface EntryOptions extends ContextOptions {
+  mountElementId: string
+  loading?: string
+  /** the bundler's code that hot-replaces imports: `ctx.bundler.hotAccept()` */
+  hotAccept: (imports: [string, string][], callback: string) => string
+}
+
+export function renderEntry(app: App, options: EntryOptions) {
   const entries = renderEntries(app.dir, app.entries)
   return [
     ...[...app.imports].map(({ source }) => `import ${json(toSpecifier(app.dir, source))}`),
@@ -104,15 +111,15 @@ export function renderEntry(app: App, options: ContextOptions & { mountElementId
     `void Promise.allSettled(fibers).then(() => ctx.bail('app/bootstrap') || mount())`,
     '',
     `// a runtime plugin is hot-replaced by disposing its fiber and mounting the new module`,
-    `if (import.meta.hot) {`,
-    `  import.meta.hot.accept(${json(entries.specifiers)}, (modules) => {`,
-    `    modules.forEach((module, index) => {`,
-    `      if (!module) return`,
-    `      void fibers[index].dispose()`,
-    `      fibers[index] = ctx.plugin(unwrapExports(module), entries[index][1])`,
-    `    })`,
-    `  })`,
-    `}`,
+    options.hotAccept(entries.bindings, [
+      `(modules: any[]) => {`,
+      `  modules.forEach((module, index) => {`,
+      `    if (!module) return`,
+      `    void fibers[index].dispose()`,
+      `    fibers[index] = ctx.plugin(unwrapExports(module), entries[index][1])`,
+      `  })`,
+      `}`,
+    ].join('\n')),
     '',
   ].join('\n')
 }
@@ -193,6 +200,7 @@ export const TYPINGS = [
   `interface ImportMeta {`,
   `  readonly env: ImportMetaEnv`,
   `  readonly hot?: any`,
+  `  readonly webpackHot?: any`,
   `}`,
   '',
   `declare module '*.module.css' { const classes: { readonly [key: string]: string }; export default classes }`,

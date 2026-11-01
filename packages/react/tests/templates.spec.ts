@@ -34,12 +34,15 @@ describe('templates', () => {
 
   it('mounts the entry once the runtime plugins are applied, with src/loading', () => {
     const app = { dir: '/app/src/.cormi', entries: new Set([{ file: '/app/src/app.tsx' }]), imports: new Set([{ source: '/app/src/global.css' }]) } as any
-    const code = renderEntry(app, { base: '/', history: 'browser', mountElementId: 'root', loading: '/app/src/loading.tsx' })
+    const hotAccept = (imports: [string, string][], callback: string) => `hot(${JSON.stringify(imports)}, ${callback})`
+    const code = renderEntry(app, { base: '/', history: 'browser', mountElementId: 'root', loading: '/app/src/loading.tsx', hotAccept })
     expect(code.indexOf('import "../global.css"')).toBe(0)
     expect(code).toContain('import loading from "../loading.tsx"')
     expect(code).toContain('history: "browser", loading })')
     expect(code).toContain(`void Promise.allSettled(fibers).then(() => ctx.bail('app/bootstrap') || mount())`)
     expect(code).toContain('export async function unmount()')
+    // the runtime plugins are hot-replaced through the bundler
+    expect(code).toContain('hot([["../app.tsx","entry0"]], (modules: any[]) => {')
   })
 })
 

@@ -29,6 +29,7 @@
     "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@vitejs/plugin-react": "^5.2.0",
     "cordis": "4.0.0-rc.12"
   },
   "peerDependencies": {
