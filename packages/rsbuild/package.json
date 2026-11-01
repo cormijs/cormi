@@ -26,6 +26,9 @@
     "plugin"
   ],
   "cormi": {
+    "bundler": [
+      "rsbuild"
+    ],
     "service": {
       "implements": [
         "bundler",

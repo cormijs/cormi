@@ -25,6 +25,12 @@
     "react"
   ],
   "cormi": {
+    "bundler": [
+      "vite"
+    ],
+    "renderer": [
+      "react"
+    ],
     "service": {
       "implements": [
         "router",

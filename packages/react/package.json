@@ -68,6 +68,9 @@
     "renderer"
   ],
   "cormi": {
+    "renderer": [
+      "react"
+    ],
     "service": {
       "implements": [
         "renderer",

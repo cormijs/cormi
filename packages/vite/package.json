@@ -25,6 +25,9 @@
     "plugin"
   ],
   "cormi": {
+    "bundler": [
+      "vite"
+    ],
     "service": {
       "implements": [
         "bundler",

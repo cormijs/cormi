@@ -64,6 +64,9 @@
     "renderer"
   ],
   "cormi": {
+    "renderer": [
+      "vue"
+    ],
     "service": {
       "implements": [
         "renderer",
