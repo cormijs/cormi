@@ -26,6 +26,7 @@ const HELP = `Usage: cormi <command> [options]
 ${COMMANDS}
 
 Options:
+  --config <file> the plugin tree, instead of cormi.yml
   --port <port>   port of the dev and preview server, over cormi.yml
   --host <host>   host of the dev and preview server, over cormi.yml
   -v, --version
@@ -43,7 +44,7 @@ async function registerTypeScript() {
 
 function getService<K extends 'bundler' | 'app'>(ctx: Context, name: K): Context[K] {
   const service = ctx.get(name)
-  if (!service) throw new CommandError(`service ${name} is not available: is a bundler (e.g. @cormi/vite) with @cormi/preset, or @cormi/preset-react, in cormi.yml?`)
+  if (!service) throw new CommandError(`service ${name} is not available: is a bundler (e.g. @cormi/vite or @cormi/rsbuild) with @cormi/preset, or @cormi/preset-react, in cormi.yml?`)
   return service
 }
 
@@ -53,7 +54,7 @@ function getService<K extends 'bundler' | 'app'>(ctx: Context, name: K): Context
  */
 async function once(cwd: string, mode: Mode, task: (ctx: Context) => Promise<unknown>, { strict = true, logger = true } = {}) {
   await registerTypeScript()
-  const ctx = await start({ cwd, mode, logger })
+  const ctx = await start({ cwd, mode, logger, config: process.env.CORMI_CONFIG })
   try {
     await (strict ? settle(ctx) : idle(ctx))
     await task(ctx)
@@ -64,7 +65,7 @@ async function once(cwd: string, mode: Mode, task: (ctx: Context) => Promise<unk
 
 /** The commands registered by the plugins of the app, for `cormi help`. */
 async function getPluginCommands(cwd: string) {
-  if (!existsSync(join(cwd, 'cormi.yml'))) return ''
+  if (!existsSync(join(cwd, process.env.CORMI_CONFIG ?? 'cormi.yml'))) return ''
   let commands: [string, string][] = []
   await once(cwd, 'setup', async (ctx) => {
     commands = [...ctx.cli.commands].map(([name, command]) => {
@@ -78,7 +79,7 @@ async function getPluginCommands(cwd: string) {
 /** Load the app and keep it running until the process is interrupted. */
 async function serve(cwd: string, mode: 'dev' | 'preview') {
   await registerTypeScript()
-  const ctx = await start({ cwd, mode, hmr: mode === 'dev' })
+  const ctx = await start({ cwd, mode, hmr: mode === 'dev', config: process.env.CORMI_CONFIG })
   let exiting = false
   const exit = (code: number) => {
     if (exiting) return
@@ -132,17 +133,18 @@ export async function run(argv = process.argv.slice(2)) {
   const args = parse(argv, {
     alias: { version: ['v'], help: ['h'] },
     boolean: ['version', 'help'],
-    string: ['host', 'port'],
+    string: ['config', 'host', 'port'],
   })
   if (args.version) return console.log(getVersion())
+  // the options of the command line win over cormi.yml; the worker of the dev server inherits them
+  if (args.config) process.env.CORMI_CONFIG = args.config
+  if (args.port) process.env.CORMI_PORT = args.port
+  if (args.host) process.env.CORMI_HOST = args.host
   const command = String(args._[0] ?? 'help')
   if (args.help || command === 'help') {
     const plugins = await getPluginCommands(process.cwd())
     return console.log(plugins ? HELP.replace(COMMANDS, `${COMMANDS}\n${plugins}`) : HELP)
   }
-  // the options of the command line win over cormi.yml
-  if (args.port) process.env.CORMI_PORT = args.port
-  if (args.host) process.env.CORMI_HOST = args.host
 
   const cwd = process.cwd()
   switch (command) {
