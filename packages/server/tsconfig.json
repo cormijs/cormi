@@ -13,10 +13,7 @@
       "path": "../core"
     },
     {
-      "path": "../client"
-    },
-    {
-      "path": "../vite"
+      "path": "../runtime"
     }
   ]
 }

@@ -1,16 +1,13 @@
-import { readFile, writeFile } from 'node:fs/promises'
-import { join, relative } from 'node:path'
-import { LOADER_ENDPOINT } from '@cormi/client/constants'
-import { type Html, Schema, winPath } from '@cormi/core'
-import type {} from '@cormi/vite'
-import { getEntryAssets } from '@cormi/vite'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { LOADER_ENDPOINT } from '@cormi/runtime/constants'
+import { type Html, Schema } from '@cormi/core'
 import { Context } from 'cordis'
-import type { ViteDevServer } from 'vite'
 import { getOrigin, send, type ServerRequest, toRequest } from './http.ts'
 
 type Assets = Pick<Html.RenderOptions, 'scripts' | 'styles' | 'preloads'>
 
-/** What the server entry renders, see `@cormi/client/server`. */
+/** What the server entry renders, see `@cormi/react/client/server`. */
 interface RenderResult {
   status: number
   content: string
@@ -20,11 +17,7 @@ interface RenderResult {
 
 /** The assets of the client entry: the source module in dev mode, the built chunks otherwise. */
 async function getAssets(ctx: Context): Promise<Assets> {
-  const { cormi, app, vite } = ctx
-  const entry = winPath(relative(cormi.cwd, app.clientEntry))
-  if (cormi.mode === 'dev') return { scripts: [vite.config.publicPath + entry] }
-  const manifest = JSON.parse(await readFile(join(vite.outDir, '.vite/manifest.json'), 'utf8'))
-  const { js, css, preload } = getEntryAssets(manifest, entry, vite.config.publicPath)
+  const { js, css, preload } = await ctx.bundler.assets(ctx.app.clientEntry)
   return { scripts: js, styles: css, preloads: preload }
 }
 
@@ -33,26 +26,6 @@ function isPageRequest(req: ServerRequest) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return false
   const accept = req.headers.get('accept')
   return !accept || accept.includes('text/html') || accept.includes('*/*')
-}
-
-const CSS_RE = /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)$/
-
-/**
- * Stylesheets imported by the modules the server has rendered (dev mode).
- * In dev mode Vite injects styles from JavaScript; linking them in the
- * document avoids a flash of unstyled content before the app hydrates.
- */
-function collectDevStyles(server: ViteDevServer, entry: string) {
-  const styles = new Set<string>()
-  const seen = new Set<unknown>()
-  const visit = (module: ReturnType<typeof server.environments.ssr.moduleGraph.getModuleById>) => {
-    if (!module || seen.has(module)) return
-    seen.add(module)
-    if (CSS_RE.test(module.url)) styles.add(module.url)
-    for (const imported of module.importedModules) visit(imported)
-  }
-  visit(server.environments.ssr.moduleGraph.getModuleById(entry))
-  return [...styles].map(url => `<link rel="stylesheet" href="${url}?direct" data-cormi-dev>`).join('\n')
 }
 
 const STARTING = '<!DOCTYPE html><meta http-equiv="refresh" content="1"><p>Cormi is starting…</p>'
@@ -72,17 +45,17 @@ export function Pages(ctx: Context, config: Pages.Config) {
     let assets: Promise<Assets> | undefined
 
     const render = async (req: ServerRequest): Promise<Response> => {
-      const { cormi, vite, html } = ctx
-      if (cormi.mode === 'dev' && !vite.devServer) {
+      const { cormi, bundler, html } = ctx
+      if (!bundler.ready) {
         return new Response(STARTING, { status: 503, headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': '1' } })
       }
       const url = new URL(req.url, getOrigin(req))
       let result: RenderResult | undefined
       if (config.ssr) {
-        const entry = await vite.loadServerEntry()
+        const entry = await bundler.loadServerEntry()
         const rendered: Response | RenderResult = await entry.handler.render(toRequest(req))
         if (rendered instanceof Response) return rendered
-        if (vite.devServer) rendered.head += collectDevStyles(vite.devServer, ctx.app.serverEntry)
+        if (cormi.mode === 'dev') rendered.head += bundler.devStyles?.(ctx.app.serverEntry) ?? ''
         result = rendered
       }
       if (cormi.mode === 'dev') assets = undefined
@@ -93,7 +66,7 @@ export function Pages(ctx: Context, config: Pages.Config) {
         body: result?.body,
         ...await (assets ??= getAssets(ctx)),
       })
-      if (vite.devServer) markup = await vite.devServer.transformIndexHtml(url.pathname + url.search, markup)
+      if (cormi.mode === 'dev') markup = await bundler.transformDocument(url.pathname + url.search, markup)
       return new Response(markup, {
         status: result?.status ?? 200,
         headers: { 'content-type': 'text/html; charset=utf-8' },
@@ -104,7 +77,7 @@ export function Pages(ctx: Context, config: Pages.Config) {
       const route = req.query.get('route')
       const url = req.query.get('url')
       if (!route || !url) return new Response('missing route or url', { status: 400 })
-      const entry = await ctx.vite.loadServerEntry()
+      const entry = await ctx.bundler.loadServerEntry()
       return entry.handler.loader(toRequest(req, url), route)
     })
 
@@ -114,7 +87,7 @@ export function Pages(ctx: Context, config: Pages.Config) {
       try {
         send(req, res, await render(req))
       } catch (error) {
-        ctx.vite.devServer?.ssrFixStacktrace(error as Error)
+        ctx.bundler.fixStacktrace?.(error as Error)
         ctx.logger('pages').error(error)
         res.status = 500
         res.headers.set('content-type', 'text/plain; charset=utf-8')
@@ -125,7 +98,7 @@ export function Pages(ctx: Context, config: Pages.Config) {
 }
 
 export namespace Pages {
-  export const inject = ['app', 'html', 'vite']
+  export const inject = ['app', 'html', 'bundler']
 
   export interface Config {
     /** render pages on the server */

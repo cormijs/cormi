@@ -3,7 +3,6 @@ import { stat } from 'node:fs/promises'
 import { extname, join, normalize, sep } from 'node:path'
 import { Readable } from 'node:stream'
 import type {} from '@cordisjs/plugin-server'
-import type {} from '@cormi/vite'
 import { Context } from 'cordis'
 
 const TYPES: Record<string, string> = {
@@ -41,8 +40,8 @@ const PRIVATE = ['server', '.vite']
  * cached forever; everything else is revalidated.
  */
 export function Static(ctx: Context) {
-  const root = ctx.vite.outDir
-  const prefix = ctx.vite.config.publicPath.replace(/\/$/, '')
+  const root = ctx.bundler.outDir
+  const prefix = ctx.bundler.config.publicPath.replace(/\/$/, '')
 
   ctx.server.use(async (req, res, next) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') return next()
@@ -62,5 +61,5 @@ export function Static(ctx: Context) {
 }
 
 export namespace Static {
-  export const inject = ['server', 'vite']
+  export const inject = ['server', 'bundler']
 }

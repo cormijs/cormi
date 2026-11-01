@@ -1,7 +1,6 @@
 import { join, relative } from 'node:path'
 import { watch } from 'chokidar'
 import { getConventionRoutes, Schema, winPath } from '@cormi/core'
-import type {} from '@cormi/vite'
 import { Context } from 'cordis'
 import { match, type MatchFunction } from 'path-to-regexp'
 import { toRequest } from './http.ts'
@@ -87,7 +86,7 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
       for (const route of routes) {
         const matched = route.match(pathname)
         if (!matched) continue
-        const entry = await ctx.vite.loadServerEntry()
+        const entry = await ctx.bundler.loadServerEntry()
         const module: ApiModule = await entry.modules.api.default[route.id]()
         const handler = module[req.method] ?? (req.method === 'HEAD' ? module.GET : undefined) ?? module.default
         if (typeof handler !== 'function') {
@@ -102,7 +101,7 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
 }
 
 export namespace ApiRoutes {
-  export const inject = ['app', 'vite']
+  export const inject = ['app', 'bundler']
 
   export interface Config {
     /** directory of API routes, relative to the app root */

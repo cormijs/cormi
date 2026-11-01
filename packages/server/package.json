@@ -26,12 +26,10 @@
   ],
   "dependencies": {
     "@cordisjs/plugin-server": "^1.7.0",
-    "@cormi/client": "workspace:*",
     "@cormi/core": "workspace:*",
-    "@cormi/vite": "workspace:*",
+    "@cormi/runtime": "workspace:*",
     "chokidar": "^4.0.3",
     "cordis": "4.0.0-rc.12",
-    "path-to-regexp": "^8.3.0",
-    "vite": "^7.3.7"
+    "path-to-regexp": "^8.3.0"
   }
 }
