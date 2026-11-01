@@ -1,9 +1,9 @@
 # 浏览器端
 
-浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。浏览器插件的形式是：
+浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormi/react/client` 导入。浏览器插件的形式是：
 
 ```tsx
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 
 export default (ctx: Context, config: { color: string }) => {
   ctx.wrap(({ children }) => <ThemeContext value={config.color}>{children}</ThemeContext>)
@@ -23,7 +23,7 @@ export default (ctx: Context, config: { color: string }) => {
 
 | 成员 | 说明 |
 |---|---|
-| `wrap(component, order?)` | 用组件包裹应用根部，也可以写作 `ctx.wrap()`。`order` 大的在外层，相同时后注册的在外层 |
+| `wrap(component, order?)`（React） | 用组件包裹应用根部，也可以写作 `ctx.wrap()`。`order` 大的在外层，相同时后注册的在外层 |
 | `props` | 宿主（如 qiankun 主应用）传入的 props；独立运行时为空对象 |
 | `setProps(props)` | 更新 props，触发 `app/props` |
 
@@ -31,7 +31,7 @@ export default (ctx: Context, config: { color: string }) => {
 
 ### ctx.$router
 
-React Router 7 的数据路由。
+路由表、模块与导航。React 应用中由 React Router 7 的数据路由实现。
 
 | 成员 | 说明 |
 |---|---|
@@ -39,6 +39,7 @@ React Router 7 的数据路由。
 | `router` | React Router 的路由器实例，应用渲染后可用 |
 | `add(routes, modules?)` | 在运行时添加路由；已渲染时直接修补路由器，插件卸载时移除 |
 | `navigate(to, options?)` | 导航 |
+| `href(location)` | 一个位置的 URL：带上 basename，hash 模式下在 `#` 之后 |
 | `preload(path)` | 加载匹配路由的模块，例如链接悬停时 |
 | `load(id)` | 加载一个路由模块（结果被缓存） |
 | `base`、`basename` | 应用自己的 base；路由实际运行的 basename（被宿主挂在子路径下时二者不同） |
@@ -46,7 +47,7 @@ React Router 7 的数据路由。
 用路由清单的 `meta` 生成菜单：
 
 ```tsx
-import { Link, useCordis } from 'cormi/client'
+import { Link, useCordis } from '@cormi/react/client'
 
 export function Menu() {
   const { $router } = useCordis()
@@ -89,7 +90,7 @@ ctx.$router.add(
 | `useServerInsertedHTML(fn)` | SSR 时向 `<head>` 插入 HTML，供 CSS-in-JS 库使用 |
 
 ```tsx
-import { useContext } from 'cormi/client'
+import { useContext } from '@cormi/react/client'
 import { useEffect } from 'react'
 
 function Tracker() {

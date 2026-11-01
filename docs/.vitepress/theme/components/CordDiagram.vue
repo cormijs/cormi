@@ -22,24 +22,26 @@ interface Registration {
 
 // a real cormi.yml, and what each of its plugins registers on ctx
 const entries: Entry[] = [
-  { id: 'preset', name: '@cormi/preset-react', inject: [], provides: ['router', 'html', 'vite', 'app'] },
+  { id: 'preset', name: '@cormi/preset', inject: [], provides: ['router', 'html', 'app'] },
+  { id: 'vite', name: '@cormi/vite', inject: ['app'], provides: ['vite'] },
+  { id: 'react', name: '@cormi/react', inject: ['app', 'router', 'vite'] },
   { id: 'layout', name: '@cormi/plugin-layout', inject: ['router', 'app'] },
   { id: 'tailwind', name: '@cormi/plugin-tailwindcss', inject: ['vite', 'app'] },
-  { id: 'model', name: '@cormi/plugin-model', inject: ['app'] },
   { id: 'local', name: './plugin.ts', inject: ['html'] },
 ]
 
 const services: ServiceName[] = ['router', 'html', 'vite', 'app']
 
 const registrations: Registration[] = [
+  { id: 'react-ext', plugin: 'react', service: 'router', call: `extension('.tsx', '.jsx')` },
   { id: 'layout-route', plugin: 'layout', service: 'router', call: `layout('plugin-layout/Layout.tsx')` },
   { id: 'local-meta', plugin: 'local', service: 'html', call: `head(<meta name="generator">)` },
-  { id: 'preset-react', plugin: 'preset', service: 'vite', call: `plugin(react())` },
+  { id: 'react-vite', plugin: 'react', service: 'vite', call: `plugin(react())` },
   { id: 'tailwind-vite', plugin: 'tailwind', service: 'vite', call: `plugin(tailwindcss())` },
   { id: 'preset-app', plugin: 'preset', service: 'app', call: `entry('src/app.tsx')` },
+  { id: 'react-entry', plugin: 'react', service: 'app', call: `file('entry.tsx')` },
   { id: 'layout-entry', plugin: 'layout', service: 'app', call: `entry('@cormi/plugin-layout/client')` },
   { id: 'tailwind-css', plugin: 'tailwind', service: 'app', call: `import('tailwindcss')` },
-  { id: 'model-entry', plugin: 'model', service: 'app', call: `entry('@cormi/plugin-model/client')` },
 ]
 
 const enabled = reactive<Record<string, boolean>>(Object.fromEntries(entries.map(entry => [entry.id, true])))

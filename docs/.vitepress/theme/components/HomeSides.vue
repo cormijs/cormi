@@ -40,7 +40,7 @@ const browser = [
         <span class="bridge-line" />
       </div>
       <div class="side">
-        <div class="side-label">浏览器 · <code>cormi/client</code></div>
+        <div class="side-label">浏览器 · <code>cormi/client</code> · <code>@cormi/react/client</code></div>
         <dl>
           <template v-for="[name, methods] in browser" :key="name">
             <dt>{{ name }}</dt>

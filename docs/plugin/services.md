@@ -4,13 +4,18 @@
 |---|---|---|
 | `ctx.cormi` | `cormi`（根上提供，无需 inject） | — |
 | `ctx.cli` | `cormi`（根上提供，无需 inject） | `command()`、`generator()` |
-| `ctx.router` | `@cormi/preset-react` | `route()`、`layout()`、`patch()` |
-| `ctx.html` | `@cormi/preset-react` | `head()`、`body()`、`transform()` |
-| `ctx.app` | `@cormi/preset-react` | `entry()`、`import()`、`file()`、`server()` |
-| `ctx.vite` | `@cormi/preset-react` | `plugin()`、`configure()`、`input()` |
+| `ctx.router` | `@cormi/preset` | `route()`、`layout()`、`patch()`、`extension()` |
+| `ctx.html` | `@cormi/preset` | `head()`、`body()`、`transform()` |
+| `ctx.app` | `@cormi/preset` | `entry()`、`import()`、`file()`、`server()` |
+| `ctx.bundler` | 打包器，如 `@cormi/vite` | `input()`；构建、开发文档与服务端入口 |
+| `ctx.renderer` | UI 框架，如 `@cormi/react` | — |
+| `ctx.vite` | `@cormi/vite` | `plugin()`、`configure()`、`input()` |
+| `ctx.react` | `@cormi/react` | — |
 | `ctx.server` | `@cordisjs/plugin-server`（dev 与 preview） | `get()`、`post()`、`all()`、`use()`、`ws()` |
 | `ctx.workspace` | `cormi`（根上提供） | `create()` |
-| `ctx.console` | `@cormi/preset-react`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
+| `ctx.console` | `@cormi/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
+
+只用 `ctx.bundler`、`ctx.renderer` 等通用服务的插件，适用于任何打包器与 UI 框架；需要某个实现的特有能力时，注入它的具名服务——`inject: ['vite']`、`inject: ['react']`。在不支持的组合中，这样的插件会转入 pending，控制台会显示它在等待的服务。
 
 所有注册方法都是 effect：注册属于调用方插件，插件卸载时自动撤回，并返回一个可以提前撤回的函数。
 
@@ -60,6 +65,7 @@ ctx.router.patch((routes) => {
 | `layout(file, options?)` | 用布局包裹路由，后注册的布局在外层 |
 | `patch(fn)` | 按注册顺序修改生成后的路由表 |
 | `resolveFile(file)` | 按页面目录解析路由模块，支持 `@/` |
+| `extension(...exts)` | 让这些扩展名的文件成为路由模块，UI 框架用它注册 `.tsx`、`.vue` |
 
 路由表变化后触发 `router/update(routes)`。
 
@@ -112,9 +118,24 @@ ctx.app.server('foo', ctx.cormi.resolve('src/server/foo.ts'))
 
 注册变化时，生成目录会在正在加载的插件都稳定之后重写一次；不再被注册的文件会被删除。写入后触发 `app/generate()`。
 
+## ctx.bundler
+
+应用的打包器，由打包器插件实现（目前是 `@cormi/vite`）。
+
+| 成员 | 说明 |
+|---|---|
+| `name` | 实现的名称，如 `vite` |
+| `config` | 各打包器共有的构建配置：`publicPath`、`outDir`、`alias`、`define`、`sourcemap` |
+| `outDir` | 构建输出目录的绝对路径 |
+| `input(name, file)` | 客户端构建的额外入口 |
+| `assets(file)` | 一个入口的资源：dev 下是模块本身，构建后是它的产物 |
+| `transformDocument(url, html)` | dev 下给文档加上 HMR 客户端等 |
+| `loadServerEntry()` | 服务端入口：dev 下由开发服务器加载，否则来自构建产物 |
+| `build()` | 构建，前后触发 `build/before`、`build/after` |
+
 ## ctx.vite
 
-打包器。dev 模式下，Vite 开发服务器挂在 `ctx.server` 上，注册变化时自动重启。
+Vite 特有的能力。dev 模式下，Vite 开发服务器挂在 `ctx.server` 上，注册变化时自动重启。
 
 ```ts
 import tailwindcss from '@tailwindcss/vite'

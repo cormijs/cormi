@@ -34,7 +34,7 @@ umi 是 Cormi 的能力清单：一个全栈框架该有的东西，Cormi 基本
 
 ## 配置项
 
-| umi | Cormi（`@cormi/preset-react` 的配置，除非另有说明） |
+| umi | Cormi（`@cormi/preset` 的配置，构建项在 `@cormi/vite` 上；用 `@cormi/preset-react` 时写在一起） |
 |---|---|
 | `routes` | `routes` |
 | `base`、`publicPath`、`history.type` | `base`、`publicPath`、`history` |

@@ -1,6 +1,6 @@
 # 路由与数据
 
-路由运行在 React Router 7 的数据路由上。`cormi/client` 重新导出了 React Router 的全部 API（`useParams`、`useLoaderData`、`useNavigate`、`redirect`……），页面和插件都从这里导入。
+路由表与 loader 协议与 UI 框架无关；在 React 应用中，路由运行在 React Router 7 的数据路由上。`@cormi/react/client` 重新导出了 React Router 的全部 API（`useParams`、`useLoaderData`、`useNavigate`、`redirect`……），页面和插件都从这里导入。约定式路由的扩展名由 UI 框架注册：React 是 `.tsx` 与 `.jsx`，此外 `.ts`、`.js` 总是可用。
 
 ## 约定式路由
 
@@ -27,7 +27,7 @@ dev 模式下，新增或删除页面文件，路由表会随即更新。
 ::: code-group
 
 ```tsx [src/layouts/index.tsx]
-import { Link, Outlet } from 'cormi/client'
+import { Link, Outlet } from '@cormi/react/client'
 
 export default function Layout() {
   return (
@@ -51,7 +51,7 @@ export default function Layout() {
 在 preset 配置中写 `routes`，就不再扫描 `src/pages`：
 
 ```yaml
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'
   config:
     routes:
       - path: /
@@ -94,7 +94,7 @@ export function shouldRevalidate() {}                             // 控制导�
 ::: code-group
 
 ```tsx [src/pages/about.tsx]
-import { useLoaderData } from 'cormi/client'
+import { useLoaderData } from '@cormi/react/client'
 
 export async function loader() {
   const { platform } = await import('node:os')
@@ -124,7 +124,7 @@ export async function clientLoader({ serverLoader }) {
 
 ## 链接与预加载
 
-`cormi/client` 的 `<Link>` 是 React Router 的 `<Link>`，额外支持 `prefetch`，提前加载目标路由的模块：
+`@cormi/react/client` 的 `<Link>` 是 React Router 的 `<Link>`，额外支持 `prefetch`，提前加载目标路由的模块：
 
 | `prefetch` | 时机 |
 |---|---|

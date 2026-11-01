@@ -3,10 +3,12 @@
 `cormi.yml` 是应用的插件树，由 cordis 官方的 [`@cordisjs/plugin-loader`](https://github.com/cordiverse/cordis) 加载。文件是一个列表，每个条目是一个插件：
 
 ```yaml
-- name: '@cormi/preset-react'     # 包名
+- name: '@cormi/preset'           # 包名
   config:
     title: My App
     ssr: true
+- name: '@cormi/vite'
+- name: '@cormi/react'
 - name: '@cormi/plugin-request'
   config:
     timeout: 3000
@@ -47,9 +49,9 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 
 表达式以字符串引号开头时，整体要再用一层引号包起来，否则 YAML 会把它当作普通字符串。
 
-## preset-react 的配置
+## 应用、打包器与 UI 框架的配置
 
-`@cormi/preset-react` 的配置是扁平的，它的各个子插件读取各自需要的字段。
+服务器、路由、渲染与 HTML 的配置写在 `@cormi/preset` 上，构建的配置写在打包器 `@cormi/vite` 上，`@cormi/react` 没有配置。用 `@cormi/preset-react` 时，这些配置写在一起，各部分读取各自的字段。
 
 ### 服务器
 
@@ -89,7 +91,7 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 | `scripts` | `[]` | `<body>` 末尾的脚本 |
 | `crossorigin` | `false` | 入口脚本、样式和预加载的 `crossorigin`，资源由 CDN 提供时使用 |
 
-### 构建
+### 构建（`@cormi/vite`）
 
 | 配置 | 默认值 | 说明 |
 |---|---|---|
@@ -111,5 +113,5 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 
 ```sh
 cormi config                 # 列出插件树：名称、状态、id
-cormi config preset-react    # 打印匹配插件解析后的配置（含默认值）
+cormi config preset          # 打印匹配插件解析后的配置（含默认值）
 ```

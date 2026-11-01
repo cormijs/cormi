@@ -40,7 +40,7 @@ export const GET: ApiHandler = (request, { params }) => {
 `proxy` 把请求转发到其他服务器，在 dev 与 preview 下生效（排在 mock 之后）：
 
 ```yaml
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'
   config:
     proxy:
       /api:
@@ -64,7 +64,7 @@ export const GET: ApiHandler = (request, { params }) => {
 ## 服务端渲染
 
 ```yaml
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'
   config:
     ssr: true
 ```

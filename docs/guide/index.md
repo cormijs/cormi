@@ -9,17 +9,19 @@ Cormi 是一个 React 全栈框架。它的插件宿主是 [Cordis](https://gith
 应用写在 `cormi.yml` 里，每个条目是一个插件：
 
 ```yaml
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'      # 应用：路由、HTML、页面、API、服务器
   config:
     title: My App
     ssr: true
+- name: '@cormi/vite'        # 打包器
+- name: '@cormi/react'       # UI 框架
 - name: '@cormi/plugin-antd'
   config:
     locale: zh_CN
 - name: ./plugin.ts
 ```
 
-`@cormi/preset-react` 也只是一个插件。它组合了路由、HTML、打包、React 渲染器和 HTTP 服务，每一部分都是一个子插件，也可以不经 preset 单独组合。`cormi.yml` 由 cordis 官方的 loader 加载，所以 cordis 生态里的插件同样可以写进来。
+打包器与 UI 框架也只是插件：`@cormi/vite` 提供 `ctx.bundler`，`@cormi/react` 提供 `ctx.renderer`，换一个实现就是换掉一行（见 [设计：可选的打包器与 UI 框架](/reference/pluggable)）。`@cormi/preset-react` 是前三者合在一起的简写。`cormi.yml` 由 cordis 官方的 loader 加载，所以 cordis 生态里的插件同样可以写进来。
 
 ## 能力是服务
 
@@ -54,7 +56,7 @@ umi 的插件在固定的阶段里依次运行；改动配置往往意味着重�
 
 ## 浏览器端也是 Cordis
 
-浏览器里的运行时同样是一个 cordis `Context`（与 koishi-webui 的模型相同）。Node 插件通过 `ctx.app.entry()` 注册浏览器插件，浏览器插件用 `ctx.wrap()` 包裹根组件、用 `ctx.on()` 监听导航等事件，这些注册也会随插件卸载：
+浏览器里的运行时同样是一个 cordis `Context`（与 koishi-webui 的模型相同）。Node 插件通过 `ctx.app.entry()` 注册浏览器插件，浏览器插件用 `ctx.on()` 监听导航等事件、用 UI 框架提供的方法（React 的 `ctx.wrap()`）包裹根组件，这些注册也会随插件卸载。与 UI 框架无关的浏览器插件从 `cormi/client` 导入类型：
 
 ```tsx
 import type { Context } from 'cormi/client'

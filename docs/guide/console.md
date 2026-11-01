@@ -12,7 +12,7 @@ dev server :8000
 控制台只在 dev 模式下挂载，构建产物和 `cormi preview` 中都没有它。不需要时，在 preset 配置中关闭：
 
 ```yaml
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'
   config:
     console: false
 ```
@@ -35,7 +35,7 @@ dev server :8000
 
 - 配置表单由插件的 `Config`（Schema）生成：字符串、数字、开关、选项、列表、键值对与嵌套对象各有对应的控件，其他结构以 JSON 编辑。`cormi.yml` 中用 `!!js` 写成的表达式只显示、不编辑，保存时原样保留。
 - “注册”列出插件及其子插件在 ctx 上注册的东西，例如 `ctx.app.entry("…")`、`ctx.vite.plugin()`。停用插件，这些注册会一起撤回。
-- 停用 `@cormi/preset-react` 会卸载应用的服务，控制台也随之断开；控制台会提示确认。
+- 停用 `@cormi/preset`（或 `@cormi/preset-react`）会卸载应用的服务，控制台也随之断开；控制台会提示确认。
 
 ### 市场
 

@@ -55,7 +55,9 @@ pnpm dev            # http://localhost:8000
     "setup": "cormi setup"
   },
   "dependencies": {
-    "@cormi/preset-react": "workspace:*",
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
+    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
@@ -69,19 +71,23 @@ pnpm dev            # http://localhost:8000
 
 :::
 
-`cormi.yml` 列出应用的插件：
+`cormi.yml` 列出应用、它的打包器与 UI 框架：
 
 ::: code-group
 
 ```yaml [cormi.yml]
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'
   config:
     title: My App
+- name: '@cormi/vite'
+- name: '@cormi/react'
 ```
 
 :::
 
-写一个页面：
+三行也可以合成一行 `- name: '@cormi/preset-react'`，配置写在一起，效果相同。
+
+写一个页面，React 的 API 从 `@cormi/react/client` 导入：
 
 ::: code-group
 

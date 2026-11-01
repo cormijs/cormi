@@ -38,7 +38,7 @@ export function apply(ctx: Context, config: { generator: string }) {
 <div class="cm-filename"><code>src/app.tsx</code><span>浏览器端，按约定自动挂载</span></div>
 
 ```tsx
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormi/react/client'
 import { StrictMode } from 'react'
 
 export default (ctx: Context) => {

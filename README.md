@@ -14,10 +14,12 @@
 
 ```yaml
 # cormi.yml
-- name: '@cormi/preset-react'
+- name: '@cormi/preset'     # 应用：路由、HTML、页面、API、服务器
   config:
     title: My App
     ssr: true
+- name: '@cormi/vite'       # 打包器
+- name: '@cormi/react'      # UI 框架；三行可合写为 @cormi/preset-react
 - name: ./plugin.ts
 ```
 
@@ -36,7 +38,7 @@ export function apply(ctx: Context, config: { generator: string }) {
 
 ```ts
 // src/app.ts：应用自己的浏览器插件
-import type { Context } from 'cormi/client'
+import type { Context } from 'cormi/client'   // React 的 API 在 @cormi/react/client
 
 export default (ctx: Context) => {
   ctx.on('router/change', location => console.log(location.pathname))
@@ -55,12 +57,14 @@ cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名
 | 目录 | 内容 |
 |---|---|
 | `packages/core` | `ctx.cormi`、`ctx.router`、`ctx.html`、`ctx.app`、`ctx.workspace`（`plugins/*` 工作区插件），以及基于官方 loader 的启动 |
-| `packages/vite` | `ctx.vite`：dev server（挂在 `ctx.server` 上）与构建 |
-| `packages/client` | 浏览器端 Context（`$app`、`$router`）、SSR |
+| `packages/vite` | 打包器 `ctx.bundler` 的 Vite 实现（同时提供 `ctx.vite`）：dev server 与构建 |
 | `packages/server` | `ctx.server` 上的页面、loader 端点、API 路由、静态资源 |
-| `packages/preset-react` | 组合以上服务的 preset 与 React 渲染器 |
+| `packages/runtime` | 与 UI 框架无关的浏览器 Context（`$app`、`$router` 契约）、loader 协议（`cormi/client`） |
+| `packages/react` | React：渲染器（`ctx.renderer`、`ctx.react`）与浏览器 API `@cormi/react/client`、SSR |
+| `packages/preset` | 应用本身：路由、HTML、页面、API、服务器与控制台，不含打包器与 UI 框架 |
+| `packages/preset-react` | `@cormi/preset` + `@cormi/vite` + `@cormi/react` 的简写 |
 | `packages/console` | dev 模式下的控制台（`/__cormi/`）：插件树管理、应用内部、日志、工作区与市场 |
-| `packages/cormi` | CLI，Node 端 API（`cormi`）与浏览器端 API（`cormi/client`） |
+| `packages/cormi` | CLI，Node 端 API（`cormi`）与 UI 框架无关的浏览器 API（`cormi/client`） |
 | `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
 | `docs` | 官网兼文档站（VitePress） |
 | `examples/*` | with-console（控制台与工作区插件）、basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave |

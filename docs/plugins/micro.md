@@ -78,7 +78,7 @@
 
 ### 共享
 
-react、react-dom、react-router、cordis 与 `cormi/client` 默认以单例共享，`shared` 可以追加。子包之间的协作有两种方式：
+react、react-dom、react-router、cordis、`cormi/client` 与 `@cormi/react/client` 默认以单例共享，`shared` 可以追加。子包之间的协作有两种方式：
 
 ```tsx
 // 1. 渲染其他子包暴露的组件，它所属的子包会先加载

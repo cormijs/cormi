@@ -18,7 +18,7 @@ import CordDiagram from './CordDiagram.vue'
     </div>
     <CordDiagram />
     <p class="caption">
-      这是 dev 模式下修改 <code>cormi.yml</code> 时发生的事：停用一个条目，loader 写入 <code>disabled: true</code> 并卸载该插件。停用 preset 试试，依赖它所提供服务的插件会转入 pending，直到服务回来。
+      这是 dev 模式下修改 <code>cormi.yml</code> 时发生的事：停用一个条目，loader 写入 <code>disabled: true</code> 并卸载该插件。停用 <code>@cormi/vite</code> 试试：依赖 <code>ctx.vite</code> 的 React 渲染器与 Tailwind 转入 pending，直到打包器回来——换一个打包器，也只是换掉这一行。
     </p>
   </section>
 </template>

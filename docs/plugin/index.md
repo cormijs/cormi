@@ -76,7 +76,7 @@ export function apply(ctx: Context) {
 
 ## 组合插件
 
-一个插件可以加载其他插件，`@cormi/preset-react` 就是这样组合出来的：
+一个插件可以加载其他插件，`@cormi/preset-react` 就是这样由 `@cormi/preset`、`@cormi/vite`、`@cormi/react` 组合出来的：
 
 ```ts
 import * as Mock from '@cormi/plugin-mock'
@@ -140,10 +140,13 @@ export class I18n extends Service {
     "./client": "./client/index.tsx"
   },
   "peerDependencies": {
-    "cormi": "*"
+    "cormi": "*",
+    "@cormi/react": "*"
   }
 }
 ```
+
+浏览器端用 React 的插件把 `@cormi/react` 写进 `peerDependencies`，从 `@cormi/react/client` 导入；与 UI 框架无关的浏览器插件只从 `cormi/client` 导入类型。
 
 :::
 

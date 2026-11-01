@@ -76,6 +76,7 @@ export default defineConfig({
           items: [
             { text: '从 umi 迁移', link: '/reference/umi' },
             { text: '架构说明', link: '/architecture' },
+            { text: '设计：可选的打包器与 UI 框架', link: '/reference/pluggable' },
           ],
         },
       ],
@@ -85,6 +86,7 @@ export default defineConfig({
           items: [
             { text: '从 umi 迁移', link: '/reference/umi' },
             { text: '架构说明', link: '/architecture' },
+            { text: '设计：可选的打包器与 UI 框架', link: '/reference/pluggable' },
           ],
         },
       ],
