@@ -22,7 +22,9 @@
     "cormi",
     "cormi-plugin",
     "cordis",
-    "mock"
+    "mock",
+    "bundler:*",
+    "renderer:*"
   ],
   "cormi": {},
   "peerDependencies": {
@@ -33,6 +35,11 @@
     "path-to-regexp": "^8.3.0"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

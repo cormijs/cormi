@@ -23,7 +23,9 @@
     "cormi-plugin",
     "cordis",
     "eslint",
-    "lint"
+    "lint",
+    "bundler:*",
+    "renderer:*"
   ],
   "cormi": {},
   "peerDependencies": {
@@ -37,6 +39,11 @@
     "typescript-eslint": "^8.72.1"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

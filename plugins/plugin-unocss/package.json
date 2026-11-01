@@ -23,7 +23,9 @@
     "cormi-plugin",
     "cordis",
     "unocss",
-    "atomic-css"
+    "atomic-css",
+    "bundler:vite",
+    "renderer:*"
   ],
   "cormi": {
     "bundler": [
@@ -38,7 +40,11 @@
     "vite": "^7.3.7"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

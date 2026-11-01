@@ -23,13 +23,21 @@
     "cormi-plugin",
     "cordis",
     "module-federation",
-    "micro-frontends"
+    "micro-frontends",
+    "bundler:vite",
+    "bundler:rsbuild",
+    "renderer:*"
   ],
   "cormi": {
     "bundler": [
       "vite",
       "rsbuild"
-    ]
+    ],
+    "check": {
+      ".": {
+        "name": "check"
+      }
+    }
   },
   "peerDependencies": {
     "@module-federation/rsbuild-plugin": "^2.9.2",
@@ -45,8 +53,11 @@
     }
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
+    "@cormi/react": "workspace:*",
     "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@module-federation/rsbuild-plugin": "^2.9.2",
     "@module-federation/vite": "^1.23.7",
     "@rsbuild/core": "^2.3.0",

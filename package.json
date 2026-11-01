@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -b",
     "typecheck:client": "node scripts/typecheck-client.mjs",
+    "check:plugins": "node scripts/check-plugins.mjs",
     "e2e": "node --import tsx scripts/e2e.mts",
     "e2e:dev": "node --import tsx scripts/e2e.mts --dev",
     "docs:dev": "pnpm --filter @cormi/docs dev",

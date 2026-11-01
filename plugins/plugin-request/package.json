@@ -26,7 +26,9 @@
     "cordis",
     "request",
     "fetch",
-    "useRequest"
+    "useRequest",
+    "bundler:*",
+    "renderer:react"
   ],
   "cormi": {
     "renderer": [
@@ -43,7 +45,11 @@
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

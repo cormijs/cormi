@@ -36,7 +36,9 @@
     "cormi-plugin",
     "cordis",
     "qiankun",
-    "micro-frontends"
+    "micro-frontends",
+    "bundler:*",
+    "renderer:react"
   ],
   "cormi": {
     "renderer": [
@@ -60,8 +62,11 @@
     "qiankun": "^2.10.16"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

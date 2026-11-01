@@ -19,8 +19,11 @@
   ],
   "keywords": [
     "cormi",
-    "cormi-plugin"
+    "cormi-plugin",
+    "bundler:*",
+    "renderer:*"
   ],
+  "cormi": {},
   "peerDependencies": {
     "cormi": "*"
   }

@@ -36,7 +36,9 @@
     "cormi-plugin",
     "cordis",
     "module-federation",
-    "micro-frontends"
+    "micro-frontends",
+    "bundler:vite",
+    "renderer:react"
   ],
   "cormi": {
     "bundler": [
@@ -58,8 +60,11 @@
     "cordis": "4.0.0-rc.12"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"

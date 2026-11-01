@@ -27,7 +27,9 @@
     "cordis",
     "layout",
     "antd",
-    "menu"
+    "menu",
+    "bundler:*",
+    "renderer:react"
   ],
   "cormi": {
     "renderer": [
@@ -44,7 +46,11 @@
     "@ant-design/icons": "^6.3.4"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "antd": "^6.6.8",
     "cormi": "workspace:*",

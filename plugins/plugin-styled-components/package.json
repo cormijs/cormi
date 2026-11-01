@@ -25,7 +25,9 @@
     "cormi-plugin",
     "cordis",
     "styled-components",
-    "css-in-js"
+    "css-in-js",
+    "bundler:vite",
+    "renderer:react"
   ],
   "cormi": {
     "bundler": [
@@ -42,8 +44,11 @@
     "styled-components": "^6"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
     "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1",

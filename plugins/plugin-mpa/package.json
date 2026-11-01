@@ -23,7 +23,9 @@
     "cormi-plugin",
     "cordis",
     "mpa",
-    "multi-page"
+    "multi-page",
+    "bundler:*",
+    "renderer:react"
   ],
   "cormi": {
     "renderer": [
@@ -38,7 +40,11 @@
     "chokidar": "^4.0.3"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "cormi": "workspace:*"
   }
 }

@@ -25,7 +25,9 @@
     "cormi-plugin",
     "cordis",
     "dva",
-    "redux"
+    "redux",
+    "bundler:*",
+    "renderer:react"
   ],
   "cormi": {
     "renderer": [
@@ -48,7 +50,11 @@
     "regenerator-runtime": "^0.14.1"
   },
   "devDependencies": {
+    "@cormi/preset": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@cormi/vite": "workspace:*",
+    "@cormi/vue": "workspace:*",
     "@types/react": "^19.3.0",
     "cormi": "workspace:*",
     "react": "^19.3.1"
