@@ -7,12 +7,14 @@ import { CommandError, idle, type Mode, settle, start, stop } from '@cormi/core'
 import type { Context } from 'cordis'
 import parse from 'yargs-parser'
 import { MIN_NODE_VERSION, RESTART_EXIT_CODE } from './constants.ts'
+import { checkPlugin, formatReport, writeDeclaration } from './plugin-check.ts'
 
 const BUILTIN_COMMANDS: [string, string][] = [
   ['dev', 'serve the app with the dev server'],
   ['build', 'write the client and server bundles'],
   ['preview', 'serve the build output'],
   ['setup', 'write the generated files (src/.cormi) only'],
+  ['plugin check', 'check a plugin package with each bundler and UI framework (--write)'],
 ]
 
 function formatCommands(commands: [string, string][]) {
@@ -126,13 +128,32 @@ function daemon(argv: string[]) {
   start()
 }
 
+/**
+ * `cormi plugin check [--write]`: load the plugin package of `cwd` with each
+ * bundler and UI framework it can be loaded with, infer what it supports,
+ * and compare with the `cormi` field of its package.json.
+ */
+async function checkPluginCommand(cwd: string, write: boolean) {
+  await registerTypeScript()
+  const report = await checkPlugin(cwd)
+  console.log(formatReport(report))
+  if (report.exports.some(item => item.error)) throw new CommandError('cannot infer what the plugin supports')
+  if (!report.mismatches.length && !report.keywords) return console.log('  package.json declares the same')
+  if (write) {
+    writeDeclaration(cwd, report)
+    return console.log('  package.json is updated: the cormi field and the keywords that mirror it')
+  }
+  const what = report.mismatches.length ? `declares otherwise for ${report.mismatches.join(', ')}` : 'has keywords that do not mirror the declaration'
+  throw new CommandError(`package.json ${what}: run cormi plugin check --write`)
+}
+
 export async function run(argv = process.argv.slice(2)) {
   if (Number(process.versions.node.split('.')[0]) < MIN_NODE_VERSION) {
     throw new CommandError(`Cormi requires node >= ${MIN_NODE_VERSION}, current is ${process.versions.node}`)
   }
   const args = parse(argv, {
     alias: { version: ['v'], help: ['h'] },
-    boolean: ['version', 'help'],
+    boolean: ['version', 'help', 'write'],
     string: ['config', 'host', 'port'],
   })
   if (args.version) return console.log(getVersion())
@@ -157,6 +178,9 @@ export async function run(argv = process.argv.slice(2)) {
       return once(cwd, 'build', ctx => getService(ctx, 'bundler').build())
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())
+    case 'plugin':
+      if (args._[1] !== 'check') throw new CommandError('usage: cormi plugin check [--write]')
+      return checkPluginCommand(cwd, !!args.write)
     default:
       // commands of plugins, e.g. generate and config
       return once(cwd, 'setup', async (ctx) => {
