@@ -5,10 +5,23 @@ import { readPackages } from './packages.mjs'
 
 const registry = 'https://registry.npmjs.org'
 const dryRun = process.argv.includes('--dry-run')
+/** Whether a version is on npm; the request is tried again when the network fails. */
+async function isPublished(name, version) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const response = await fetch(`${registry}/${name.replace('/', '%2f')}/${version}`)
+      if (response.ok || response.status === 404) return response.ok
+      throw new Error(`the registry answered ${response.status}`)
+    } catch (error) {
+      if (attempt === 3) throw error
+      await new Promise(resolve => setTimeout(resolve, 2000 * attempt))
+    }
+  }
+}
+
 const failed = []
 for (const { dir, path, meta } of readPackages()) {
-  const response = await fetch(`${registry}/${meta.name.replace('/', '%2f')}/${meta.version}`)
-  if (response.ok) {
+  if (await isPublished(meta.name, meta.version)) {
     console.log(`${meta.name}@${meta.version} is published already`)
     continue
   }
