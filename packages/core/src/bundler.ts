@@ -38,6 +38,8 @@ export interface EntryAssets {
 export interface Bundler {
   /** the name of the implementation, e.g. `vite` */
   readonly name: string
+  /** the version of the bundler, e.g. Vite's */
+  readonly version?: string
   readonly config: Bundler.Config
   /** absolute path of the build output */
   readonly outDir: string
@@ -115,6 +117,8 @@ export namespace Bundler {
 export interface Renderer {
   /** the name of the implementation, e.g. `react` */
   readonly name: string
+  /** the version of the UI framework, e.g. React's */
+  readonly version?: string
   /**
    * The exports of a route module that is not a script, e.g. those of the
    * `<script>` of a `.vue` file; `undefined` for scripts, which the router
