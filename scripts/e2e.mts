@@ -12,6 +12,7 @@ import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Browser, Page } from 'playwright-core'
+import { conclude } from '../packages/core/src/index.ts'
 import { launch } from './browser.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -33,15 +34,15 @@ interface Example {
   bundlers?: string[]
 }
 
-/** The plugin tree of an example with another bundler: in place of @cormi/vite, or next to @cormi/preset for the shorthand. */
+/** The plugin tree of an example with another bundler: in place of @cormijs/vite, or next to @cormijs/preset for the shorthand. */
 function withBundler(config: string, name: string) {
-  if (config.includes(`- name: '@cormi/vite'`)) return config.replace(`- name: '@cormi/vite'`, `- name: '@cormi/${name}'`)
+  if (config.includes(`- name: '@cormijs/vite'`)) return config.replace(`- name: '@cormijs/vite'`, `- name: '@cormijs/${name}'`)
   const lines = config.split('\n')
-  const start = lines.indexOf(`- name: '@cormi/preset-react'`)
-  if (start < 0) throw new Error('the example has neither @cormi/vite nor @cormi/preset-react')
+  const start = lines.indexOf(`- name: '@cormijs/preset-react'`)
+  if (start < 0) throw new Error('the example has neither @cormijs/vite nor @cormijs/preset-react')
   const end = lines.findIndex((line, index) => index > start && line.startsWith('- '))
-  lines.splice(end < 0 ? lines.length : end, 0, `- name: '@cormi/${name}'`, `- name: '@cormi/react'`)
-  lines[start] = `- name: '@cormi/preset'`
+  lines.splice(end < 0 ? lines.length : end, 0, `- name: '@cormijs/${name}'`, `- name: '@cormijs/react'`)
+  lines[start] = `- name: '@cormijs/preset'`
   return lines.join('\n')
 }
 
@@ -90,6 +91,19 @@ const MARKET: { name: string; version: string; description: string; keywords: st
 function serveRegistry() {
   const server = createServer((req, res) => {
     const url = new URL(req.url!, REGISTRY)
+    // the index of cormijs/registry: manifests, verification, downloads
+    if (url.pathname === '/index.json') {
+      const objects = MARKET.map(({ versions, ...pkg }) => ({
+        ...pkg,
+        date: '2026-11-01T00:00:00.000Z',
+        links: { npm: `https://www.npmjs.com/package/${pkg.name}` },
+        manifest: conclude(pkg),
+        official: pkg.name === 'cormi-plugin-anywhere',
+        downloads: { lastMonth: 1234 },
+        verified: pkg.name === 'cormi-plugin-anywhere' ? { time: '2026-11-01T00:00:00.000Z', compat: {}, matches: true } : undefined,
+      }))
+      return res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ version: 1, time: '2026-11-01T00:00:00.000Z', objects }))
+    }
     if (url.pathname === '/-/v1/search') {
       const objects = MARKET.map(({ versions, ...pkg }) => ({ package: { ...pkg, links: {} } }))
       return res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ objects }))
@@ -156,7 +170,7 @@ const checks: Record<string, Check> = {
     assert.equal((await fetch(`${base}/api/users`, { method: 'POST' })).status, 405)
     assert.deepEqual(await fetch(`${base}/proxy/users/1`).then(res => res.json()), { id: 1, name: 'Alice' })
 
-    // pages exported by @cormi/plugin-export-static work on a static host
+    // pages exported by @cormijs/plugin-export-static work on a static host
     if (!dev) {
       const port = Number(new URL(base).port) + 5
       const host = await serveStatic(`${root}examples/basic/dist`, port)
@@ -185,7 +199,7 @@ const checks: Record<string, Check> = {
     await page.click('text=About')
     await page.waitForSelector('text=Tailwind scans')
 
-    // @cormi/plugin-legacy (Vite only): without module scripts, the legacy bundle renders the app
+    // @cormijs/plugin-legacy (Vite only): without module scripts, the legacy bundle renders the app
     if (dev || bundler !== 'vite') return
     assert.match(html, /<script nomodule [^>]*id="vite-legacy-entry"/)
     const legacy = await (await browser.newContext()).newPage()
@@ -377,7 +391,7 @@ const examples: Record<string, Example> = {
 
   'with-console': {
     bundlers: ['vite', 'rsbuild'],
-    servers: [{ dir: 'with-console', env: () => ({ npm_config_registry: REGISTRY }) }],
+    servers: [{ dir: 'with-console', env: () => ({ npm_config_registry: REGISTRY, CORMI_MARKET: `${REGISTRY}/index.json` }) }],
     async check(page, base) {
       // a workspace plugin, loaded from its sources by package name
       const greetings: string[] = []
@@ -453,6 +467,9 @@ const examples: Record<string, Example> = {
         await page.click('.cc-nav-item >> text=市场')
         const item = (name: string) => page.locator('.cc-package', { has: page.locator(`.cc-package-name:text-is("${name}")`) })
         await item('cormi-plugin-anywhere').locator('text=通用').waitFor()
+        // from the index of the registry: official, verified, downloads
+        await item('cormi-plugin-anywhere').locator('text=已验证').waitFor()
+        await item('cormi-plugin-anywhere').locator('text=月下载 1234').waitFor()
         await item('cormi-plugin-undeclared').locator('text=未声明兼容性').waitFor()
         // the Vue plugin is hidden until asked for; its older version works here
         assert.equal(await item('cormi-plugin-vue-only').count(), 0)
@@ -466,7 +483,7 @@ const examples: Record<string, Example> = {
         // a bundler: what switching to it would change
         const webpack = item('cormi-plugin-webpack')
         await webpack.locator('text=启用它会把打包器换成 webpack').waitFor()
-        await webpack.locator(`code:text-is("@cormi/${bundler}")`).waitFor()
+        await webpack.locator(`code:text-is("@cormijs/${bundler}")`).waitFor()
       } finally {
         await writeFile(file, config)
         await rm(`${dir}/plugins/e2e`, { recursive: true, force: true })
