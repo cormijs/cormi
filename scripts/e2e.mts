@@ -319,6 +319,11 @@ const examples: Record<string, Example> = {
       assert.equal(await page.title(), 'Cormi · /about')
       await page.click('text=User 2')
       await page.waitForSelector('#user >> text=User 2')
+
+      // the console is a React app of its own, also in a Vue app
+      if (!dev) return
+      await page.goto(`${base}/__cormi/`)
+      await page.waitForSelector('[data-stack=renderer] >> text=Vue')
     },
   },
 
@@ -336,6 +341,7 @@ const examples: Record<string, Example> = {
   },
 
   'with-console': {
+    bundlers: ['vite', 'rsbuild'],
     async check(page, base) {
       // a workspace plugin, loaded from its sources by package name
       const greetings: string[] = []
@@ -351,11 +357,16 @@ const examples: Record<string, Example> = {
       }
 
       const dir = `${root}examples/with-console`
-      const config = await readFile(`${dir}/cormi.yml`, 'utf8')
+      // the plugin tree the app runs with, which the console writes
+      const file = `${dir}/${bundler === 'vite' ? 'cormi.yml' : VARIANT}`
+      const config = await readFile(file, 'utf8')
       try {
         await page.goto(`${base}/__cormi/`)
         await page.waitForSelector('.cc-status >> text=已连接')
         await page.waitForSelector('.cc-stat >> text=插件已加载')
+        // the console runs on its own Vite and React, whatever the app's
+        await page.waitForSelector(`[data-stack=bundler] >> text=${bundler === 'vite' ? 'Vite' : 'Rsbuild'}`)
+        await page.waitForSelector('[data-stack=renderer] >> text=React')
 
         // edit the config of a plugin through its form: cormi.yml is written, the plugin reloads
         await page.click('.cc-nav-item >> text=插件')
@@ -363,7 +374,7 @@ const examples: Record<string, Example> = {
         await page.fill('.cc-row:has(code:text-is("greeting")) input', 'Hi from the console')
         await page.click('.cc-config button:text-is("保存")')
         await page.waitForSelector('.cc-saved >> text=已保存')
-        assert.match(await readFile(`${dir}/cormi.yml`, 'utf8'), /greeting: Hi from the console/)
+        assert.match(await readFile(file, 'utf8'), /greeting: Hi from the console/)
         await page.click('.cc-nav-item >> text=日志')
         await page.waitForSelector('.cc-log >> text=loaded, greeting: Hi from the console')
 
@@ -374,7 +385,7 @@ const examples: Record<string, Example> = {
         await page.waitForSelector('.cc-codeline >> text=ctx.app.entry("cormi-plugin-hello/client")')
         await page.click('.cc-detail-head button:text-is("停用")')
         await page.waitForSelector('.cc-detail-head >> text=已停用')
-        assert.match(await readFile(`${dir}/cormi.yml`, 'utf8'), /disabled: true/)
+        assert.match(await readFile(file, 'utf8'), /disabled: true/)
         await waitFor(async () => !(await readFile(`${dir}/src/.cormi/entry.tsx`, 'utf8')).includes('cormi-plugin-hello'))
         await page.click('.cc-detail-head button:text-is("启用")')
         await page.waitForSelector('.cc-detail-head >> text=运行中')
@@ -399,8 +410,10 @@ const examples: Record<string, Example> = {
         await page.waitForSelector('.cc-table >> text=ctx.router')
         await page.click('.cc-nav-item >> text=应用')
         await page.waitForSelector('.cc-codeline >> text=cormi-plugin-hello/client')
+        // the plugins of the app's bundler, those of the renderer included
+        await page.waitForSelector('.cc-pills >> text=cormi:route-exports')
       } finally {
-        await writeFile(`${dir}/cormi.yml`, config)
+        await writeFile(file, config)
         await rm(`${dir}/plugins/e2e`, { recursive: true, force: true })
       }
     },
