@@ -12,3 +12,4 @@ coverage/
 .mf/
 docs/.vitepress/cache/
 .env.local
+.cormi.*.yml

@@ -13,6 +13,7 @@
     "@cormi/plugin-model": "workspace:*",
     "@cormi/preset-react": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@module-federation/vite": "^1.23.7",
     "cordis": "4.0.0-rc.12",
     "cormi": "workspace:*",
     "react": "^19.3.1",

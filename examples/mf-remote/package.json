@@ -10,8 +10,13 @@
   },
   "dependencies": {
     "@cormi/plugin-mf": "workspace:*",
+    "@cormi/preset": "workspace:*",
     "@cormi/preset-react": "workspace:*",
     "@cormi/react": "workspace:*",
+    "@cormi/rsbuild": "workspace:*",
+    "@module-federation/rsbuild-plugin": "^2.9.2",
+    "@module-federation/vite": "^1.23.7",
+    "@rsbuild/plugin-react": "^2.1.1",
     "cormi": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

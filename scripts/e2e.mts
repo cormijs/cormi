@@ -1,9 +1,10 @@
 // End-to-end checks of the examples in a browser.
 //
-//   node --import tsx scripts/e2e.mts [--dev] [example ...]
+//   node --import tsx scripts/e2e.mts [--dev] [--bundler rsbuild] [example ...]
 //
 // Without `--dev`, each example is built and served with `cormi preview`;
-// with `--dev`, it is served by the dev server.
+// with `--dev`, it is served by the dev server. With `--bundler`, the examples
+// that support another bundler run with it instead of Vite.
 import assert from 'node:assert/strict'
 import { type ChildProcess, execFileSync, spawn } from 'node:child_process'
 import { readFile, rm, stat, writeFile } from 'node:fs/promises'
@@ -16,6 +17,8 @@ import { launch } from './browser.ts'
 const root = fileURLToPath(new URL('..', import.meta.url))
 const cli = `${root}packages/cormi/bin/cormi.js`
 const dev = process.argv.includes('--dev')
+const bundlerIndex = process.argv.indexOf('--bundler')
+const bundler = bundlerIndex < 0 ? 'vite' : process.argv[bundlerIndex + 1]
 
 /** `bases` are the URLs of `servers`; `base` is the first one. */
 type Check = (page: Page, base: string, browser: Browser, bases: string[]) => Promise<void>
@@ -26,7 +29,24 @@ interface Example {
   servers?: { dir: string; env?: (bases: string[]) => Record<string, string> }[]
   /** console errors the check causes on purpose */
   ignore?: RegExp[]
+  /** the bundlers the example runs with (default: vite) */
+  bundlers?: string[]
 }
+
+/** The plugin tree of an example with another bundler: in place of @cormi/vite, or next to @cormi/preset for the shorthand. */
+function withBundler(config: string, name: string) {
+  if (config.includes(`- name: '@cormi/vite'`)) return config.replace(`- name: '@cormi/vite'`, `- name: '@cormi/${name}'`)
+  const lines = config.split('\n')
+  const start = lines.indexOf(`- name: '@cormi/preset-react'`)
+  if (start < 0) throw new Error('the example has neither @cormi/vite nor @cormi/preset-react')
+  const end = lines.findIndex((line, index) => index > start && line.startsWith('- '))
+  lines.splice(end < 0 ? lines.length : end, 0, `- name: '@cormi/${name}'`, `- name: '@cormi/react'`)
+  lines[start] = `- name: '@cormi/preset'`
+  return lines.join('\n')
+}
+
+/** the plugin tree an example runs with, besides its cormi.yml */
+const VARIANT = `.cormi.${bundler}.yml`
 
 async function text(page: Page, selector: string) {
   return (await page.textContent(selector))?.trim()
@@ -130,8 +150,8 @@ const checks: Record<string, Check> = {
     await page.click('text=About')
     await page.waitForSelector('text=Tailwind scans')
 
-    // @cormi/plugin-legacy: without module scripts, the legacy bundle renders the app
-    if (dev) return
+    // @cormi/plugin-legacy (Vite only): without module scripts, the legacy bundle renders the app
+    if (dev || bundler !== 'vite') return
     assert.match(html, /<script nomodule [^>]*id="vite-legacy-entry"/)
     const legacy = await (await browser.newContext()).newPage()
     await legacy.route(`${base}/`, async (route) => {
@@ -187,6 +207,8 @@ const checks: Record<string, Check> = {
 
 const examples: Record<string, Example> = {
   ...Object.fromEntries(Object.entries(checks).map(([name, check]) => [name, { check }])),
+  'basic': { check: checks.basic, bundlers: ['vite', 'rsbuild'] },
+  'with-tailwind': { check: checks['with-tailwind'], bundlers: ['vite', 'rsbuild'] },
 
   'with-request': {
     ignore: [/status of 500/],
@@ -275,6 +297,7 @@ const examples: Record<string, Example> = {
   },
 
   mf: {
+    bundlers: ['vite', 'rsbuild'],
     servers: [
       { dir: 'mf-remote' },
       { dir: 'mf-host', env: ([remote]) => ({ REMOTE_ORIGIN: remote }) },
@@ -453,8 +476,9 @@ async function waitForServer(base: string, server: ChildProcess) {
   throw new Error(`the server at ${base} did not start`)
 }
 
-const selected = process.argv.slice(2).filter(arg => !arg.startsWith('--'))
-const names = selected.length ? selected : Object.keys(examples)
+const selected = process.argv.slice(2).filter((arg, index, args) => !arg.startsWith('--') && args[index - 1] !== '--bundler')
+const names = (selected.length ? selected : Object.keys(examples))
+  .filter(name => (examples[name].bundlers ?? ['vite']).includes(bundler))
 const browser = await launch()
 let failed = 0
 for (const [index, name] of names.entries()) {
@@ -471,9 +495,14 @@ for (const [index, name] of names.entries()) {
     for (const [offset, server] of servers.entries()) {
       const cwd = `${root}examples/${server.dir}`
       const env = { ...process.env, ...server.env?.(bases) }
-      if (!dev) execFileSync(process.execPath, [cli, 'build'], { cwd, env, stdio: 'ignore' })
+      const config: string[] = []
+      if (bundler !== 'vite') {
+        await writeFile(join(cwd, VARIANT), withBundler(await readFile(join(cwd, 'cormi.yml'), 'utf8'), bundler))
+        config.push('--config', VARIANT)
+      }
+      if (!dev) execFileSync(process.execPath, [cli, 'build', ...config], { cwd, env, stdio: 'ignore' })
       // in dev mode, run the worker directly instead of the daemon
-      const child = spawn(process.execPath, [cli, dev ? 'dev' : 'preview', '--port', bases[offset].split(':')[2]], {
+      const child = spawn(process.execPath, [cli, dev ? 'dev' : 'preview', ...config, '--port', bases[offset].split(':')[2]], {
         cwd,
         env: { ...env, CORMI_WORKER: dev ? '1' : '' },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -494,6 +523,9 @@ for (const [index, name] of names.entries()) {
     for (const child of processes) {
       child.kill('SIGTERM')
       await new Promise(resolve => child.exitCode === null ? child.once('exit', resolve) : resolve(undefined))
+    }
+    if (bundler !== 'vite') {
+      for (const server of servers) await rm(`${root}examples/${server.dir}/${VARIANT}`, { force: true })
     }
   }
 }
