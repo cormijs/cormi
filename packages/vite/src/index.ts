@@ -64,6 +64,15 @@ export class Vite extends Service implements Bundler {
     return getEntryAssets(manifest, entry, this.config.publicPath)
   }
 
+  /** `import.meta.hot` passes the new modules to the callback. */
+  hotAccept(imports: [string, string][], callback: string) {
+    return [
+      `if (import.meta.hot) {`,
+      `  import.meta.hot.accept(${JSON.stringify(imports.map(([specifier]) => specifier))}, ${callback})`,
+      `}`,
+    ].join('\n')
+  }
+
   /** Add the HMR client and the preambles of plugins to a document (dev mode); waits for a restarting server. */
   async transformDocument(url: string, html: string) {
     const server = await this._devTask
