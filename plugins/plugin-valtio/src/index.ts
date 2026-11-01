@@ -1,7 +1,7 @@
 import { type Context, Schema } from 'cormi'
 
 export const name = 'valtio'
-export const inject = ['app']
+export const inject = ['app', 'react']
 
 export interface Config {
   /** connect the stores of `defineStore()` to Redux DevTools in dev mode */

@@ -25,7 +25,6 @@
     "tailwindcss"
   ],
   "peerDependencies": {
-    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {

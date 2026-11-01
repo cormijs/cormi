@@ -6,7 +6,7 @@ import { checkShared, getShared, MANIFEST_FILE, type Manifest, REMOTE_ENTRY, toC
 import type {} from '@cormi/vite'
 
 export const name = 'federation-package'
-export const inject = ['app', 'router', 'vite']
+export const inject = ['app', 'router', 'vite', 'react']
 
 export interface Config {
   /** name of the package's container; defaults to the package name */

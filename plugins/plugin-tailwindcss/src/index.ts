@@ -5,7 +5,7 @@ import { type Context, Schema, winPath } from 'cormi'
 import type {} from '@cormi/vite'
 
 export const name = 'tailwindcss'
-export const inject = ['app', 'vite']
+export const inject = ['app', 'bundler']
 
 export interface Config {
   /**
@@ -19,9 +19,9 @@ export const Config: Schema<Config> = Schema.object({
   css: Schema.string().description('your own stylesheet with @import "tailwindcss"'),
 })
 
-/** Tailwind CSS v4 through its Vite plugin; the stylesheet is imported before the app starts. */
+/** Tailwind CSS v4 through the plugin of the bundler; the stylesheet is imported before the app starts. */
 export function apply(ctx: Context, config: Config) {
-  ctx.vite.plugin(() => tailwindcss())
+  ctx.bundler.plugin({ vite: () => tailwindcss() })
   if (config.css) {
     ctx.app.import(ctx.cormi.resolve(config.css))
     return

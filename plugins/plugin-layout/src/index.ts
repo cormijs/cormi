@@ -5,7 +5,7 @@ import type { ClientConfig } from './types.ts'
 export type * from './types.ts'
 
 export const name = 'layout'
-export const inject = ['app', 'router']
+export const inject = ['app', 'router', 'react']
 
 export interface Config extends ClientConfig {}
 

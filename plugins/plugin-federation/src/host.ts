@@ -5,7 +5,7 @@ import { type Context, readJSON, Schema } from 'cormi'
 import { checkShared, getShared, REGISTRY_FILE, REMOTE_ENTRY, toContainerName } from './shared.ts'
 
 export const name = 'federation-host'
-export const inject = ['app', 'bundler']
+export const inject = ['app', 'bundler', 'react']
 
 export interface PackageEntry {
   /** URL the package is deployed at, where its `federation.json` is */

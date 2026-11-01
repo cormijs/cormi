@@ -7,7 +7,7 @@ import type { ClientConfig } from './types.ts'
 export type * from './types.ts'
 
 export const name = 'dva'
-export const inject = ['app']
+export const inject = ['app', 'react']
 
 export interface Config extends ClientConfig {
   /** directory of models, relative to the app root */

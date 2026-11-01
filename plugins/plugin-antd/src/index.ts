@@ -4,7 +4,7 @@ import type { ClientConfig } from './types.ts'
 export type * from './types.ts'
 
 export const name = 'antd'
-export const inject = ['app']
+export const inject = ['app', 'react']
 
 export interface Config extends ClientConfig {
   /** a locale of `antd/locale`, e.g. `zh_CN` */

@@ -20,8 +20,8 @@ export const Config: Schema<Config> = Schema.object({
 
 const CONFIG_FILES = ['eslint.config.js', 'eslint.config.mjs', 'eslint.config.cjs', 'eslint.config.ts', 'eslint.config.mts']
 
-/** The config used when the app has no `eslint.config.*` of its own. */
-export function getDefaultConfig(): Linter.Config[] {
+/** The config used when the app has no `eslint.config.*` of its own; with the rules of hooks for React apps. */
+export function getDefaultConfig(options: { react?: boolean } = {}): Linter.Config[] {
   return [
     { ignores: ['**/dist/**', '**/src/.cormi/**', '**/node_modules/**'] },
     js.configs.recommended,
@@ -29,19 +29,24 @@ export function getDefaultConfig(): Linter.Config[] {
     {
       files: ['**/*.{js,jsx,ts,tsx,mjs,mts}'],
       languageOptions: { globals: { ...globals.browser, ...globals.node } },
-      // the plugin's own typings predate ESLint 10's
-      plugins: { 'react-hooks': reactHooks as ESLint.Plugin },
-      rules: {
-        'react-hooks/rules-of-hooks': 'error',
-        'react-hooks/exhaustive-deps': 'warn',
-      },
     },
+    ...options.react
+      ? [{
+          files: ['**/*.{js,jsx,ts,tsx,mjs,mts}'],
+          // the plugin's own typings predate ESLint 10's
+          plugins: { 'react-hooks': reactHooks as ESLint.Plugin },
+          rules: {
+            'react-hooks/rules-of-hooks': 'error',
+            'react-hooks/exhaustive-deps': 'warn',
+          },
+        } satisfies Linter.Config]
+      : [],
   ]
 }
 
 /**
  * `cormi lint [files...] [--fix]`: ESLint with the app's `eslint.config.*`,
- * or with a default config for TypeScript and React hooks.
+ * or with a default config for TypeScript (and React hooks, in React apps).
  */
 export function apply(ctx: Context, config: Config) {
   ctx.cli.command('lint', {
@@ -53,7 +58,7 @@ export function apply(ctx: Context, config: Config) {
         cwd,
         fix: !!args.fix,
         errorOnUnmatchedPattern: false,
-        ...ownConfig ? {} : { overrideConfigFile: true, overrideConfig: getDefaultConfig() },
+        ...ownConfig ? {} : { overrideConfigFile: true, overrideConfig: getDefaultConfig({ react: ctx.get('renderer')?.name === 'react' }) },
       })
       const patterns = args._.length ? args._.map(String) : config.files.filter(file => existsSync(join(cwd, file)))
       const results = await eslint.lintFiles(patterns)

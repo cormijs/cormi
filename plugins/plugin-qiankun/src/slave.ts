@@ -5,7 +5,7 @@ import type {} from '@cormi/vite'
 export { toQiankunDocument } from './document.ts'
 
 export const name = 'qiankun-slave'
-export const inject = ['app', 'html', 'vite']
+export const inject = ['app', 'html', 'vite', 'react']
 
 export interface Config {
   /** name of the micro app, as configured in the master; defaults to the package name */

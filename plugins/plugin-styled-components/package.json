@@ -29,7 +29,6 @@
   ],
   "peerDependencies": {
     "@cormi/react": "workspace:*",
-    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*",
     "react": ">=19",
     "styled-components": "^6"

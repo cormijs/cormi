@@ -5,7 +5,7 @@ import type { MasterClientConfig, MicroAppConfig, SandboxConfig } from './types.
 export type * from './types.ts'
 
 export const name = 'qiankun-master'
-export const inject = ['app', 'router']
+export const inject = ['app', 'router', 'react']
 
 export interface MicroAppRoute {
   /** route path, e.g. `/app1/*`; the micro app's router runs below its static part */

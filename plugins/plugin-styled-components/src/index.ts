@@ -5,7 +5,7 @@ import type {} from '@cormi/vite'
 export type * from './types.ts'
 
 export const name = 'styled-components'
-export const inject = ['app', 'vite']
+export const inject = ['app', 'bundler', 'react']
 
 export interface Config extends ClientConfig {}
 
@@ -21,5 +21,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.app.entry('@cormi/plugin-styled-components/client', config satisfies ClientConfig)
   // styled-components has no `exports`: Node would import its CommonJS build,
   // whose default export is not `styled`; the server bundle uses its ES build
-  ctx.vite.configure({ ssr: { noExternal: ['styled-components'] } })
+  ctx.bundler.plugin({
+    vite: { name: 'cormi:styled-components', config: () => ({ ssr: { noExternal: ['styled-components'] } }) },
+  })
 }

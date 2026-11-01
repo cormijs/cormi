@@ -1,7 +1,7 @@
 import type { Context } from 'cormi'
 
 export const name = 'initial-state'
-export const inject = ['app']
+export const inject = ['app', 'react']
 
 /**
  * The initial state of the app, e.g. the current user. A runtime plugin

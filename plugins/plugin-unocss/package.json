@@ -26,7 +26,6 @@
     "atomic-css"
   ],
   "peerDependencies": {
-    "@cormi/vite": "workspace:*",
     "cormi": "workspace:*"
   },
   "dependencies": {

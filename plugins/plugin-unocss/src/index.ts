@@ -6,7 +6,7 @@ import UnoCSS from 'unocss/vite'
 import type {} from '@cormi/vite'
 
 export const name = 'unocss'
-export const inject = ['app', 'vite']
+export const inject = ['app', 'bundler']
 
 export interface Config {
   /** the preset used when the app has no `uno.config.*` of its own */
@@ -25,9 +25,9 @@ const PRESETS: Record<Config['preset'], () => Preset<any>> = {
   mini: () => presetMini(),
 }
 
-/** UnoCSS: the Vite plugin and `virtual:uno.css`, imported before the app starts. */
+/** UnoCSS: the plugin of the bundler and `virtual:uno.css`, imported before the app starts. */
 export function apply(ctx: Context, config: Config) {
   const ownConfig = CONFIG_FILES.some(file => existsSync(join(ctx.cormi.cwd, file)))
-  ctx.vite.plugin(() => UnoCSS(ownConfig ? {} : { presets: [PRESETS[config.preset]()] }))
+  ctx.bundler.plugin({ vite: () => UnoCSS(ownConfig ? {} : { presets: [PRESETS[config.preset]()] }) })
   ctx.app.import('virtual:uno.css')
 }

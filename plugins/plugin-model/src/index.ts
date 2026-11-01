@@ -4,7 +4,7 @@ import { watch } from 'chokidar'
 import { type Context, Schema, winPath } from 'cormi'
 
 export const name = 'model'
-export const inject = ['app']
+export const inject = ['app', 'react']
 
 export interface Config {
   /** directory of models, relative to the app root */
