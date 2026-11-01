@@ -63,7 +63,7 @@ Rsbuild 的插件写在一个本地插件里，例如 Less：
 ```ts
 // plugin.ts，写进 cormi.yml
 import { pluginLess } from '@rsbuild/plugin-less'
-import type { Context } from 'cormi'
+import type { Context } from '@cormijs/cormi'
 import type {} from '@cormijs/rsbuild'
 
 export const inject = ['rsbuild']

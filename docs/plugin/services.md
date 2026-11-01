@@ -2,8 +2,8 @@
 
 | 服务 | 提供方 | 注册方法 |
 |---|---|---|
-| `ctx.cormi` | `cormi`（根上提供，无需 inject） | — |
-| `ctx.cli` | `cormi`（根上提供，无需 inject） | `command()`、`generator()` |
+| `ctx.cormi` | `@cormijs/cormi`（根上提供，无需 inject） | — |
+| `ctx.cli` | `@cormijs/cormi`（根上提供，无需 inject） | `command()`、`generator()` |
 | `ctx.router` | `@cormijs/preset` | `route()`、`layout()`、`patch()`、`extension()` |
 | `ctx.html` | `@cormijs/preset` | `head()`、`body()`、`transform()` |
 | `ctx.app` | `@cormijs/preset` | `entry()`、`import()`、`file()`、`server()` |
@@ -14,7 +14,7 @@
 | `ctx.react` | `@cormijs/react` | — |
 | `ctx.vue` | `@cormijs/vue` | — |
 | `ctx.server` | `@cordisjs/plugin-server`（dev 与 preview） | `get()`、`post()`、`all()`、`use()`、`ws()` |
-| `ctx.workspace` | `cormi`（根上提供） | `create()` |
+| `ctx.workspace` | `@cormijs/cormi`（根上提供） | `create()` |
 | `ctx.console` | `@cormijs/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
 
 只用 `ctx.bundler`、`ctx.renderer` 等通用服务的插件，适用于任何打包器与 UI 框架；需要某个实现的特有能力时，注入它的具名服务——`inject: ['vite']`、`inject: ['react']`。在不支持的组合中，这样的插件会转入 pending，控制台会显示它在等待的服务。
@@ -95,7 +95,7 @@ ctx.html.transform(html => html.replace('<html', '<html data-theme="dark"'))
 | `transform(fn)` | 改写最终的文档；按注册顺序执行，可以是异步的 |
 | `render(options)` | 渲染文档，dev server、构建和 SSR 都用它 |
 
-标签的形式是 `{ tag, attrs?, content? }`，`content` 原样插入。`renderTag()` 与 `escapeHtml()` 可以从 `cormi` 导入。
+标签的形式是 `{ tag, attrs?, content? }`，`content` 原样插入。`renderTag()` 与 `escapeHtml()` 可以从 `@cormijs/cormi` 导入。
 
 ## ctx.app
 
@@ -134,7 +134,7 @@ ctx.app.server('foo', ctx.cormi.resolve('src/server/foo.ts'))
 各个打包器的插件不能通用，所以 `plugin()` 接收一个按打包器名称索引的对象，为插件支持的每个打包器各给一个它自己的插件。当前的打包器取用自己的那一项；没有时抛出错误，插件加载失败，而不是悄悄缺少一部分功能。
 
 ```ts
-import { type Context, importPeer } from 'cormi'
+import { type Context, importPeer } from '@cormijs/cormi'
 import type {} from '@cormijs/rsbuild'   // 类型：rsbuild 一项的形式由 @cormijs/rsbuild 声明
 import type {} from '@cormijs/vite'
 
@@ -249,7 +249,7 @@ ctx.inject(['server'], (ctx) => {
 命令行。注册的命令以 `setup` 模式加载插件树后运行。
 
 ```ts
-import { CommandError, createFile } from 'cormi'
+import { CommandError, createFile } from '@cormijs/cormi'
 
 ctx.cli.command('routes', {
   description: 'print the routes of the app',

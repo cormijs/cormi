@@ -5,7 +5,7 @@
 ::: code-group
 
 ```ts [src/index.ts]
-import type { Context } from 'cormi'
+import type { Context } from '@cormijs/cormi'
 
 export const name = 'cache'
 
@@ -34,8 +34,8 @@ export function apply(ctx: Context) {
 ::: code-group
 
 ```tsx [console/index.tsx]
-import type { Context } from 'cormi/client'
-import { useConsole, useData } from 'cormi/console'
+import type { Context } from '@cormijs/cormi/client'
+import { useConsole, useData } from '@cormijs/cormi/console'
 
 function CachePage() {
   const keys = useData<string[]>('cache') ?? []
@@ -80,7 +80,7 @@ export default (ctx: Context) => {
 | `listen(name, listener)` | 监听服务器广播的事件 |
 | `get(name)` | 读取一项数据的当前值 |
 
-控制台页面总是 React 组件——控制台自带 React，即使应用用的是 Vue。React 钩子从 `cormi/console` 导入：
+控制台页面总是 React 组件——控制台自带 React，即使应用用的是 Vue。React 钩子从 `@cormijs/cormi/console` 导入：
 
 | 钩子 | 说明 |
 |---|---|
@@ -88,6 +88,6 @@ export default (ctx: Context) => {
 | `useConsole()` | 控制台服务，用于 `call()` |
 | `useStatus()` | 与服务器的连接状态：`connecting`、`open` 或 `closed` |
 
-页面可以使用控制台的样式类（`cc-page`、`cc-page-head`、`cc-button`、`cc-table`……），与内置页面保持一致；`cormi/console` 也导出 `Section`、`Tag`、`Lamp`、`Empty`、`CodeLine` 几个组件。
+页面可以使用控制台的样式类（`cc-page`、`cc-page-head`、`cc-button`、`cc-table`……），与内置页面保持一致；`@cormijs/cormi/console` 也导出 `Section`、`Tag`、`Lamp`、`Empty`、`CodeLine` 几个组件。
 
 开发服务器重启时，控制台会自动重新连接，并重新收到所有数据。

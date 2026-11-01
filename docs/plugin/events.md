@@ -59,7 +59,7 @@ ctx.on('build/after', async ({ outDir }) => {
 ::: code-group
 
 ```ts [src/app.tsx]
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormijs/cormi/client'
 import type {} from '@cormijs/plugin-request/client'
 
 export default (ctx: Context) => {

@@ -1,6 +1,6 @@
 # 浏览器端
 
-浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormijs/react/client` 导入，Vue 应用从 `@cormijs/vue/client` 导入（见 [Vue](#vue)）。浏览器插件的形式是：
+浏览器里的运行时是一个 cordis `Context`，与 koishi-webui 的模型相同。它分两层：`@cormijs/cormi/client` 是与 UI 框架无关的部分（`$app` 的生命周期与 props、`$router` 的路由表与导航、loader 协议），UI 框架在此之上提供自己的 API——React 应用从 `@cormijs/react/client` 导入，Vue 应用从 `@cormijs/vue/client` 导入（见 [Vue](#vue)）。浏览器插件的形式是：
 
 ```tsx
 import type { Context } from '@cormijs/react/client'

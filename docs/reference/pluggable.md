@@ -79,7 +79,7 @@ interface Renderer {
 
 | 包 | 内容 |
 |---|---|
-| `@cormijs/runtime`（`cormi/client`） | 与 UI 框架无关的浏览器 Context：`$app` 的生命周期与 props、`$router` 的最小契约（`routes`、`load`、`add`、`href`、`navigate`、`preload`、`router/change` 事件）、loader 协议 |
+| `@cormijs/runtime`（`@cormijs/cormi/client`） | 与 UI 框架无关的浏览器 Context：`$app` 的生命周期与 props、`$router` 的最小契约（`routes`、`load`、`add`、`href`、`navigate`、`preload`、`router/change` 事件）、loader 协议 |
 | `@cormijs/react/client`、`@cormijs/vue/client` | 各框架的实现：React 的 `ctx.wrap()`、钩子、基于 React Router 的 `$router`、SSR；Vue 的 `app.use()`、组合式函数、基于 Vue Router 的 `$router`、SSR |
 
 ## 已定的决策
@@ -94,7 +94,7 @@ interface Renderer {
 | 映射缺少当前打包器 | 抛出错误，插件加载失败 | 不支持的组合要看得见；可有可无的部分用 `ctx.inject(['vite'], …)` |
 | 路由导出的剥离 | 不用 unplugin，在映射中给每个打包器一个实现 | 它只能作用于客户端构建，而 unplugin 的通用钩子分不清客户端与服务端；Vite 用 `transform` 的 `ssr` 参数，Rsbuild 用 `api.transform({ environments })` |
 | 控制台 | 与应用的打包器、UI 框架解耦 | 控制台作为开发工具自带 Vite 与 React，无论应用用什么；它的 Vite 以路径区分 HMR，与应用的 Vite 共用一个 HTTP 服务也不冲突 |
-| UI 框架 API 的导入路径 | `@cormijs/react/client`、`@cormijs/vue/client` | UI 集成是应用的直接依赖，与插件的 `/client` 约定一致；`cormi/client` 变为与框架无关的运行时，`cormi` 不再依赖 React |
+| UI 框架 API 的导入路径 | `@cormijs/react/client`、`@cormijs/vue/client` | UI 集成是应用的直接依赖，与插件的 `/client` 约定一致；`@cormijs/cormi/client` 变为与框架无关的运行时，`@cormijs/cormi` 不再依赖 React |
 | `cormi.yml` 的写法 | 显式组合，保留 preset 简写 | `@cormijs/preset`（应用：路由、HTML、页面、API、服务器）+ 打包器 + UI 框架，选择一目了然；`@cormijs/preset-react` 保留为等价简写 |
 
 ```yaml
@@ -135,7 +135,7 @@ legacy 是 `@vitejs/plugin-legacy` 的封装，Rsbuild 自己按 browserslist �
 
 每个阶段结束时，全部示例的 e2e（preview 与 dev）保持通过。
 
-1. **无行为变化的拆分**（已完成）：`@cormijs/client` 拆为 `@cormijs/runtime` 与 `@cormijs/react`；preset 中的 React 渲染器移入 `@cormijs/react`，与 UI 框架无关的部分成为 `@cormijs/preset`；`@cormijs/vite` 提供 `bundler`；页面服务中 Vite 特有的逻辑移到 `bundler` 接口之后；core 不再写死 `.tsx`；`cormi` 不再依赖 React 与 Vite。只适用于 Vite 的插件已改用 `ctx.vite` 的类型并以 `@cormijs/vite` 为 peer 依赖。
+1. **无行为变化的拆分**（已完成）：`@cormijs/client` 拆为 `@cormijs/runtime` 与 `@cormijs/react`；preset 中的 React 渲染器移入 `@cormijs/react`，与 UI 框架无关的部分成为 `@cormijs/preset`；`@cormijs/vite` 提供 `bundler`；页面服务中 Vite 特有的逻辑移到 `bundler` 接口之后；core 不再写死 `.tsx`；`@cormijs/cormi` 不再依赖 React 与 Vite。只适用于 Vite 的插件已改用 `ctx.vite` 的类型并以 `@cormijs/vite` 为 peer 依赖。
 2. **插件分类与改造**（已完成）：`ctx.bundler.plugin()` 与 `Bundler.Plugins`；React 渲染器、文件约定、tailwindcss、unocss、styled-components 通过它注册打包器插件，不再注入 `vite`；React 插件声明 `inject: ['react']`；plugin-lint 只在 React 应用中启用 hooks 规则。分类见下表。
 3. **第二实现**（已完成）：`@cormijs/rsbuild`；React、文件约定、tailwindcss、mf 的 Rsbuild 实现；`@cormijs/vue` 与 `with-vue` 示例。e2e 是组合矩阵：Vite 上全部示例，Rsbuild 上 basic、with-tailwind、with-vue 与模块联邦，各自 preview 与 dev。
 4. **控制台解耦**（已完成）：控制台自带 Vite 与 React，以中间件模式挂在 `/__cormi/`，入口是它自己的虚拟模块，不再写进应用的 `src/.cormi`；概览显示打包器与 UI 框架（契约增加 `version`），“应用”页列出打包器解析出的插件。e2e 中控制台在 Vite、Rsbuild 应用与 Vue 应用里都被检查。

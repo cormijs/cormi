@@ -50,7 +50,7 @@ export default function Counter() {
 ::: code-group
 
 ```ts [src/app.ts]
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormijs/cormi/client'
 import type {} from '@cormijs/plugin-initial-state/client'
 
 declare module '@cormijs/plugin-initial-state/client' {
@@ -123,7 +123,7 @@ await request('/users', { method: 'POST', data: { name: 'Alice' } })
 ::: code-group
 
 ```tsx [src/app.tsx]
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormijs/cormi/client'
 import type {} from '@cormijs/plugin-request/client'
 
 export default (ctx: Context) => {

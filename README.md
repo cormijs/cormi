@@ -15,7 +15,7 @@
 Cormi 以 npm 的 `next` 标签发布候选版本（`0.1.0-rc`）：
 
 ```sh
-pnpm add cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react react react-dom
+pnpm add @cormijs/cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react react react-dom
 ```
 
 ```yaml
@@ -31,7 +31,7 @@ pnpm add cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next 
 
 ```ts
 // plugin.ts：一个 Node 插件
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 
 export const name = 'my-plugin'
 export const inject = ['html']
@@ -44,7 +44,7 @@ export function apply(ctx: Context, config: { generator: string }) {
 
 ```ts
 // src/app.ts：应用自己的浏览器插件
-import type { Context } from 'cormi/client'   // React、Vue 的 API 在 @cormijs/react/client、@cormijs/vue/client
+import type { Context } from '@cormijs/cormi/client'   // React、Vue 的 API 在 @cormijs/react/client、@cormijs/vue/client
 
 export default (ctx: Context) => {
   ctx.on('router/change', location => console.log(location.pathname))
@@ -66,13 +66,13 @@ cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名
 | `packages/vite` | 打包器 `ctx.bundler` 的 Vite 实现（同时提供 `ctx.vite`）：dev server 与构建 |
 | `packages/rsbuild` | 打包器 `ctx.bundler` 的 Rsbuild 实现（同时提供 `ctx.rsbuild`）：web 与 node 两个环境 |
 | `packages/server` | `ctx.server` 上的页面、loader 端点、API 路由、静态资源 |
-| `packages/runtime` | 与 UI 框架无关的浏览器 Context（`$app`、`$router` 契约）、loader 协议（`cormi/client`） |
+| `packages/runtime` | 与 UI 框架无关的浏览器 Context（`$app`、`$router` 契约）、loader 协议（`@cormijs/cormi/client`） |
 | `packages/react` | React：渲染器（`ctx.renderer`、`ctx.react`）与浏览器 API `@cormijs/react/client`、SSR |
 | `packages/vue` | Vue：渲染器（`ctx.renderer`、`ctx.vue`）与浏览器 API `@cormijs/vue/client`（Vue Router）、SSR |
 | `packages/preset` | 应用本身：路由、HTML、页面、API、服务器与控制台，不含打包器与 UI 框架 |
 | `packages/preset-react` | `@cormijs/preset` + `@cormijs/vite` + `@cormijs/react` 的简写 |
 | `packages/console` | dev 模式下的控制台（`/__cormi/`）：插件树管理、应用内部、日志、工作区与市场 |
-| `packages/cormi` | CLI，Node 端 API（`cormi`）与 UI 框架无关的浏览器 API（`cormi/client`） |
+| `packages/cormi` | CLI（命令 `cormi`），Node 端 API（`@cormijs/cormi`）与 UI 框架无关的浏览器 API（`@cormijs/cormi/client`） |
 | `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
 | `docs` | 官网兼文档站（VitePress） |
 | `examples/*` | with-console（控制台与工作区插件）、basic、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave、with-vue |

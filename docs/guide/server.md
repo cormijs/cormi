@@ -17,7 +17,7 @@
 ::: code-group
 
 ```ts [src/api/users/[id].ts]
-import type { ApiHandler } from 'cormi'
+import type { ApiHandler } from '@cormijs/cormi'
 import { users } from './index.ts'
 
 export const GET: ApiHandler = (request, { params }) => {

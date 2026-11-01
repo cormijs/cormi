@@ -28,7 +28,7 @@ Cormi 是一个前端全栈框架，打包器可选 Vite 或 Rsbuild，UI 框架
 插件通过 `ctx.<name>` 使用能力，并用 `inject` 声明依赖。加载顺序由依赖决定：一个插件需要的服务就绪之后，它才会加载。
 
 ```ts
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 
 export const name = 'generator-meta'
 export const inject = ['html']
@@ -56,10 +56,10 @@ umi 的插件在固定的阶段里依次运行；改动配置往往意味着重�
 
 ## 浏览器端也是 Cordis
 
-浏览器里的运行时同样是一个 cordis `Context`（与 koishi-webui 的模型相同）。Node 插件通过 `ctx.app.entry()` 注册浏览器插件，浏览器插件用 `ctx.on()` 监听导航等事件、用 UI 框架提供的方法（React 的 `ctx.wrap()`）包裹根组件，这些注册也会随插件卸载。与 UI 框架无关的浏览器插件从 `cormi/client` 导入类型：
+浏览器里的运行时同样是一个 cordis `Context`（与 koishi-webui 的模型相同）。Node 插件通过 `ctx.app.entry()` 注册浏览器插件，浏览器插件用 `ctx.on()` 监听导航等事件、用 UI 框架提供的方法（React 的 `ctx.wrap()`）包裹根组件，这些注册也会随插件卸载。与 UI 框架无关的浏览器插件从 `@cormijs/cormi/client` 导入类型：
 
 ```tsx
-import type { Context } from 'cormi/client'
+import type { Context } from '@cormijs/cormi/client'
 
 export default (ctx: Context) => {
   ctx.on('router/change', location => console.log(location.pathname))

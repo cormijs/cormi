@@ -7,7 +7,7 @@ Cormi 的插件就是 cordis 插件。内置能力、官方插件和应用自己
 ::: code-group
 
 ```ts [plugin.ts]
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 
 export const name = 'generator-meta'
 export const inject = ['html']
@@ -93,7 +93,7 @@ export function apply(ctx: Context, config: Config) {
 插件可以提供自己的服务，让其他插件通过 `inject` 使用：
 
 ```ts
-import { type Context, Service } from 'cormi'
+import { type Context, Service } from '@cormijs/cormi'
 
 declare module 'cordis' {
   interface Context {
@@ -146,7 +146,7 @@ export class I18n extends Service {
 }
 ```
 
-浏览器端用 React 的插件把 `@cormijs/react` 写进 `peerDependencies`，从 `@cormijs/react/client` 导入，并在 Node 端声明 `inject: ['react']`——应用换用其他 UI 框架时，插件转入 pending，而不是在浏览器里报错。与 UI 框架无关的浏览器插件只从 `cormi/client` 导入类型。
+浏览器端用 React 的插件把 `@cormijs/react` 写进 `peerDependencies`，从 `@cormijs/react/client` 导入，并在 Node 端声明 `inject: ['react']`——应用换用其他 UI 框架时，插件转入 pending，而不是在浏览器里报错。与 UI 框架无关的浏览器插件只从 `@cormijs/cormi/client` 导入类型。
 
 :::
 

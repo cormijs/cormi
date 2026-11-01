@@ -118,7 +118,7 @@ export default (ctx: Context, config: Config) => {
 }
 ```
 
-浏览器端分两层：`@cormijs/runtime`（即 `cormi/client`）是与 UI 框架无关的部分——`Context`、`$app`（props 与生命周期事件）、抽象的 `$router`（路由清单、模块加载、`add()`、`href()`、服务端 loader 协议）；`@cormijs/react/client` 在其上实现 React Router 数据路由、`ctx.wrap()`、钩子与 SSR。不涉及组件的浏览器插件只依赖前者。
+浏览器端分两层：`@cormijs/runtime`（即 `@cormijs/cormi/client`）是与 UI 框架无关的部分——`Context`、`$app`（props 与生命周期事件）、抽象的 `$router`（路由清单、模块加载、`add()`、`href()`、服务端 loader 协议）；`@cormijs/react/client` 在其上实现 React Router 数据路由、`ctx.wrap()`、钩子与 SSR。不涉及组件的浏览器插件只依赖前者。
 
 - 入口导出 `bootstrap`、`mount(options)`、`update(options)`、`unmount` 生命周期。入口会等运行时插件应用完毕后再挂载；某个插件在 `app/bootstrap`（bail）中返回 `true`，就表示由它接管挂载，例如 qiankun 子应用由加载脚本调用 `mount({ container, basename, origin, props })`。宿主传入的 props 用 `useHostProps()` 读取。
 - 核心服务在 root 上提供，任何运行时插件无需 inject：`ctx.$app`（React 下还是根组件包装器，常用方法以 mixin 暴露为 `ctx.wrap(component, order?)`）、`ctx.$router`（React 下是 React Router 7 数据路由；`ctx.$router.add(routes, modules)` 在运行时添加路由，已渲染时直接修补路由器，插件销毁时移除）。名字带 `$`，与同一应用的 Node 端服务（`ctx.app`、`ctx.router`）在类型上互不冲突——koishi 的客户端也是这样做的。
@@ -181,7 +181,7 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 
 ## 联邦应用（`@cormijs/plugin-federation`）
 
-适合多个团队用同一技术栈共同维护一个大应用：每个子包（package）是一个独立的 Cormi 应用，可以单独开发、单独构建、单独部署；底座（host）在启动时按 URL 收集子包，把它们的页面接入自己的路由和布局。与 qiankun 不同，子包不是被隔离的另一个应用，而是底座里的 cordis 插件：react、react-dom、react-router、cordis、`cormi/client`、`@cormijs/react/client` 以单例共享（可用 `shared` 追加，如 antd 或公共组件库），子包的页面在底座的路由器里渲染，子包之间可以通过 cordis 服务协作。这一设计来自 HZERO（`@hzerojs/plugin-micro`）的“模块联邦微前端”。
+适合多个团队用同一技术栈共同维护一个大应用：每个子包（package）是一个独立的 Cormi 应用，可以单独开发、单独构建、单独部署；底座（host）在启动时按 URL 收集子包，把它们的页面接入自己的路由和布局。与 qiankun 不同，子包不是被隔离的另一个应用，而是底座里的 cordis 插件：react、react-dom、react-router、cordis、`@cormijs/cormi/client`、`@cormijs/react/client` 以单例共享（可用 `shared` 追加，如 antd 或公共组件库），子包的页面在底座的路由器里渲染，子包之间可以通过 cordis 服务协作。这一设计来自 HZERO（`@hzerojs/plugin-micro`）的“模块联邦微前端”。
 
 ```yaml
 # 底座 cormi.yml

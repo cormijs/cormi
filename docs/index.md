@@ -18,7 +18,7 @@ titleTemplate: 以 Cordis 为插件宿主的前端全栈框架
 <div class="cm-filename"><code>plugin.ts</code><span>Node 端，写进 cormi.yml：<code>- name: ./plugin.ts</code></span></div>
 
 ```ts
-import { type Context, Schema } from 'cormi'
+import { type Context, Schema } from '@cormijs/cormi'
 
 export const name = 'generator-meta'
 export const inject = ['html'] // [!code highlight]

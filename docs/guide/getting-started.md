@@ -14,7 +14,7 @@ Cormi 正处于 0.1 的候选版本（`0.1.0-rc`），以 npm 的 `next` 标签�
 ```sh
 mkdir my-app && cd my-app
 pnpm init
-pnpm add cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react react react-dom
+pnpm add @cormijs/cormi@next @cormijs/preset@next @cormijs/vite@next @cormijs/react@next @vitejs/plugin-react react react-dom
 pnpm add -D @types/react @types/react-dom typescript
 ```
 
