@@ -178,6 +178,8 @@ export async function createPlugin(root: string, name: string, options: Workspac
     exports,
     files: ['lib', 'src', ...options.client ? ['client'] : [], ...options.console ? ['console'] : []],
     keywords: ['cormi', 'cormi-plugin'],
+    // what the market shows: the bundlers and UI frameworks it supports (`bundler: ['vite']`…), any when omitted
+    cormi: {},
     peerDependencies: { cormi: '*' },
   }
   const node = [
