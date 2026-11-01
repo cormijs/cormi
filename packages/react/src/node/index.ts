@@ -1,4 +1,5 @@
 import { type Renderer as RendererContract, Schema } from '@cormi/core'
+import { createRequire } from 'node:module'
 import { Context, Service } from 'cordis'
 import { Generators } from './generators.ts'
 import { Renderer } from './renderer.ts'
@@ -25,6 +26,8 @@ export class React extends Service implements RendererContract {
   static inject = ['app', 'router']
 
   readonly name = 'react'
+  /** the version of React, as the app installs it */
+  readonly version: string | undefined = getVersion('react')
 
   constructor(ctx: Context, public config: React.Config) {
     super(ctx, 'react')
@@ -33,6 +36,12 @@ export class React extends Service implements RendererContract {
     ctx.plugin(Renderer)
     ctx.plugin(Generators)
   }
+}
+
+function getVersion(name: string): string | undefined {
+  try {
+    return createRequire(import.meta.url)(`${name}/package.json`).version
+  } catch {}
 }
 
 export namespace React {

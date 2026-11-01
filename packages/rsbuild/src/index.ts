@@ -13,6 +13,7 @@ import {
   type RsbuildPlugin,
   type RsbuildPlugins,
   type Rspack,
+  version,
 } from '@rsbuild/core'
 import { Context, Service } from 'cordis'
 import { Awaitable, Dict } from 'cosmokit'
@@ -54,6 +55,7 @@ export class Rsbuild extends Service implements Bundler {
   static inject = ['app']
 
   readonly name = 'rsbuild'
+  readonly version = version
 
   /** the dev server, in dev mode */
   devServer: RsbuildDevServer | undefined

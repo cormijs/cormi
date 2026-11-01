@@ -6,7 +6,7 @@ import type {} from '@cordisjs/plugin-server'
 import { type Bundler, idle, Refresher, Schema, winPath, type Workspace } from '@cormi/core'
 import { Context, Service } from 'cordis'
 import { Awaitable, Dict } from 'cosmokit'
-import { build, createServer, type InlineConfig, type Manifest, mergeConfig, type PluginOption, type ViteDevServer } from 'vite'
+import { build, createServer, type InlineConfig, type Manifest, mergeConfig, type PluginOption, version, type ViteDevServer } from 'vite'
 import { type EntryAssets, getEntryAssets, toAliases } from './config.ts'
 
 export * from './config.ts'
@@ -32,6 +32,7 @@ export class Vite extends Service implements Bundler {
   static inject = ['app']
 
   readonly name = 'vite'
+  readonly version = version
 
   /** the dev server, in dev mode */
   devServer: ViteDevServer | undefined

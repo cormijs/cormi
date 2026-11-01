@@ -1,4 +1,5 @@
 import { type Renderer as RendererContract, Schema } from '@cormi/core'
+import { createRequire } from 'node:module'
 import { Context, Service } from 'cordis'
 import { getSfcExports } from './exports.ts'
 import { Generators } from './generators.ts'
@@ -28,6 +29,8 @@ export class Vue extends Service implements RendererContract {
   static inject = ['app', 'router']
 
   readonly name = 'vue'
+  /** the version of Vue, as the app installs it */
+  readonly version: string | undefined = getVersion('vue')
 
   constructor(ctx: Context, public config: Vue.Config) {
     super(ctx, 'vue')
@@ -40,6 +43,12 @@ export class Vue extends Service implements RendererContract {
   async routeExports(file: string) {
     if (file.endsWith('.vue')) return getSfcExports(file)
   }
+}
+
+function getVersion(name: string): string | undefined {
+  try {
+    return createRequire(import.meta.url)(`${name}/package.json`).version
+  } catch {}
 }
 
 export namespace Vue {
