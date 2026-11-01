@@ -105,9 +105,18 @@ export class Vite extends Service implements Bundler {
     this.ctx.inject(['server'], ctx => this._serve(ctx))
   }
 
-  /** Add a Vite plugin. A function is called for every server or build, to get fresh plugin instances. */
-  plugin(plugin: Vite.PluginInput) {
-    return this._register(this._plugins, plugin, 'ctx.vite.plugin()')
+  /**
+   * Add a Vite plugin. A function is called for every server or build, to get
+   * fresh plugin instances. As `ctx.bundler.plugin()`, takes the plugin of
+   * each bundler by name, and uses `vite`.
+   */
+  plugin(plugin: Vite.PluginInput | Bundler.Plugin) {
+    if (!isBundlerPlugin(plugin)) return this._register(this._plugins, plugin, 'ctx.vite.plugin()')
+    if (!plugin.vite) {
+      const names = Object.keys(plugin)
+      throw new Error(`the plugin supports ${names.length ? names.join(', ') : 'no bundler'}, not vite`)
+    }
+    return this._register(this._plugins, plugin.vite, 'ctx.bundler.plugin()')
   }
 
   /** Add an input to client builds (e.g. a page of a multi-page app); its assets are in `BuildResult.inputs`. */
@@ -341,12 +350,26 @@ function workspacePlugin(workspace: Workspace | undefined): PluginOption {
   }
 }
 
+// a Vite plugin has a name; the plugins of several bundlers are keyed by bundler
+function isBundlerPlugin(value: Vite.PluginInput | Bundler.Plugin): value is Bundler.Plugin {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || 'then' in value) return false
+  return !('name' in value)
+}
+
 /** umi's `{ chrome: 87, safari: 14 }` or esbuild targets (`['chrome87', 'es2020']`); Vite's default otherwise. */
 export function toBuildTarget(targets: Vite.Config['targets']) {
   if (!targets) return
   if (Array.isArray(targets)) return targets.length ? targets : undefined
   const list = Object.entries(targets).filter(([, version]) => version !== false).map(([browser, version]) => `${browser}${version}`)
   return list.length ? list : undefined
+}
+
+declare module '@cormi/core' {
+  namespace Bundler {
+    interface Plugins {
+      vite: Vite.PluginInput
+    }
+  }
 }
 
 export namespace Vite {
