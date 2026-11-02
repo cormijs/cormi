@@ -6,7 +6,7 @@
 + 覆盖 umi 的应用能力（约定式路由、SSR、loader、API 路由、mock……），但 API 以服务和事件的形式提供，而非 umi 的插件 API
 + 浏览器端同样是一个 cordis Context，插件可以同时拥有 Node 端和浏览器端
 
-文档与官网在 [docs/](docs/)（VitePress）：`pnpm docs:dev` 本地预览，`pnpm docs:build` 构建。设计说明见 [docs/architecture.md](docs/architecture.md)。
+文档与官网在 [cormi.js.org](https://cormi.js.org/)，源码在 [docs/](docs/)（VitePress，经 GitHub Pages 发布）：`pnpm docs:dev` 本地预览，`pnpm docs:build` 构建。设计说明见 [docs/architecture.md](docs/architecture.md)。
 
 > `references` 下有 umi 和 cordis，以及基于 cordis 的 koishi / satori 等框架的源码可以进行参考。
 
