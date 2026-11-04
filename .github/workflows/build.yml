@@ -7,6 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # for the tests of @cormijs/cache-redis
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -25,6 +31,8 @@ jobs:
         run: pnpm typecheck:client
       - name: Unit test
         run: pnpm test
+        env:
+          REDIS_URL: redis://localhost:6379
       - name: Check the declarations of the plugins
         run: pnpm check:plugins
       - name: Build the docs
