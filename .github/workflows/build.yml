@@ -78,9 +78,31 @@ jobs:
       - name: Run the examples in a browser
         run: node --import tsx scripts/e2e.mts --bundler ${{ matrix.bundler }} ${{ matrix.mode == 'dev' && '--dev' || '' }}
 
+  # every kind of app of @cormijs/create, with the packages of the workspace
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Install Chromium
+        run: pnpm exec playwright-core install --with-deps chromium-headless-shell
+      - name: Create, build and run the apps
+        run: pnpm e2e:create
+
   # the packages whose version is not on npm yet: bump them (pnpm bump) and push to main
   publish:
-    needs: [build, e2e]
+    needs: [build, e2e, create]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:

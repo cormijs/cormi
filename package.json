@@ -15,6 +15,7 @@
     "pub": "node scripts/publish.mjs",
     "e2e": "node --import tsx scripts/e2e.mts",
     "e2e:dev": "node --import tsx scripts/e2e.mts --dev",
+    "e2e:create": "node --import tsx scripts/create-check.mts",
     "docs:dev": "pnpm --filter @cormijs/docs dev",
     "docs:build": "pnpm --filter @cormijs/docs build",
     "docs:preview": "pnpm --filter @cormijs/docs preview"

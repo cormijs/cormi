@@ -1,0 +1,49 @@
+{
+  "name": "@cormijs/create",
+  "description": "Create a Cormi app: a frontend, a backend, both, or pages rendered on the server",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "bin": {
+    "create-cormi": "bin/create.js"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/create#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/create"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "create",
+    "scaffold",
+    "template"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.8.1"
+  }
+}
