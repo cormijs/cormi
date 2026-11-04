@@ -1,0 +1,64 @@
+{
+  "name": "@cormijs/plugin-rate-limit",
+  "description": "Rate limits for the requests of Cormi apps, counted in ctx.cache",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-rate-limit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-rate-limit"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "rate-limit",
+    "bundler:*",
+    "renderer:*",
+    "required:cache",
+    "required:middleware"
+  ],
+  "cormi": {
+    "service": {
+      "required": [
+        "cache",
+        "middleware"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@cormijs/cache": "workspace:*",
+    "@cormijs/cormi": "workspace:*"
+  },
+  "devDependencies": {
+    "@cormijs/cache": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*"
+  }
+}

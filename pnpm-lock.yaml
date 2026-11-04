@@ -407,6 +407,61 @@ importers:
         specifier: ~5.9.3
         version: 5.9.3
 
+  examples/with-auth:
+    dependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/plugin-auth':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-auth
+      '@cormijs/plugin-cors':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-cors
+      '@cormijs/plugin-rate-limit':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-rate-limit
+      '@cormijs/plugin-security':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-security
+      '@cormijs/plugin-session':
+        specifier: workspace:*
+        version: link:../../plugins/plugin-session
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../../packages/vite
+      '@vitejs/plugin-react':
+        specifier: ^5.2.0
+        version: 5.2.0(vite@7.3.7(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.1
+        version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.5
+        version: 22.20.5
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+
   examples/with-console:
     dependencies:
       '@cormijs/cormi':
@@ -1326,6 +1381,54 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1
 
+  plugins/plugin-auth:
+    devDependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/plugin-session':
+        specifier: workspace:*
+        version: link:../plugin-session
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../../packages/rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../../packages/vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
+
+  plugins/plugin-cors:
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../../packages/rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../../packages/vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
+
   plugins/plugin-dva:
     dependencies:
       chokidar:
@@ -1717,6 +1820,30 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1
 
+  plugins/plugin-rate-limit:
+    devDependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../../packages/rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../../packages/vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
+
   plugins/plugin-react-query:
     dependencies:
       '@tanstack/react-query-devtools':
@@ -1787,6 +1914,51 @@ importers:
       react:
         specifier: ^19.3.1
         version: 19.3.1
+
+  plugins/plugin-security:
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../../packages/rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../../packages/vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
+
+  plugins/plugin-session:
+    devDependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../../packages/rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../../packages/vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
 
   plugins/plugin-styled-components:
     devDependencies:

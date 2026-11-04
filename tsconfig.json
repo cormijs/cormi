@@ -65,6 +65,9 @@
       "path": "./plugins/plugin-security"
     },
     {
+      "path": "./plugins/plugin-rate-limit"
+    },
+    {
       "path": "./plugins/plugin-tailwindcss"
     },
     {
