@@ -50,11 +50,17 @@ export async function createConsoleServer(options: ConsoleServerOptions) {
     plugins: [react(), {
       name: 'cormi:console',
       enforce: 'pre',
-      resolveId(id) {
+      async resolveId(id, importer) {
         if (id === ENTRY_URL) return entryId
         // console pages of workspace packages, from their sources
         if (options.workspace && Object.keys(options.workspace.packages).length) {
-          return options.workspace.resolve(id, ['browser', 'import', 'module'])
+          const file = options.workspace.resolve(id, ['browser', 'import', 'module'])
+          if (file) return file
+        }
+        // the entry is no file, which Vite would resolve from its root (the console's): the console
+        // pages of installed packages resolve from the app root
+        if (importer === entryId && !/^[./]/.test(id)) {
+          return this.resolve(id, join(options.cwd, 'package.json'), { skipSelf: true })
         }
       },
       load(id) {
