@@ -6,7 +6,7 @@ const repo = 'https://github.com/cormijs/cormi'
 export default defineConfig({
   lang: 'zh-CN',
   title: 'Cormi',
-  description: '以 Cordis 为插件宿主的前端全栈框架：一份 cormi.yml，就是整个应用。',
+  description: '以 Cordis 为插件宿主的全栈框架：一份 cormi.yml，就是整个应用。',
   cleanUrls: true,
   lastUpdated: true,
   head: [
@@ -32,18 +32,31 @@ export default defineConfig({
           items: [
             { text: '介绍', link: '/guide/' },
             { text: '快速开始', link: '/guide/getting-started' },
+            { text: '页面与服务端', link: '/guide/sides' },
+          ],
+        },
+        {
+          text: '页面',
+          items: [
+            { text: '目录与约定', link: '/guide/conventions' },
+            { text: '路由、数据与 SSR', link: '/guide/routing' },
             { text: '打包器与 UI 框架', link: '/guide/stack' },
+          ],
+        },
+        {
+          text: '服务端',
+          items: [
+            { text: '服务端代码与接口', link: '/guide/server' },
+            { text: '中间件与代理', link: '/guide/middleware' },
+            { text: '数据库', link: '/guide/database' },
           ],
         },
         {
           text: '应用',
           items: [
             { text: 'cormi.yml', link: '/guide/config' },
-            { text: '目录与约定', link: '/guide/conventions' },
-            { text: '路由与数据', link: '/guide/routing' },
-            { text: '服务端：API、代理与 SSR', link: '/guide/server' },
-            { text: '构建与部署', link: '/guide/deploy' },
             { text: '命令行', link: '/guide/cli' },
+            { text: '构建与部署', link: '/guide/deploy' },
             { text: '控制台与工作区', link: '/guide/console' },
           ],
         },

@@ -1,23 +1,29 @@
 # 介绍
 
-Cormi 是一个前端全栈框架，打包器可选 Vite 或 Rsbuild，UI 框架可选 React 或 Vue。它的插件宿主是 [Cordis](https://github.com/cordiverse/cordis)——[Koishi](https://koishi.chat) 背后的插件系统——设计也遵循 cordis 与 koishi 的哲学。
+Cormi 是一个全栈框架：页面的打包器可选 Vite 或 Rsbuild，UI 框架可选 React 或 Vue；服务端有接口、中间件与数据库（[minato](https://github.com/cordiverse/minato)，SQLite、PostgreSQL、MySQL、MongoDB 任选）。它可以是一个前端应用、一个后端服务，或两者兼有。它的插件宿主是 [Cordis](https://github.com/cordiverse/cordis)——[Koishi](https://koishi.chat) 背后的插件系统——设计也遵循 cordis 与 koishi 的哲学。
 
-它提供的能力与 umi 这一类框架相当：约定式与配置式路由、布局、服务端渲染、数据加载、API 路由、mock、代理，以及一组覆盖 antd、状态管理、请求、微前端的官方插件。不同之处在于这些能力的形态：Cormi 没有 `api.modifyXxx` 式的插件 API，没有阶段状态机，能力是 `ctx` 上的服务，扩展点是类型化事件。
+页面一侧的能力与 umi 这一类框架相当：约定式与配置式路由、布局、服务端渲染、数据加载、mock、代理，以及一组覆盖 antd、状态管理、请求、微前端的官方插件。服务端一侧，`server/` 中的接口与表由 Node 直接运行，数据库、中间件都是服务。两侧之间的界限是明确的，见 [页面与服务端](/guide/sides)。
+
+不同之处在于这些能力的形态：Cormi 没有 `api.modifyXxx` 式的插件 API，没有阶段状态机，能力是 `ctx` 上的服务，扩展点是类型化事件。
 
 ## 应用是一棵插件树
 
 应用写在 `cormi.yml` 里，每个条目是一个插件：
 
 ```yaml
-- name: '@cormijs/preset'      # 应用：路由、HTML、页面、API、服务器
+- name: '@cormijs/preset'      # 应用：路由、HTML、页面、接口、服务器
   config:
     title: My App
     ssr: true
-- name: '@cormijs/vite'        # 打包器
-- name: '@cormijs/react'       # UI 框架
+- name: '@cormijs/vite'        # 页面：打包器
+- name: '@cormijs/react'       #       UI 框架
 - name: '@cormijs/plugin-antd'
   config:
     locale: zh_CN
+- name: '@cormijs/database'    # 服务端：数据库
+- name: '@minatojs/driver-sqlite'
+  config:
+    path: data/app.db
 - name: ./plugin.ts
 ```
 
@@ -42,7 +48,7 @@ export function apply(ctx: Context, config: { generator: string }) {
 }
 ```
 
-Node 端的服务有 `ctx.router`、`ctx.html`、`ctx.app`、`ctx.bundler`、`ctx.server`、`ctx.cli` 等，见 [Node 端服务](/plugin/services)。
+Node 端的服务有 `ctx.router`、`ctx.html`、`ctx.app`、`ctx.bundler`、`ctx.server`、`ctx.middleware`、`ctx.database`、`ctx.cli` 等，见 [Node 端服务](/plugin/services)。
 
 ## 注册即副作用
 
@@ -75,5 +81,6 @@ export default (ctx: Context) => {
 
 ## 下一步
 
-- [快速开始](/guide/getting-started)：运行示例，或创建一个应用
+- [快速开始](/guide/getting-started)：创建一个应用，或运行示例
+- [页面与服务端](/guide/sides)：应用的两侧，以及它们相遇的地方
 - [插件的结构](/plugin/)：写第一个插件

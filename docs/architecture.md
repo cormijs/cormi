@@ -1,6 +1,6 @@
 # Cormi 架构
 
-Cormi 是一个以 Cordis 4 为宿主的前端全栈框架。它不是 umi 的克隆：umi 只作为「全栈框架该有哪些能力」的清单，API 形态完全遵循 cordis / koishi 的哲学。打包器与 UI 框架也是插件：打包器有 Vite（`@cormijs/vite`）与 Rsbuild（`@cormijs/rsbuild`），UI 框架有 React（`@cormijs/react`）与 Vue（`@cormijs/vue`），设计见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
+Cormi 是一个以 Cordis 4 为宿主的全栈框架。它不是 umi 的克隆：umi 只作为「全栈框架该有哪些能力」的清单，API 形态完全遵循 cordis / koishi 的哲学。打包器与 UI 框架也是插件：打包器有 Vite（`@cormijs/vite`）与 Rsbuild（`@cormijs/rsbuild`），UI 框架有 React（`@cormijs/react`）与 Vue（`@cormijs/vue`），设计见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
 
 ## 原则
 
@@ -139,7 +139,7 @@ export const handle = {}
 
 客户端导航时，服务端 `loader` 的数据从 `<base>/__cormi/loader` 端点获取。
 
-`src/api/**` 下的文件是 API 路由（`src/api/users/[id].ts` → `/api/users/:id`），按方法导出处理器（`GET`、`POST`……）或一个 `default` 处理器，签名为 `(request: Request, { params }) => Response | any`，非 `Response` 的返回值以 JSON 发送。
+`server/api/**` 下的文件是接口（`server/api/users/[id].ts` → `/api/users/:id`），由 Node 直接运行，每个模块是一个注入 `inject` 中服务的插件；按方法导出处理器（`GET`、`POST`……）或一个 `default` 处理器，签名为 `(request: Request, { params, ctx, state }) => Response | any`，非 `Response` 的返回值以 JSON 发送。见 [服务端代码与接口](/guide/server)。
 
 ## 插件包结构（参照 koishi）
 

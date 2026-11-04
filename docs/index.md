@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Cormi
-titleTemplate: 以 Cordis 为插件宿主的前端全栈框架
+titleTemplate: 以 Cordis 为插件宿主的全栈框架
 ---
 
 <div class="cm-home">

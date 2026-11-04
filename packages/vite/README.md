@@ -4,4 +4,4 @@
 
 The Vite service of Cormi: dev server on ctx.server, client and server bundles
 
-这是 [Cormi](https://github.com/cormijs/cormi) 的一部分：以 Cordis 为插件宿主的前端全栈框架。文档见 [docs](https://github.com/cormijs/cormi/tree/main/docs)。
+这是 [Cormi](https://github.com/cormijs/cormi) 的一部分：以 Cordis 为插件宿主的全栈框架。文档见 [docs](https://github.com/cormijs/cormi/tree/main/docs)。

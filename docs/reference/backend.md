@@ -1,6 +1,6 @@
 # 设计：后端服务
 
-> 状态：设计已定，按阶段实施中。本页记录决策与理由。
+> 状态：设计已定，第 1 阶段（服务端基础、数据库、脚手架）已完成，其余按阶段实施中。本页记录决策与理由。
 
 目标：Cormi 不只渲染页面，也能独立作为后端服务——连接数据库、编写接口，并以插件的方式接入各种中间件与基础服务。
 
@@ -27,6 +27,9 @@
 | 页面的服务端代码 | 通过 `context` 拿到 `ctx` | `loader` 仍在服务端入口（打包后的代码）里运行，Cormi 在调用时传入 `context: { ctx, state }` |
 | 中间件 | 基于 fetch，有顺序与路径 | `(request, context, next) => Response`；`order` 决定先后，`path` 限定作用范围；会话、登录用户等放在请求级的 `state` 中，中间件、接口与 `loader` 共享 |
 | 第一批能力 | 数据库与接口、会话与鉴权、中间件顺序与常用中间件、缓存、对象存储 | — |
+| 前后端的界限 | 页面（`src/`）与服务端（`server/`）是应用的两侧，只通过 HTTP、`loader` 的 `context` 与 `import type` 相遇；页面从 `server/` 导入值时构建失败 | 同一个仓库里写前后端，最大的负担是分不清代码在哪里运行、能用什么。把界限做成规则，由打包器检查，比文档里的约定更可靠 |
+| 服务端何时运行 | 只在应用提供服务时（`cormi dev`、`cormi start`）：`ctx.cormi.serving`。`@cormijs/database` 在构建时不提供 `model`，注入它的驱动随之等待 | 构建页面不应依赖数据库：CI 与 Docker 的构建阶段通常连不上它 |
+| 脚手架 | `@cormijs/create`（`pnpm create @cormijs`），按两侧组合出四种类型：前端、后端、前后端、服务端渲染；只询问已选的一侧需要的选择 | 类型不是配置，而是由 `cormi.yml` 与目录推出：应用可以从一种类型长成另一种 |
 
 ## 服务端代码：`server/`
 
@@ -41,7 +44,7 @@ server/
 // server/models/user.ts
 import type { Context } from '@cormijs/cormi'
 
-declare module 'minato' {
+declare module '@cormijs/database' {
   interface Tables {
     user: { id: number; name: string; createdAt: Date }
   }
@@ -67,8 +70,9 @@ export async function GET(request: Request, { params, ctx }: ApiContext) {
 ```
 
 - 每个接口模块是一个子插件：`inject` 的服务就绪之前，请求得到 503 并说明在等哪个服务；服务消失时，接口随之下线。
-- 修改接口文件只重载这一个插件（`@cordisjs/plugin-hmr`）；新增、删除文件由目录监听处理。
-- 生产环境同样由 tsx 运行源码（`cormi start`），不需要构建步骤。
+- `server/` 中的文件变化时，服务端代码整体重新加载（旧的插件先卸载）；导入的应用内文件通过模块代数（`?cormi-v=N`）一并重新加载，`node_modules` 不变。
+- 生产环境同样直接运行源码（`cormi start`），不需要构建步骤。
+- 服务端用到的服务的类型由 `server/env.d.ts` 引用（`/// <reference types="@cormijs/database" />`）：只做声明合并不会加载一个包的类型。
 - 页面的 `loader` 通过参数中的 `context.ctx` 访问服务、`context.state` 访问会话与登录用户。
 - `cormi g api users/[id]`、`cormi g model user` 生成上面的文件。
 
@@ -135,7 +139,7 @@ const { url } = await ctx.storage.put(`avatars/${id}.png`, file, { contentType: 
 
 ## 实施阶段
 
-1. **服务端基础**：`server/` 约定与原生运行的接口（`inject`、热重载、503）；`loader` 的 `context`；`ctx.middleware`（顺序、路径、`state`）；纯后端应用与 `cormi start`；`@cormijs/database`；示例 `with-api` 与 e2e。
+1. **服务端基础**（已完成）：`server/` 约定与原生运行的接口（`inject`、热重载、503）；`loader` 的 `context`；`ctx.middleware`（顺序、路径、`state`）；纯后端应用与 `cormi start`；`@cormijs/database`；页面与服务端的界限；`@cormijs/create`；示例 `with-api` 与 e2e。
 2. **缓存**：`@cormijs/cache` 与内存、Redis、数据库驱动。
 3. **会话、鉴权与常用中间件**：session、auth、cors、security、rate-limit。
 4. **对象存储**：`@cormijs/storage` 与本地、S3 驱动。

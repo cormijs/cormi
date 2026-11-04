@@ -35,14 +35,24 @@
 | 成员 | 说明 |
 |---|---|
 | `cwd` | 应用根目录 |
-| `mode` | `dev`、`build`、`preview` 或 `setup` |
+| `mode` | `dev`、`build`、`preview`（`cormi start` 与 `cormi preview`）或 `setup` |
+| `serving` | 应用是否在提供服务：`dev` 或 `preview` |
 | `env` | dev 下为 `development`，否则为 `production` |
-| `paths` | `{ cwd, src, tmp, public }`，`tmp` 即 `src/.cormi` |
+| `paths` | `{ cwd, src, server, tmp, public }`，`tmp` 即 `src/.cormi` |
 | `resolve(...paths)` | 相对于应用根目录解析路径 |
 
 ```ts
 if (ctx.cormi.mode === 'dev') {
   // 只在开发时做的事
+}
+```
+
+服务端的插件（连接数据库、缓存、消息队列……）只在 `serving` 时连接外部系统，这样 `cormi build` 与生成器不依赖它们。提供抽象服务的插件可以只在 `serving` 时提供服务，注入它的驱动就会一直等待，`@cormijs/database` 正是这样做的：
+
+```ts
+export function apply(ctx: Context) {
+  if (!ctx.cormi.serving) return
+  ctx.plugin(MyService)
 }
 ```
 
@@ -229,7 +239,7 @@ Rsbuild 特有的能力，`ctx.bundler` 在 Rsbuild 下就是它。应用分两�
 
 ## ctx.server
 
-`@cordisjs/plugin-server` 提供的 HTTP 服务，只在 dev 与 preview 下存在，所以要放进 `ctx.inject(['server'], ...)`。
+`@cordisjs/plugin-server` 提供的 HTTP 服务，只在 dev 与 preview 下存在，所以要放进 `ctx.inject(['server'], ...)`。应用自己的中间件用更简单的 [`ctx.middleware`](#ctx-middleware)。
 
 ```ts
 ctx.inject(['server'], (ctx) => {
@@ -243,6 +253,28 @@ ctx.inject(['server'], (ctx) => {
 ```
 
 路由处理器可以返回一个 `Response`。页面是所有路由之后的回退。
+
+## ctx.middleware
+
+应用的中间件，只在 dev 与 preview 下存在，要 `inject: ['middleware']`。中间件基于 fetch，`order` 小的在外层，`path` 限定路径，`state` 是请求级的状态，见 [中间件与代理](/guide/middleware)。
+
+```ts
+export const inject = ['middleware']
+
+export function apply(ctx: Context) {
+  ctx.middleware.use(async (request, { state }, next) => {
+    const response = await next()
+    response.headers.set('x-frame-options', 'DENY')
+    return response
+  }, { order: -10 })
+}
+```
+
+在 `ctx.server` 的路由中，用 `getRequestContext(req)` 取得同一个请求的 fetch `Request` 与 `state`。
+
+## ctx.model、ctx.database
+
+`@cormijs/database` 提供的 minato 服务：`ctx.model` 声明表，`ctx.database` 查询，只在 dev 与 preview 下存在。见 [数据库](/guide/database)。
 
 ## ctx.cli
 

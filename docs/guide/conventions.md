@@ -1,23 +1,32 @@
 # 目录与约定
 
-一个 Cormi 应用的目录：
+一个 Cormi 应用的目录，按 [页面与服务端](/guide/sides) 分为三部分：
 
 ```
 my-app/
+│  # 应用
 ├─ cormi.yml            插件树
 ├─ plugin.ts            应用自己的 Node 插件（可选，写进 cormi.yml）
 ├─ plugins/             工作区插件包，按包名加载源码（见“控制台与工作区”）
 ├─ mock/                mock 接口（@cormijs/plugin-mock）
+│  # 页面
 ├─ public/              原样提供的文件
-└─ src/
-   ├─ pages/            约定式路由
-   ├─ layouts/index.tsx 全局布局
-   ├─ api/              API 路由
-   ├─ models/           模型（@cormijs/plugin-model、@cormijs/plugin-dva）
-   ├─ app.tsx           应用自己的浏览器插件
-   ├─ global.css        全局样式
-   └─ .cormi/           生成文件，不要编辑
+├─ src/
+│  ├─ pages/            约定式路由
+│  ├─ layouts/index.tsx 全局布局
+│  ├─ models/           页面的状态模型（@cormijs/plugin-model、@cormijs/plugin-dva）
+│  ├─ app.tsx           应用自己的浏览器插件
+│  ├─ global.css        全局样式
+│  └─ .cormi/           生成文件，不要编辑
+│  # 服务端
+└─ server/
+   ├─ index.ts          应用在服务端的插件
+   ├─ env.d.ts          服务端用到的服务的类型
+   ├─ models/           数据库的表（@cormijs/database）
+   └─ api/              接口
 ```
+
+前端应用没有 `server/`，后端服务没有 `src/` 与 `public/`。`src/models` 是页面的状态模型，`server/models` 是数据库的表，二者无关。
 
 ## 文件约定
 
@@ -33,7 +42,15 @@ my-app/
 | `public/favicon.(ico\|png\|svg)` | 未配置 `favicons` 时作为页面图标 |
 | `src/layouts/index.tsx` | 包裹所有路由的布局，见 [布局](/guide/routing#布局) |
 | `src/pages/**` | 约定式路由，见 [路由与数据](/guide/routing) |
-| `src/api/**` | API 路由，见 [API 路由](/guide/server#api-路由) |
+
+服务端的约定见 [服务端代码与接口](/guide/server)：
+
+| 文件 | 作用 |
+|---|---|
+| `server/index.(ts\|js)` | 应用在服务端的插件，例如注册中间件 |
+| `server/models/*.(ts\|js)` | 插件，按文件名顺序加载，通常声明数据库的表 |
+| `server/api/**` | 接口：`server/api/users/[id].ts` 是 `/api/users/:id` |
+| `server/env.d.ts` | 服务端用到的服务的类型引用 |
 
 ## 路径别名
 

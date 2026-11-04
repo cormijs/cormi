@@ -1,4 +1,4 @@
-# 路由与数据
+# 路由、数据与 SSR
 
 路由表与 loader 协议与 UI 框架无关；在 React 应用中，路由运行在 React Router 7 的数据路由上。`@cormijs/react/client` 重新导出了 React Router 的全部 API（`useParams`、`useLoaderData`、`useNavigate`、`redirect`……），页面和插件都从这里导入。约定式路由的扩展名由 UI 框架注册：React 是 `.tsx` 与 `.jsx`，此外 `.ts`、`.js` 总是可用。
 
@@ -111,7 +111,20 @@ export default function About() {
 
 - 开启 SSR 时，首屏的数据由服务端渲染时直接取得，随页面一起 hydrate。
 - 客户端导航时，数据从 `<base>/__cormi/loader` 端点获取。`loader` 中抛出的 `redirect()` 同样生效。
-- 纯客户端渲染（`ssr: false`）的应用也可以使用服务端 `loader`，只要它运行在 `cormi dev` 或 `cormi preview` 之上。
+- 纯客户端渲染（`ssr: false`）的应用也可以使用服务端 `loader`，只要它运行在 `cormi dev` 或 `cormi start` 之上。
+
+`loader` 的 `context` 连接着服务端：`context.ctx` 是应用的上下文，可以使用服务端的服务（例如 [数据库](/guide/database#在页面中读取)）；`context.state` 是这个请求的状态，与中间件、接口共享（见 [请求状态](/guide/middleware#请求状态)）：
+
+```tsx
+import type { LoaderContext } from '@cormijs/cormi'
+import { type LoaderFunctionArgs, useLoaderData } from '@cormijs/react/client'
+
+export async function loader({ context }: LoaderFunctionArgs<LoaderContext>) {
+  return context.ctx.database.get('todo', {})
+}
+```
+
+Vue 的 `loader` 写在 `<script lang="ts">` 中，参数类型是 `LoaderArgs<LoaderContext>`（从 `@cormijs/vue/client` 导入）。[静态导出](/plugins/build#export-static) 在构建时运行 `loader`，此时服务端的服务没有运行，`context.ctx` 上没有它们。
 
 `clientLoader` 在浏览器中运行，可以通过 `serverLoader()` 调用同一路由的服务端 `loader`，再加以处理：
 
@@ -121,6 +134,25 @@ export async function clientLoader({ serverLoader }) {
   return cached ? JSON.parse(cached) : serverLoader()
 }
 ```
+
+## 服务端渲染
+
+```yaml
+- name: '@cormijs/preset'
+  config:
+    ssr: true
+```
+
+开启后，页面请求由服务端入口（`src/.cormi/server.tsx`）渲染：匹配的路由先运行 `loader`，再把应用渲染为 HTML，数据随页面发送，浏览器端 hydrate。
+
+- 服务端也会挂载应用的浏览器插件（`ctx.app.entry()` 注册的模块与 `src/app.tsx`），所以插件中只能在浏览器运行的代码要放进事件或 effect 里，或判断 `typeof window`。
+- 访问 `window`、`document` 的组件代码同样要放进 `useEffect`。
+- CSS-in-JS 库通过 `useServerInsertedHTML()` 把样式插入 `<head>`；`@cormijs/plugin-antd` 与 `@cormijs/plugin-styled-components` 已经这样做了。
+- 服务端渲染的状态码来自路由：未匹配的路径返回 404。
+
+不开启 SSR 时，服务器为所有页面请求返回同一个文档，由浏览器渲染；首屏路由加载期间显示 `src/loading.tsx`。
+
+服务端入口属于页面一侧：它由打包器构建，运行页面的代码；`server/` 的代码不会进入其中，两者通过 `loader` 的 `context` 相连。
 
 ## 链接与预加载
 

@@ -1,79 +1,97 @@
-# 服务端：API、代理与 SSR
+# 服务端代码与接口
 
-`cormi dev` 和 `cormi preview` 都会启动一个 HTTP 服务（`@cordisjs/plugin-server`）。插件注册的路由（API、mock、代理……）和静态资源先处理请求，页面是最后的回退。
+`server/` 是应用的服务端：Node 直接运行它的源码，不经过打包器，所以没有页面的后端服务同样适用。它只在应用提供服务时运行（`cormi dev`、`cormi start`），见 [页面与服务端](/guide/sides)。
 
-## API 路由
+```
+server/
+├─ index.ts            应用在服务端的插件，例如中间件
+├─ env.d.ts            服务端用到的服务的类型
+├─ models/*.ts         表结构，每个文件是一个插件
+└─ api/**              接口：api/users/[id].ts 是 /api/users/:id
+```
 
-`src/api` 下的每个模块是一个 API 路由：
+`server/index.ts` 与 `server/models/*.ts` 是普通的 cordis 插件，按这个顺序加载：导出 `apply`（以及 `inject`、`Config`），或默认导出一个插件。
+
+## 接口
+
+`server/api` 下的每个模块是一个接口：
 
 | 文件 | 路径 |
 |---|---|
-| `src/api/users/index.ts` | `/api/users` |
-| `src/api/users/[id].ts` | `/api/users/:id` |
-| `src/api/files/[...path].ts` | `/api/files/*path` |
+| `server/api/users/index.ts` | `/api/users` |
+| `server/api/users/[id].ts` | `/api/users/:id` |
+| `server/api/files/[...path].ts` | `/api/files/*path` |
 
-模块按 HTTP 方法导出处理器（`GET`、`POST`……），或导出一个处理所有方法的 `default`。处理器接收标准的 `Request`，返回 `Response`；返回其他值时，以 JSON 发送：
+模块按 HTTP 方法导出处理器（`GET`、`POST`……），或导出处理所有方法的 `default`。处理器接收标准的 `Request` 与 `{ params, ctx, state }`，返回 `Response`；返回其他值时以 JSON 发送：
 
 ::: code-group
 
-```ts [src/api/users/[id].ts]
-import type { ApiHandler } from '@cormijs/cormi'
-import { users } from './index.ts'
+```ts [server/api/todos/[id].ts]
+import type { ApiContext } from '@cormijs/cormi'
 
-export const GET: ApiHandler = (request, { params }) => {
-  const user = users.find(user => String(user.id) === params.id)
-  if (!user) return Response.json({ error: 'not found' }, { status: 404 })
-  return user
+// 处理器用到的服务
+export const inject = ['database']
+
+export async function GET(request: Request, { params, ctx }: ApiContext<{ id: string }>) {
+  const [todo] = await ctx.database.get('todo', { id: Number(params.id) })
+  return todo ?? Response.json({ error: 'not found' }, { status: 404 })
 }
 ```
 
 :::
 
-- 参数更少的路由优先匹配：`/api/users/me` 先于 `/api/users/:id`。
-- 模块没有导出请求方法对应的处理器时，返回 405。
-- API 模块会被打包进服务端入口，所以 `cormi preview` 运行构建产物时同样可用。
-
-开发阶段需要假数据时，用 [`@cormijs/plugin-mock`](/plugins/build#mock)，它的路由优先于真实的 API。
-
-## 代理
-
-`proxy` 把请求转发到其他服务器，在 dev 与 preview 下生效（排在 mock 之后）：
-
-```yaml
-- name: '@cormijs/preset'
-  config:
-    proxy:
-      /api:
-        target: http://localhost:3000
-        changeOrigin: true
-        pathRewrite:
-          ^/api: ''
-        headers:
-          x-from: cormi
-```
-
-| 选项 | 说明 |
+| 参数 | 说明 |
 |---|---|
-| `target` | 转发的目标服务器 |
-| `changeOrigin` | 发送目标服务器的 host；原来的 host 保留在 `x-forwarded-host` |
-| `pathRewrite` | 改写路径，键是正则 |
-| `headers` | 附加到转发请求的请求头 |
+| `params` | 路径参数，`[...path]` 是数组 |
+| `ctx` | 这个接口的上下文：可以使用 `inject` 声明的服务 |
+| `state` | 请求级的状态，与中间件、页面的 `loader` 共享，见 [中间件](/guide/middleware#请求状态) |
 
-请求通过 `fetch()` 转发并以流的形式返回，不支持 WebSocket。
+- 每个接口模块是一个插件：`inject` 的服务就绪之前，请求得到 503，并说明在等哪个服务；服务消失时，接口随之等待。没有声明的服务不能使用（cordis 会报 `cannot get property "database" without inject`）。
+- 参数更少的路由优先匹配：`/api/users/me` 先于 `/api/users/:id`。
+- 模块没有导出请求方法对应的处理器时返回 405，并带上 `allow` 头；没有匹配的接口时返回 404。
 
-## 服务端渲染
+开发阶段需要假数据时，用 [`@cormijs/plugin-mock`](/plugins/build#mock)，它的路由优先于真实的接口。
 
-```yaml
-- name: '@cormijs/preset'
-  config:
-    ssr: true
+## 服务端的类型
+
+服务端代码用到的服务（`ctx.database`、`ctx.model`……）由插件包声明类型。`server/env.d.ts` 引用这些包，它们的类型就在整个服务端生效：
+
+::: code-group
+
+```ts [server/env.d.ts]
+// The types of the services the server code uses: a line for each plugin of cormi.yml that provides one
+/// <reference types="@cormijs/database" />
 ```
 
-开启后，页面请求由服务端入口（`src/.cormi/server.tsx`）渲染：匹配的路由先运行 `loader`，再把应用渲染为 HTML，数据随页面发送，浏览器端 hydrate。
+:::
 
-- 服务端也会挂载应用的浏览器插件（`ctx.app.entry()` 注册的模块与 `src/app.tsx`），所以插件中只能在浏览器运行的代码要放进事件或 effect 里，或判断 `typeof window`。
-- 访问 `window`、`document` 的组件代码同样要放进 `useEffect`。
-- CSS-in-JS 库通过 `useServerInsertedHTML()` 把样式插入 `<head>`；`@cormijs/plugin-antd` 与 `@cormijs/plugin-styled-components` 已经这样做了。
-- 服务端渲染的状态码来自路由：未匹配的路径返回 404。
+新增一个提供服务的插件时，在这里加一行；`cormi g model` 会自动加上数据库的这一行。
 
-不开启 SSR 时，服务器为所有页面请求返回同一个文档，由浏览器渲染；首屏路由加载期间显示 `src/loading.tsx`。
+请求状态（`State`）与表（`Tables`）的类型通过声明合并扩展，写在设置它们的文件里：
+
+```ts
+declare module '@cormijs/cormi' {
+  interface State {
+    requestId: string
+  }
+}
+```
+
+## 热重载
+
+在 `cormi dev` 下，`server/` 中的文件变化时，服务端代码整体重新加载：旧的插件先卸载，新的再加载，所以同一个服务不会被提供两次。`server/` 导入的应用内文件随之重新加载，`node_modules` 中的依赖保持不变。
+
+## 生产环境
+
+```sh
+cormi start
+```
+
+`cormi start` 运行应用：服务端代码、构建好的页面（如果有）。服务端代码在生产环境同样直接运行源码，不需要构建；部署时带上 `server/` 与依赖即可，见 [构建与部署](/guide/deploy)。
+
+## 生成器
+
+```sh
+cormi g api todos/[id]     # server/api/todos/[id].ts
+cormi g model todo         # server/models/todo.ts（需要 @cormijs/database）
+```
