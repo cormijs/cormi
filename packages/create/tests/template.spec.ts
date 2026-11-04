@@ -13,7 +13,7 @@ describe('render', () => {
     const { paths, pkg, files } = create({ kind: 'web' })
     expect(paths.some(path => path.startsWith('server/'))).toBe(false)
     expect(paths).toContain('src/pages/index.tsx')
-    expect(pkg.scripts).toEqual({ dev: 'cormi dev', build: 'cormi build', preview: 'cormi preview', setup: 'cormi setup' })
+    expect(pkg.scripts).toEqual({ dev: 'cormi dev', build: 'cormi build', start: 'cormi start', setup: 'cormi setup' })
     expect(pkg.dependencies['@vitejs/plugin-react']).toBeDefined()
     expect(pkg.dependencies['@cormijs/database']).toBeUndefined()
     expect(pkg.devDependencies['@types/node']).toBeUndefined()
@@ -24,11 +24,12 @@ describe('render', () => {
     const { paths, pkg, files } = create({ kind: 'api' })
     expect(paths.some(path => path.startsWith('src/'))).toBe(false)
     expect(paths).toEqual(expect.arrayContaining(['server/index.ts', 'server/env.d.ts', 'server/models/todo.ts', 'server/api/todos/index.ts', 'server/api/todos/[id].ts', 'data/.gitignore']))
-    expect(pkg.scripts).toEqual({ dev: 'cormi dev', start: 'cormi start' })
+    expect(pkg.scripts).toEqual({ dev: 'cormi dev', build: 'cormi build', start: 'cormi start' })
     expect(Object.keys(pkg.dependencies)).toEqual(['@cormijs/cormi', '@cormijs/database', '@cormijs/preset', '@minatojs/driver-sqlite', 'minato'])
     expect(files['cormi.yml']).not.toMatch(/vite|react/)
     expect(JSON.parse(files['tsconfig.json']).include).toEqual(['server'])
     expect(files['.gitignore']).not.toMatch(/src\/\.cormi/)
+    expect(files['.gitignore']).toMatch(/^dist$/m)
   })
 
   it('writes the pages and the server of a full-stack app', () => {
@@ -66,6 +67,7 @@ describe('render', () => {
   it('writes the commands of the package manager', () => {
     expect(create({ kind: 'api', pm: 'npm' }).files['README.md']).toMatch(/npm start {2,}/)
     expect(create({ kind: 'web', pm: 'pnpm' }).files['README.md']).toMatch(/pnpm build {2,}/)
+    expect(create({ kind: 'api', pm: 'pnpm' }).files['README.md']).toMatch(/pnpm start {2,}the app in production, from dist\//)
   })
 
   it('imports nothing but types of server/ in the pages', () => {

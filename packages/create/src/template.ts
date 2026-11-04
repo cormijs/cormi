@@ -164,10 +164,8 @@ function renderPackage(options: Options) {
     dependencies.minato = VERSIONS.minato
   }
 
-  const scripts: Record<string, string> = { dev: 'cormi dev' }
-  if (kind.pages) scripts.build = 'cormi build'
-  // a frontend is static files: preview tries them; an app with a server runs in production with start
-  scripts[kind.server ? 'start' : 'preview'] = kind.server ? 'cormi start' : 'cormi preview'
+  // production runs the output of the build
+  const scripts: Record<string, string> = { dev: 'cormi dev', build: 'cormi build', start: 'cormi start' }
   if (kind.pages) scripts.setup = 'cormi setup'
 
   return JSON.stringify({
@@ -243,8 +241,8 @@ function renderTsconfig(options: Options) {
 }
 
 function renderGitignore(options: Options) {
-  const lines = ['node_modules', '.env']
-  if (KINDS[options.kind].pages) lines.push('dist', 'src/.cormi')
+  const lines = ['node_modules', 'dist', '.env']
+  if (KINDS[options.kind].pages) lines.push('src/.cormi')
   return lines.join('\n') + '\n'
 }
 
@@ -268,10 +266,11 @@ function renderReadme(options: Options) {
   }
 
   const command = (script: string, description: string) => runScript(options.pm, script).padEnd(21) + description
-  const commands: string[] = [command('dev', 'the dev server, at http://localhost:8000; the console is at /__cormi/')]
-  if (kind.pages) commands.push(command('build', 'the bundles of the pages, in dist/'))
-  if (kind.server) commands.push(command('start', kind.pages ? 'the app in production: the built pages and the server code' : 'the app in production'))
-  else commands.push(command('preview', 'try the build: dist/ is static files, for any static host'))
+  const commands: string[] = [
+    command('dev', 'the dev server, from the sources, at http://localhost:8000; the console is at /__cormi/'),
+    command('build', kind.pages ? 'the pages and the compiled server code, in dist/' : 'the compiled server code, in dist/'),
+    command('start', 'the app in production, from dist/'),
+  ]
 
   const sections = [
     `# ${options.name}`,
@@ -286,6 +285,9 @@ function renderReadme(options: Options) {
     ...commands,
     '```',
   ]
+  if (!kind.server) {
+    sections.push('', 'Without a server, the pages are static files as well: dist/ (but dist/node, the code of `cormi start`) can go to any static host.')
+  }
   if (kind.pages && kind.server) {
     sections.push(
       '',

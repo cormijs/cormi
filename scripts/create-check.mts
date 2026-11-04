@@ -1,5 +1,6 @@
 // Checks the apps of @cormijs/create: each kind is created, installed with the
-// packages of the workspace, type-checked, built, served and used in a browser.
+// packages of the workspace, type-checked, built, started in production
+// without its sources, and used in a browser.
 //
 //   node --import tsx scripts/create-check.mts [id ...]
 //
@@ -7,7 +8,7 @@
 // and removed afterwards; pnpm-lock.yaml is restored.
 import assert from 'node:assert/strict'
 import { type ChildProcess, execFileSync, spawn } from 'node:child_process'
-import { readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import type { Browser, Page } from 'playwright-core'
@@ -81,7 +82,7 @@ const CASES: Record<string, Case> = {
   'api-none': {
     args: ['-t', 'api', '--database', 'none'],
     async check(page, base) {
-      assert.match((await json(`${base}/api/hello`)).body.message, /^Hello from the server, in preview mode$/)
+      assert.match((await json(`${base}/api/hello`)).body.message, /^Hello from the server, in start mode$/)
     },
   },
   'fullstack-react-vite-sqlite': {
@@ -99,7 +100,7 @@ const CASES: Record<string, Case> = {
     args: ['-t', 'fullstack', '--ui', 'react', '--bundler', 'rsbuild', '--database', 'none'],
     async check(page, base) {
       await page.goto(base)
-      await page.waitForSelector('#message:text("Hello from the server, in preview mode")')
+      await page.waitForSelector('#message:text("Hello from the server, in start mode")')
     },
   },
   'ssr-react-vite-sqlite': {
@@ -128,11 +129,14 @@ const CASES: Record<string, Case> = {
     async check(page, base, browser) {
       const noJs = await (await browser.newContext({ javaScriptEnabled: false })).newPage()
       await noJs.goto(base)
-      assert.equal(await noJs.textContent('#message'), 'Hello from the server, in preview mode')
+      assert.equal(await noJs.textContent('#message'), 'Hello from the server, in start mode')
       await noJs.context().close()
     },
   },
 }
+
+/** the sources of an app, absent when it runs in production */
+const SOURCES = ['src', 'server']
 
 const selected = process.argv.slice(2)
 const ids = selected.length ? selected : Object.keys(CASES)
@@ -182,11 +186,13 @@ try {
       if (meta.scripts.setup) execFileSync(process.execPath, [cli, 'setup'], { cwd, stdio: 'ignore' })
       // .vue files need vue-tsc
       if (!meta.dependencies.vue) execFileSync(process.execPath, [tsc, '-p', '.'], { cwd, encoding: 'utf8' })
-      if (meta.scripts.build) execFileSync(process.execPath, [cli, 'build'], { cwd, stdio: 'ignore' })
-      server = spawn(process.execPath, [cli, meta.scripts.start ? 'start' : 'preview', '--port', base.split(':')[2]], { cwd, stdio: ['ignore', 'pipe', 'pipe'] })
+      execFileSync(process.execPath, [cli, 'build'], { cwd, stdio: 'ignore' })
+      // production runs the output of the build: the sources are not deployed
+      for (const dir of SOURCES) if (existsSync(`${cwd}/${dir}`)) renameSync(`${cwd}/${dir}`, `${cwd}/${dir}.source`)
+      server = spawn(process.execPath, [cli, 'start', '--port', base.split(':')[2]], { cwd, stdio: ['ignore', 'pipe', 'pipe'] })
       server.stdout!.on('data', data => output += data)
       server.stderr!.on('data', data => output += data)
-      await waitForServer(meta.scripts.build ? base : `${base}/api/`, server)
+      await waitForServer(meta.dependencies['@cormijs/vite'] || meta.dependencies['@cormijs/rsbuild'] ? base : `${base}/api/`, server)
       // the API routes of the database answer 503 until it is there
       if (meta.dependencies['@cormijs/database']) {
         for (let i = 0; i < 50 && (await fetch(`${base}/api/todos`)).status === 503; i++) await new Promise(resolve => setTimeout(resolve, 200))
@@ -203,6 +209,7 @@ try {
         server.kill('SIGTERM')
         await new Promise(resolve => server!.once('exit', resolve))
       }
+      for (const dir of SOURCES) if (existsSync(`${cwd}/${dir}.source`)) renameSync(`${cwd}/${dir}.source`, `${cwd}/${dir}`)
     }
   }
   await browser.close()
