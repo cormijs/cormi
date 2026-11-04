@@ -393,6 +393,9 @@ importers:
       '@cormijs/preset':
         specifier: workspace:*
         version: link:../../packages/preset
+      '@cormijs/storage':
+        specifier: workspace:*
+        version: link:../../packages/storage
       '@minatojs/driver-sqlite':
         specifier: ^5.0.3
         version: 5.0.3(cordis@4.0.0-rc.12)(minato@4.0.1(cordis@4.0.0-rc.12))
@@ -1265,6 +1268,74 @@ importers:
       path-to-regexp:
         specifier: ^8.3.0
         version: 8.4.2
+
+  packages/storage:
+    dependencies:
+      '@cordisjs/plugin-server':
+        specifier: ^1.7.0
+        version: 1.7.0(cordis@4.0.0-rc.12)
+      '@cormijs/core':
+        specifier: workspace:*
+        version: link:../core
+      '@cormijs/server':
+        specifier: workspace:*
+        version: link:../server
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../vue
+
+  packages/storage-s3:
+    dependencies:
+      '@cormijs/core':
+        specifier: workspace:*
+        version: link:../core
+      '@cormijs/storage':
+        specifier: workspace:*
+        version: link:../storage
+      aws4fetch:
+        specifier: ^1.0.20
+        version: 1.0.20
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../vue
 
   packages/vite:
     dependencies:
@@ -4745,6 +4816,9 @@ packages:
   ast-walker-scope@0.10.0:
     resolution: {integrity: sha512-KzvoxDfXNz2Gm8KYLh47K3qcY3Zza3WKOuh2xoqa7LBu6MDKWAZLovJtU9DuAd/Er+rhQHCRn619lHS5U+qmhw==}
     engines: {node: ^22.18.0 || >=24.11.0}
+
+  aws4fetch@1.0.20:
+    resolution: {integrity: sha512-/djoAN709iY65ETD6LKCtyyEI04XIBP5xVvfmNxsEP0uJB5tyaGBztSryRr4HqMStr9R06PisQE7m9zDTXKu6g==}
 
   babel-dead-code-elimination@2.0.0:
     resolution: {integrity: sha512-TFbyivU8lYkdTbu0RBW+RUU77OizhOuYcvC+PioWCHz+D3DAmlpGrll515D+qzU0KnnTSrvJO+ESGHttp16/rg==}
@@ -9507,6 +9581,8 @@ snapshots:
       '@babel/parser': 8.0.10
       '@babel/types': 8.0.10
       ast-kit: 3.0.0
+
+  aws4fetch@1.0.20: {}
 
   babel-dead-code-elimination@2.0.0:
     dependencies:

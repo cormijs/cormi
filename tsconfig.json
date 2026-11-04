@@ -38,6 +38,9 @@
       "path": "./packages/storage"
     },
     {
+      "path": "./packages/storage-s3"
+    },
+    {
       "path": "./packages/create"
     },
     {

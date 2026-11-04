@@ -1,0 +1,67 @@
+{
+  "name": "@cormijs/storage-s3",
+  "description": "The file storage of a Cormi app (ctx.storage) in S3 or a compatible service: AWS, Cloudflare R2, MinIO, Aliyun OSS\u2026",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/storage-s3#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/storage-s3"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "storage",
+    "files",
+    "s3",
+    "r2",
+    "minio",
+    "bundler:*",
+    "renderer:*",
+    "impl:storage"
+  ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "storage"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cormijs/core": "workspace:*",
+    "@cormijs/storage": "workspace:*",
+    "aws4fetch": "^1.0.20",
+    "cordis": "4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*"
+  }
+}
