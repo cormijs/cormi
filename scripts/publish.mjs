@@ -19,6 +19,13 @@ async function isPublished(name, version) {
   }
 }
 
+/** Move `latest` to a prerelease when it points to a prerelease too (or to nothing). */
+async function followLatest(name, version) {
+  const tags = await (await fetch(`${registry}/-/package/${name.replace('/', '%2f')}/dist-tags`)).json().catch(() => ({}))
+  if (tags.latest && !tags.latest.includes('-')) return
+  spawnSync('npm', ['dist-tag', 'add', `${name}@${version}`, 'latest'], { stdio: 'inherit' })
+}
+
 const failed = []
 for (const { dir, path, meta } of readPackages()) {
   if (await isPublished(meta.name, meta.version)) {
@@ -29,7 +36,12 @@ for (const { dir, path, meta } of readPackages()) {
   console.log(`publishing ${meta.name}@${meta.version} (${tag}) from ${path}`)
   const args = ['publish', '--access', 'public', '--tag', tag, '--no-git-checks', ...process.env.CI ? ['--provenance'] : [], ...dryRun ? ['--dry-run'] : []]
   const result = spawnSync('pnpm', args, { cwd: dir, stdio: 'inherit' })
-  if (result.status) failed.push(meta.name)
+  if (result.status) {
+    failed.push(meta.name)
+    continue
+  }
+  // until there is a stable version, `latest` follows the newest prerelease
+  if (tag === 'next' && !dryRun) await followLatest(meta.name, meta.version)
 }
 if (failed.length) {
   console.error(`failed to publish ${failed.join(', ')}`)
