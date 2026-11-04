@@ -4,6 +4,7 @@ import { dirname, join, relative } from 'node:path'
 import type { Entry, EntryGroup, EntryTree } from '@cordisjs/plugin-loader'
 import { checkCompat, type CompatResult, conclude, type Dimension, forExport, getPackageName, type Manifest, providedStack, readJSON, type RegistryIndex, type RegistryObject, resolvePackageDir, type Stack, winPath } from '@cormijs/core'
 import type {} from '@cormijs/rsbuild'
+import { type ApiRouteStatus, getApiRoutes } from '@cormijs/server'
 import type {} from '@cormijs/vite'
 import { type Context, type Fiber, Logger, type Message } from 'cordis'
 import { compare, prerelease, rcompare, valid } from 'semver'
@@ -43,6 +44,21 @@ export interface RouteInfo {
   meta?: Record<string, any>
 }
 
+/** A route that a plugin registers on `ctx.server` itself. */
+export interface ServerRouteInfo {
+  method: string
+  path: string
+  /** the plugin that registered it */
+  plugin?: string
+}
+
+/** The data of the page of API routes. */
+export interface ApiInfo {
+  routes: ApiRouteStatus[]
+  /** the routes of plugins, besides those of server/api */
+  plugins: ServerRouteInfo[]
+}
+
 export interface ServiceInfo {
   name: string
   provider: string
@@ -77,6 +93,8 @@ export interface MarketPackage {
   compat: CompatInfo
   /** published by the Cormi project */
   official?: boolean
+  /** of the cordis ecosystem, listed by the registry, e.g. a driver of minato */
+  external?: boolean
   downloads?: number
   /** the registry checked it: whether it declares what the check infers */
   verified?: 'matches' | 'differs'
@@ -278,6 +296,17 @@ export function Builtin(ctx: Context, config: Console.Config) {
   ctx.on('router/update', () => appData.refresh())
   ctx.on('app/generate', () => appData.refresh())
 
+  // the API routes of server/api, with the services they wait for, and the routes of plugins
+  const api = ctx.console.data('api', (): ApiInfo => ({
+    routes: getApiRoutes(ctx),
+    plugins: [...ctx.server.httpRoutes]
+      // the catch-all that dispatches server/api
+      .filter(route => !(route.method === 'all' && String(route.path).endsWith('{/*rest}')))
+      .map(route => ({ method: route.method.toUpperCase(), path: String(route.path), plugin: route.fiber?.name })),
+  }))
+  ctx.on('api/update', () => api.refresh())
+  ctx.on('internal/status', () => api.refresh())
+
   // logs: the recent ones when a client connects, then each as it comes
   const exporter = { colors: false as const, export: () => {} }
   const toRecord = (message: Message): LogRecord => ({
@@ -392,6 +421,7 @@ export function Builtin(ctx: Context, config: Console.Config) {
     installed: installed[object.name],
     compat: toCompat(object.manifest, stack),
     official: object.official || undefined,
+    external: object.external || undefined,
     downloads: object.downloads?.lastMonth,
     verified: object.verified ? object.verified.matches ? 'matches' : 'differs' : undefined,
   })

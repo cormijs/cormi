@@ -1201,3 +1201,20 @@ textarea {
 .cc-detail-compat {
   margin-top: 8px;
 }
+
+.cc-response pre {
+  max-height: 420px;
+  margin: 10px 0 0;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid var(--cc-rule);
+  border-radius: 8px;
+  background: var(--cc-panel);
+  font-size: 12.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cc-response details {
+  margin-top: 6px;
+}

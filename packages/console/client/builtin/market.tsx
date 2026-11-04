@@ -76,6 +76,7 @@ function MarketItem(props: { pkg: MarketPackage }) {
         {' '}
         <CompatTags compat={pkg.compat} />
         {pkg.official && <Tag tone="leaf">官方</Tag>}
+        {pkg.external && <Tag>cordis 生态</Tag>}
         {pkg.verified === 'matches' && <Tag tone="leaf">已验证</Tag>}
         {pkg.verified === 'differs' && <Tag tone="amber">声明与检查不一致</Tag>}
         {installed && <Tag tone="leaf">已安装</Tag>}

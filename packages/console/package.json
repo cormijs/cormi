@@ -44,6 +44,7 @@
     "@cordisjs/plugin-server": "^1.7.0",
     "@cormijs/core": "workspace:*",
     "@cormijs/react": "workspace:*",
+    "@cormijs/server": "workspace:*",
     "@fontsource-variable/recursive": "^5.3.0",
     "@vitejs/plugin-react": "^5.2.0",
     "cordis": "4.0.0-rc.12",

@@ -242,6 +242,8 @@ export interface RegistryObject {
   manifest: Manifest
   /** published by the Cormi project (`@cormijs/*`) */
   official: boolean
+  /** a package of the cordis ecosystem that the registry lists, with a manifest of its own, e.g. a driver of minato */
+  external?: boolean
   downloads?: { lastMonth: number }
   /** the result of `cormi plugin check` on this version */
   verified?: {

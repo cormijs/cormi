@@ -2,6 +2,7 @@ import type { Context } from '@cormijs/react/client'
 import type { LogRecord } from '../../src/builtin.ts'
 import { logs } from '../hooks.ts'
 import { icons } from '../icons.tsx'
+import ApiPage from './api.tsx'
 import AppPage from './app.tsx'
 import LogsPage from './logs.tsx'
 import MarketPage from './market.tsx'
@@ -15,6 +16,7 @@ export default (ctx: Context) => {
   ctx.$console.page({ path: '/', name: '概览', icon: icons.overview, order: 0, component: Overview })
   ctx.$console.page({ path: '/plugins', name: '插件', icon: icons.plugins, order: 10, component: PluginsPage })
   ctx.$console.page({ path: '/app', name: '应用', icon: icons.app, order: 20, component: AppPage })
+  ctx.$console.page({ path: '/api', name: '接口', icon: icons.api, order: 25, component: ApiPage })
   ctx.$console.page({ path: '/services', name: '服务', icon: icons.services, order: 30, component: ServicesPage })
   ctx.$console.page({ path: '/logs', name: '日志', icon: icons.logs, order: 40, component: LogsPage })
   ctx.$console.page({ path: '/workspace', name: '工作区', icon: icons.workspace, order: 50, component: WorkspacePage })
