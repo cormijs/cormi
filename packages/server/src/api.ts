@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { watch } from 'chokidar'
-import { getConventionRoutes, ModuleReloader, NODE_DIR, Schema, winPath } from '@cormijs/core'
+import { ModuleReloader, NODE_DIR, Schema, winPath } from '@cormijs/core'
 import type { Context, Fiber } from 'cordis'
 import { match, type MatchFunction } from 'path-to-regexp'
 import type { ServerRequest } from './http.ts'
@@ -74,14 +74,29 @@ export function isApiRequest(req: ServerRequest) {
   return apiRequests.has(req._req)
 }
 
-/** `users/[id]` -> `/api/users/:id`, `files/[...path]` -> `/api/files/*path` */
-function toPath(prefix: string, absPath: string) {
-  const path = absPath
-    .replace(/\/+/g, '/')
-    .replace(/\[\.\.\.([^\]]+)\]/g, '*$1')
-    .replace(/\[([^\]]+)\]/g, ':$1')
-    .replace(/\/(index)?$/, '')
-  return prefix + path
+/** `users/[id]` -> `/api/users/:id`, `files/[...path]` -> `/api/files/*path`, `users/index` -> `/api/users` */
+export function toApiPath(prefix: string, id: string) {
+  const path = id.split('/')
+    .map(segment => segment.replace(/^\[\.\.\.(\w+)\]$/, '*$1').replace(/^\[(\w+)\]$/, ':$1'))
+    .join('/')
+    .replace(/(^|\/)index$/, '')
+  return path ? `${prefix}/${path}` : prefix
+}
+
+/** The modules of a directory of API routes, by their ids: `users/[id].ts` -> `users/[id]`. */
+function scanApiFiles(dir: string, base = ''): [id: string, file: string][] {
+  if (!existsSync(dir)) return []
+  const result: [string, string][] = []
+  for (const dirent of readdirSync(dir, { withFileTypes: true })) {
+    if (dirent.name.startsWith('.')) continue
+    const file = join(dir, dirent.name)
+    if (dirent.isDirectory()) {
+      result.push(...scanApiFiles(file, `${base}${dirent.name}/`))
+    } else if (/\.[cm]?[jt]s$/.test(dirent.name) && !/\.d\.[cm]?ts$/.test(dirent.name)) {
+      result.push([base + dirent.name.replace(/\.[cm]?[jt]s$/, ''), file])
+    }
+  }
+  return result
 }
 
 /** The services of a route: those it injects, and `auth` if it requires a user. */
@@ -114,13 +129,7 @@ function scanServerCode(ctx: Context, prefix: string): ServerCode {
     ...['index.ts', 'index.js'].map(file => join(root, file)).filter(existsSync).slice(0, 1),
     ...existsSync(join(root, 'models')) ? readdirSync(join(root, 'models')).filter(file => /\.[cm]?[jt]s$/.test(file) && !file.endsWith('.d.ts')).sort().map(file => join(root, 'models', file)) : [],
   ]
-  const routes = existsSync(apiDir)
-    ? Object.values(getConventionRoutes({ base: apiDir, extensions: ['.ts', '.js'] })).map(route => ({
-        id: route.id,
-        path: toPath(prefix, route.absPath ?? ''),
-        file: toRelative(join(apiDir, route.file!)),
-      }))
-    : []
+  const routes = scanApiFiles(apiDir).map(([id, file]) => ({ id, path: toApiPath(prefix, id), file: toRelative(file) }))
   return { plugins: plugins.map(toRelative), routes }
 }
 
