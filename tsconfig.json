@@ -35,6 +35,9 @@
       "path": "./packages/cache-database"
     },
     {
+      "path": "./packages/storage"
+    },
+    {
       "path": "./packages/create"
     },
     {

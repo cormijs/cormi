@@ -1,0 +1,65 @@
+{
+  "name": "@cormijs/storage",
+  "description": "The file storage of a Cormi app (ctx.storage): files by key, on the local disk; S3 with @cormijs/storage-s3",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/storage#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/storage"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "storage",
+    "files",
+    "upload",
+    "bundler:*",
+    "renderer:*",
+    "impl:storage"
+  ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "storage"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cordisjs/plugin-server": "^1.7.0",
+    "@cormijs/core": "workspace:*",
+    "@cormijs/server": "workspace:*",
+    "cordis": "4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*"
+  }
+}
