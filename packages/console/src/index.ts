@@ -55,12 +55,18 @@ export class Console extends Service {
   private _server: Promise<ConsoleServer | undefined> = Promise.resolve(undefined)
   // browsers load the console again when its entry changes; changes in a burst reload once
   private _reload: Refresher
+  // the entry the browsers have: a plugin that reloads registers the same page again, which changes nothing
+  private _loaded?: string
 
   constructor(ctx: Context, public config: Console.Config) {
     super(ctx, 'console')
     this._ctx = ctx
     const base = this.base
-    this._reload = new Refresher(async () => (await this._server)?.reloadEntry(), 50, error => ctx.logger('console').warn(error))
+    const render = () => renderEntry([...this.entries], { client: CLIENT, base, endpoint: base + 'ws' })
+    this._reload = new Refresher(async () => {
+      if (render() === this._loaded) return
+      ;(await this._server)?.reloadEntry()
+    }, 50, error => ctx.logger('console').warn(error))
 
     ctx.effect(() => {
       const server = this._server = createConsoleServer({
@@ -68,7 +74,7 @@ export class Console extends Service {
         cwd: ctx.cormi.cwd,
         http: ctx.server._http,
         workspace: ctx.get('workspace'),
-        entry: () => renderEntry([...this.entries], { client: CLIENT, base, endpoint: base + 'ws' }),
+        entry: () => this._loaded = render(),
       }).catch((error) => {
         ctx.logger('console').error(error)
         return undefined
