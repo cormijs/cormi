@@ -911,6 +911,9 @@ importers:
       '@cormijs/react':
         specifier: workspace:*
         version: link:../react
+      '@cormijs/server':
+        specifier: workspace:*
+        version: link:../server
       '@fontsource-variable/recursive':
         specifier: ^5.3.0
         version: 5.3.0
@@ -1089,6 +1092,9 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(cordis@4.0.0-rc.12)
     devDependencies:
+      '@cormijs/console':
+        specifier: workspace:*
+        version: link:../console
       '@cormijs/cormi':
         specifier: workspace:*
         version: link:../cormi
@@ -1107,6 +1113,12 @@ importers:
       '@cormijs/vue':
         specifier: workspace:*
         version: link:../vue
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
 
   packages/preset:
     dependencies:

@@ -11,11 +11,13 @@
       "types": "./lib/index.d.ts",
       "default": "./lib/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./console": "./console/index.tsx"
   },
   "files": [
     "lib",
-    "src"
+    "src",
+    "console"
   ],
   "license": "MIT",
   "homepage": "https://github.com/cormijs/cormi/tree/main/packages/database#readme",
@@ -57,11 +59,23 @@
     "minato": "^4.0.1"
   },
   "devDependencies": {
+    "@cormijs/console": "workspace:*",
     "@cormijs/cormi": "workspace:*",
     "@cormijs/preset": "workspace:*",
     "@cormijs/react": "workspace:*",
     "@cormijs/rsbuild": "workspace:*",
     "@cormijs/vite": "workspace:*",
-    "@cormijs/vue": "workspace:*"
+    "@cormijs/vue": "workspace:*",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1"
+  },
+  "peerDependencies": {
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/console": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@cormijs/console": {
+      "optional": true
+    }
   }
 }
