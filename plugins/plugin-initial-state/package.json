@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-initial-state",
   "description": "The initial state of Cormi apps, provided by runtime plugins through an event",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

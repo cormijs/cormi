@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/react",
   "description": "React for Cormi apps: the renderer of the route table, and the browser API (@cormijs/react/client) with react-router and server rendering",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "type": "module",
   "main": "lib/node/index.js",
   "types": "lib/node/index.d.ts",

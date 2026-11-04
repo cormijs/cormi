@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/create",
   "description": "Create a Cormi app: a frontend, a backend, both, or pages rendered on the server",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "type": "module",
   "bin": {
     "create-cormi": "bin/create.js"

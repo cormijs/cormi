@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/database",
   "description": "The database of a Cormi app: minato's ctx.model and ctx.database, with any minato driver",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
