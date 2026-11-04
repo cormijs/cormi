@@ -155,6 +155,8 @@ export class App extends Service {
 
   /** Regenerate the files soon. */
   refresh() {
+    // in production, the pages are built already: the sources are not written, nor needed
+    if (this.ctx.cormi.mode === 'start') return
     this._refresher.schedule()
   }
 

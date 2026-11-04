@@ -120,7 +120,8 @@ export class Workspace extends Service {
     const packages = scanWorkspace(this.ctx.cormi.cwd)
     const changed = JSON.stringify(packages) !== JSON.stringify(this.packages)
     this.packages = packages
-    if (Object.keys(packages).length || port) registerResolution(packages)
+    // in production, the packages resolve to their compiled code, see loadNodeBuild()
+    if (this.ctx.cormi.mode !== 'start' && (Object.keys(packages).length || port)) registerResolution(packages)
     if (changed) this.ctx.emit('workspace/update', packages)
   }
 

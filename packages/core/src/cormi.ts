@@ -1,5 +1,6 @@
 import { join, resolve } from 'node:path'
 import { Context, Service } from 'cordis'
+import type { NodeBuild } from './compile.ts'
 
 declare module 'cordis' {
   interface Context {
@@ -8,18 +9,20 @@ declare module 'cordis' {
 }
 
 /**
- * - `dev`: serve the app with the dev server, watch files
- * - `build`: write the client (and server) bundles, then exit
- * - `preview`: serve the build output
+ * - `dev`: serve the app with the dev server, from its sources, watch files
+ * - `build`: write the bundles of the pages and compile the Node code, then exit
+ * - `start`: serve the app in production, from the output of `build`
  * - `setup`: write the generated files only (e.g. before type checking)
  */
-export type Mode = 'dev' | 'build' | 'preview' | 'setup'
+export type Mode = 'dev' | 'build' | 'start' | 'setup'
 
 export namespace Cormi {
   export interface Options {
     /** root directory of the app */
     cwd: string
     mode: Mode
+    /** the compiled Node code, in `start` mode */
+    build?: NodeBuild
   }
 
   export interface Paths {
@@ -45,11 +48,14 @@ export class Cormi extends Service {
   readonly cwd: string
   readonly mode: Mode
   readonly paths: Cormi.Paths
+  /** the Node code that `cormi build` compiled (`dist/node`), which the app runs in `start` mode */
+  readonly build?: NodeBuild
 
   constructor(ctx: Context, options: Cormi.Options) {
     super(ctx, 'cormi')
     this.cwd = resolve(options.cwd)
     this.mode = options.mode
+    this.build = options.build
     const src = join(this.cwd, 'src')
     this.paths = {
       cwd: this.cwd,
@@ -66,12 +72,12 @@ export class Cormi extends Service {
   }
 
   /**
-   * Whether the app serves requests (`dev`, `preview`): the server side of the
+   * Whether the app serves requests (`dev`, `start`): the server side of the
    * app, its code in `server/` and services such as the database, runs only
    * then, not when it builds or writes files.
    */
   get serving() {
-    return this.mode === 'dev' || this.mode === 'preview'
+    return this.mode === 'dev' || this.mode === 'start'
   }
 
   /** Resolve a path against the app root. */

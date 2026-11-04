@@ -31,7 +31,7 @@ export async function createFile(file: string, content: string) {
  * and generators of `cormi generate` with `generator()`; both are effects of
  * the calling plugin. `start()` provides the service on the root context.
  *
- * Commands other than dev, build, preview and setup run once the plugin tree
+ * Commands other than dev, build, start and setup run once the plugin tree
  * has loaded in `setup` mode.
  */
 export class Cli extends Service {

@@ -6,6 +6,7 @@ import Logger from '@cordisjs/plugin-logger-console'
 import Timer from '@cordisjs/plugin-timer'
 import { Context, Fiber } from 'cordis'
 import { Cli } from './cli.ts'
+import { loadNodeBuild } from './compile.ts'
 import { Cormi } from './cormi.ts'
 import { loadEnv } from './env.ts'
 import { Workspace } from './workspace.ts'
@@ -41,13 +42,15 @@ export async function start(options: StartOptions) {
   const cwd = resolve(options.cwd)
   loadEnv({ cwd, envFile: '.env' })
   process.env.NODE_ENV ??= options.mode === 'dev' ? 'development' : 'production'
+  // in production, the plugin tree imports the compiled code of the app instead of its sources
+  const build = options.mode === 'start' ? await loadNodeBuild(cwd) : undefined
 
   const ctx = new Context()
   ctx.baseUrl = pathToFileURL(cwd).href + '/'
   if (options.logger !== false) await ctx.plugin(Logger)
   await ctx.plugin(Timer)
   // eslint-disable-next-line no-new
-  new Cormi(ctx, { cwd, mode: options.mode })
+  new Cormi(ctx, { cwd, mode: options.mode, build })
   // eslint-disable-next-line no-new
   new Cli(ctx)
   await ctx.plugin(Workspace)
