@@ -1,0 +1,7 @@
+# a backend: no bundler and no UI framework, so the app has no pages
+- name: '@cormijs/preset'
+# the database of server/: ctx.model and ctx.database, with SQLite
+- name: '@cormijs/database'
+- name: '@minatojs/driver-sqlite'
+  config:
+    path: data/app.db

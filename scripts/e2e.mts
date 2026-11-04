@@ -32,6 +32,10 @@ interface Example {
   ignore?: RegExp[]
   /** the bundlers the example runs with (default: vite) */
   bundlers?: string[]
+  /** the path that answers once the server is up (default: `/`, a page) */
+  ready?: string
+  /** files of the example to remove before it runs, e.g. its database */
+  clean?: string[]
 }
 
 /** The plugin tree of an example with another bundler: in place of @cormijs/vite, or next to @cormijs/preset for the shorthand. */
@@ -141,6 +145,8 @@ const checks: Record<string, Check> = {
     const noJs = await (await browser.newContext({ javaScriptEnabled: false })).newPage()
     await noJs.goto(`${base}/about`)
     assert.match((await text(noJs, '#loader'))!, /^served by \w+ on \d{4}-\d{2}-\d{2}$/)
+    // the loader's context is the app's
+    assert.equal(await text(noJs, '#mode'), `rendered in ${dev ? 'dev' : 'preview'} mode`)
     assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('nav')!).display), 'flex')
     assert.equal(await noJs.getAttribute('meta[name=generator]', 'content'), 'cormi')
     // file conventions: global.css, overrides.css (prefixed with body), public/favicon.svg
@@ -177,6 +183,7 @@ const checks: Record<string, Check> = {
       try {
         await page.goto(`http://localhost:${port}/about`)
         assert.match((await text(page, '#loader'))!, /^served by \w+ on \d{4}-\d{2}-\d{2}$/)
+        assert.equal(await text(page, '#mode'), 'rendered in build mode')
         await page.waitForFunction(() => document.title === 'Cormi · /about')
         await page.goto(`http://localhost:${port}/users/1`)
         assert.equal(await text(page, '#user'), 'User 1')
@@ -234,6 +241,33 @@ const checks: Record<string, Check> = {
     await page.waitForSelector('text=only the antd plugin reloads')
   },
 
+  async 'with-api'(page, base) {
+    // a backend: no pages
+    assert.equal((await fetch(base, { headers: { accept: 'text/html' } })).status, 404)
+    // the middleware of server/index.ts and the route share the state of the request
+    const health = await fetch(`${base}/api/health`, { headers: { 'x-request-id': 'e2e' } })
+    assert.equal(health.headers.get('x-request-id'), 'e2e')
+    assert.match(health.headers.get('server-timing')!, /^app;dur=/)
+    assert.deepEqual(await health.json(), { ok: true, mode: dev ? 'dev' : 'preview', requestId: 'e2e' })
+
+    // the routes of the database answer 503 until it is there
+    await waitFor(async () => (await fetch(`${base}/api/todos`)).status === 200)
+    assert.deepEqual((await fetch(`${base}/api/todos`).then(res => res.json())).map((todo: any) => todo.title), ['Try Cormi'])
+    const created = await fetch(`${base}/api/todos`, { method: 'POST', body: JSON.stringify({ title: 'Ship it' }) })
+    assert.equal(created.status, 201)
+    const { id } = await created.json()
+    const patched = await fetch(`${base}/api/todos/${id}`, { method: 'PATCH', body: JSON.stringify({ done: true }) }).then(res => res.json())
+    assert.equal(patched.done, true)
+    assert.equal((await fetch(`${base}/api/todos/${id}`, { method: 'DELETE' })).status, 204)
+    assert.equal((await fetch(`${base}/api/todos/${id}`)).status, 404)
+    assert.equal((await fetch(`${base}/api/todos`, { method: 'POST', body: '{}' })).status, 400)
+
+    const put = await fetch(`${base}/api/todos/1`, { method: 'PUT' })
+    assert.equal(put.status, 405)
+    assert.equal(put.headers.get('allow'), 'DELETE, GET, PATCH')
+    assert.deepEqual(await fetch(`${base}/api/nothing`).then(res => res.json()), { error: 'not found' })
+  },
+
   async 'with-model'(page, base) {
     await page.goto(`${base}/`)
     await page.waitForFunction(() => document.querySelector('#user')?.textContent?.startsWith('signed in'))
@@ -260,6 +294,7 @@ const checks: Record<string, Check> = {
 const examples: Record<string, Example> = {
   ...Object.fromEntries(Object.entries(checks).map(([name, check]) => [name, { check }])),
   'basic': { check: checks.basic, bundlers: ['vite', 'rsbuild'] },
+  'with-api': { check: checks['with-api'], ready: '/api/health', clean: ['data/app.db'] },
   'with-tailwind': { check: checks['with-tailwind'], bundlers: ['vite', 'rsbuild'] },
 
   'with-request': {
@@ -580,10 +615,10 @@ const examples: Record<string, Example> = {
   },
 }
 
-async function waitForServer(base: string, server: ChildProcess) {
+async function waitForServer(base: string, server: ChildProcess, ready = '/') {
   for (let i = 0; i < 120; i++) {
     if (server.exitCode !== null) throw new Error(`the server exited with code ${server.exitCode}`)
-    const status = await fetch(base, { headers: { accept: 'text/html' } }).then(res => res.status, () => 0)
+    const status = await fetch(base + ready, { headers: { accept: 'text/html' } }).then(res => res.status, () => 0)
     if (status === 200) return
     await new Promise(resolve => setTimeout(resolve, 500))
   }
@@ -609,6 +644,7 @@ for (const [index, name] of names.entries()) {
   try {
     for (const [offset, server] of servers.entries()) {
       const cwd = `${root}examples/${server.dir}`
+      for (const file of example.clean ?? []) await rm(join(cwd, file), { force: true })
       const env = { ...process.env, ...server.env?.(bases) }
       const config: string[] = []
       if (bundler !== 'vite') {
@@ -625,7 +661,7 @@ for (const [index, name] of names.entries()) {
       child.stdout!.on('data', data => output += data)
       child.stderr!.on('data', data => output += data)
       processes.push(child)
-      await waitForServer(bases[offset], child)
+      await waitForServer(bases[offset], child, example.ready)
     }
     await example.check(page, bases[0], browser, bases)
     assert.deepEqual(errors.filter(error => !example.ignore?.some(pattern => pattern.test(error))), [], 'no errors in the browser')

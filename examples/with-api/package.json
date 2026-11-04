@@ -1,0 +1,20 @@
+{
+  "name": "@cormijs/example-with-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cormi dev",
+    "start": "cormi start"
+  },
+  "dependencies": {
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/database": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@minatojs/driver-sqlite": "^5.0.3",
+    "minato": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~5.9.3"
+  }
+}

@@ -379,6 +379,31 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
 
+  examples/with-api:
+    dependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../../packages/cormi
+      '@cormijs/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../../packages/preset
+      '@minatojs/driver-sqlite':
+        specifier: ^5.0.3
+        version: 5.0.3(cordis@4.0.0-rc.12)(minato@4.0.1(cordis@4.0.0-rc.12))
+      minato:
+        specifier: ^4.0.1
+        version: 4.0.1(cordis@4.0.0-rc.12)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.5
+        version: 22.20.5
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+
   examples/with-console:
     dependencies:
       '@cormijs/cormi':
@@ -876,6 +901,46 @@ importers:
       '@types/yargs-parser':
         specifier: ^21.0.3
         version: 21.0.3
+
+  packages/create:
+    dependencies:
+      '@clack/prompts':
+        specifier: ^1.8.1
+        version: 1.8.1
+
+  packages/database:
+    dependencies:
+      '@cordisjs/plugin-logger':
+        specifier: ^1.0.2
+        version: 1.0.2(cordis@4.0.0-rc.12)
+      '@cormijs/core':
+        specifier: workspace:*
+        version: link:../core
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+      minato:
+        specifier: ^4.0.1
+        version: 4.0.1(cordis@4.0.0-rc.12)
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../vue
 
   packages/preset:
     dependencies:
@@ -2400,6 +2465,14 @@ packages:
   '@cacheable/utils@2.5.0':
     resolution: {integrity: sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA==}
 
+  '@clack/core@1.5.1':
+    resolution: {integrity: sha512-iHTrHA8MtVuLl2TfZySmcKv1qO2PoyC9Z7pfSDozEuV5vtY3/wcOPKJXlqJ5Oq2Cx5DDGQGAMVx6HZfRRoVEbQ==}
+    engines: {node: '>= 20.12.0'}
+
+  '@clack/prompts@1.8.1':
+    resolution: {integrity: sha512-dlT1m5e/0yUL0kRNcQn7yGLVThkgbB0Ga/1AmfDDC/8ik6AIiSf2QLQO2zPYvefsHP0aFgxO93cVLCCfDp7kzQ==}
+    engines: {node: '>= 20.12.0'}
+
   '@cordisjs/plugin-hmr@1.1.2':
     resolution: {integrity: sha512-4A62W7ZRnh1knBJNfD/8TnQ1M781amxvPkvrh0njQ/IeR6RxHYezGKgpeubYPDXxkb0DgIJD1tuX90Gng3zHbg==}
     peerDependencies:
@@ -2425,6 +2498,12 @@ packages:
     resolution: {integrity: sha512-D+i/5+glLljGlLudmoQ1y4rfNpVhyjI4oNDOtEMI7Mtqg/JlAqBgW61NKm+ojDnxUqm5IrTH3NV6sHOa/r8QKw==}
     peerDependencies:
       cordis: ^4.0.0-rc.4
+
+  '@cordisjs/plugin-logger@1.0.2':
+    resolution: {integrity: sha512-chdO46oBRc3m3kc9inXgKTbTB/H/zLRH9jM9xtHM7vh7VsnkJle+AVml4XJtteHQ2ttUasg7YS2oBvbe2J1mIQ==}
+    deprecated: use @cordisjs/plugin-logger-console instead
+    peerDependencies:
+      cordis: ^4.0.0-rc.1
 
   '@cordisjs/plugin-server@1.7.0':
     resolution: {integrity: sha512-dda7DjecNitDqALoNs2KQAIM2x5xv3GKiHi8b/4Nt2OTCFWEGgdhEmXqZiG/tM8FMfJDtawnIFLh7l1xVz4QuA==}
@@ -2899,6 +2978,17 @@ packages:
     resolution: {integrity: sha512-jRVXr+zsVHxzDXRoh+CDeXzvCsFJ6uiHhqqNQ26Cw9ZsZ3D6nqPUBt1gGVtj2ZPmRL3a9Uk1v8D1aJ8/I12Dow==}
     peerDependencies:
       solid-js: ^1.8.8
+
+  '@minatojs/driver-sqlite@5.0.3':
+    resolution: {integrity: sha512-YCXQpSiYkprq9VbS4yFXfXaNRfslevykE/cQ6CE+vZhdRcMCk907ltr0QJD6AjH6ouHaTbJfcqdrZg2IRWJSwg==}
+    peerDependencies:
+      cordis: ^4.0.0-rc.3
+      minato: ^4.0.1
+
+  '@minatojs/sql-utils@6.0.0':
+    resolution: {integrity: sha512-iKJEexHCwUO6J78pqmqKlh3NL5ojkOZxzBz0enhmzmIBqlsgmLojzzJVi8127LsQ15zCFFVH7lVyOmzSTAbzDg==}
+    peerDependencies:
+      minato: ^4.0.0
 
   '@module-federation/bridge-react-webpack-plugin@2.9.2':
     resolution: {integrity: sha512-6ikuvP1639g8jzSxveDLz/BOk0VTIkO7aSuvrZgq0waB0h553zFtkTJAXQETezzO+s1taHGhEvFoCtl6DJWu6A==}
@@ -4726,8 +4816,17 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
+  fast-string-truncated-width@3.0.3:
+    resolution: {integrity: sha512-0jjjIEL6+0jag3l2XWWizO64/aZVtpiGE3t0Zgqxv0DPuxiMjvB3M24fCyhZUO4KomJQPj3LTSUnDP3GpdwC0g==}
+
+  fast-string-width@3.0.2:
+    resolution: {integrity: sha512-gX8LrtNEI5hq8DVUfRQMbr5lpaS4nMIWV+7XEbXk2b8kiQIizgnlr12B4dA3ZEx3308ze0O4Q1R+cHts8kyUJg==}
+
   fast-uri@3.1.9:
     resolution: {integrity: sha512-hS/0Wt3Ya043oKXs0sIxrMpKQITXhMLIrVAKKXi4gozGC9v7YRWVnXIZzjNPTO02M9BdxLCWqK1yRXgNziVyJQ==}
+
+  fast-wrap-ansi@0.2.2:
+    resolution: {integrity: sha512-7F2Fl+TjRSenLqlU3UjSH0iyqopqoZIu7eZVpEirP2g1GtWa2G/ecEmBdgz31+Mxr+ELclgg6sokpSFIQiZ02Q==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -5157,6 +5256,11 @@ packages:
   min-document@2.19.2:
     resolution: {integrity: sha512-8S5I8db/uZN8r9HSLFVWPdJCvYOejMcEC82VIzNUc6Zkklf/d1gg2psfE79/vyhWOj4+J8MtwmoOz3TmvaGu5A==}
 
+  minato@4.0.1:
+    resolution: {integrity: sha512-Auvlgp80eS+dy1J4X/uk6HfGcRMHEAlrbz+UNzdfoy5v08p/x2Y4yevXwWizAgKCKrazFcb63IQuDVolOVJoYQ==}
+    peerDependencies:
+      cordis: ^4.0.0-rc.3
+
   minimatch@10.2.6:
     resolution: {integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==}
     engines: {node: 18 || 20 || >=22}
@@ -5206,6 +5310,10 @@ packages:
 
   nostics@1.3.0:
     resolution: {integrity: sha512-wzRsrJwNlFbqIRQt8aCeL2WE8USip/uuvGSOZV1D02CxX8ABTMbw8IywKjH7yWHETMXbWJI4OBpihg9rmz2Vyg==}
+
+  object-inspect@1.13.4:
+    resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
+    engines: {node: '>= 0.4'}
 
   obug@2.2.1:
     resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
@@ -5424,6 +5532,9 @@ packages:
     resolution: {integrity: sha512-E8VgUoSK+LMQrLboDxavm76MTBGrQhx9RiNuomRmYnZ10Uw12HrI8fkxOOncktb2hBpzIZ9SV/347euQHG5z+g==}
     engines: {node: '>=4'}
 
+  reggol@2.1.0:
+    resolution: {integrity: sha512-H8uONhnes+RKT0kB6D2Tc0gdxoeacW7W/y+7lL2F2VEqifuopaWNQRZPVNOpYoLGhppEhywy7SrPKBdHZneZIw==}
+
   regjsgen@0.8.0:
     resolution: {integrity: sha512-RvwtGe3d7LvWiDQXeQw8p5asZUmfU1G/l6WbUXeHta7Y2PEIvBTwH6E2EfmYUK8pxcxEdEmaomqyp0vZZ7C+3Q==}
 
@@ -5537,6 +5648,9 @@ packages:
   single-spa@5.9.5:
     resolution: {integrity: sha512-9SQdmsyz4HSP+3gs6PJzhkaMEg+6zTlu9oxIghnwUX3eq+ajq4ft5egl0iyR55LAmO/UwvU8NgIWs/ZyQMa6dw==}
 
+  sisteransi@1.0.5:
+    resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
+
   solid-js@1.9.18:
     resolution: {integrity: sha512-CHGO5YFk6Y9m/1YSxVtKnXfrW7JD3Tmof8HmR4z6TmCPsS8efo8LnzIR8CQh3cUvffqYm6DWyBFfk8dQw1CNQQ==}
 
@@ -5616,6 +5730,10 @@ packages:
   superjson@2.2.6:
     resolution: {integrity: sha512-H+ue8Zo4vJmV2nRjpx86P35lzwDT3nItnIsocgumgr0hHMQ+ZGq5vrERg9kJBo5AWGmxZDhzDo+WVIJqkB0cGA==}
     engines: {node: '>=16'}
+
+  supports-color@10.2.2:
+    resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
+    engines: {node: '>=18'}
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -6956,6 +7074,18 @@ snapshots:
       hashery: 1.5.1
       keyv: 5.6.0
 
+  '@clack/core@1.5.1':
+    dependencies:
+      fast-wrap-ansi: 0.2.2
+      sisteransi: 1.0.5
+
+  '@clack/prompts@1.8.1':
+    dependencies:
+      '@clack/core': 1.5.1
+      fast-string-width: 3.0.2
+      fast-wrap-ansi: 0.2.2
+      sisteransi: 1.0.5
+
   '@cordisjs/plugin-hmr@1.1.2(@cordisjs/plugin-timer@1.1.4(cordis@4.0.0-rc.12))(cordis@4.0.0-rc.12)':
     dependencies:
       '@babel/code-frame': 7.29.7
@@ -6984,6 +7114,13 @@ snapshots:
       cosmokit: 1.8.1
       schemastery: 3.18.0
       supports-color: 9.4.0
+
+  '@cordisjs/plugin-logger@1.0.2(cordis@4.0.0-rc.12)':
+    dependencies:
+      cordis: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+      cosmokit: 1.8.1
+      reggol: 2.1.0
+      schemastery: 3.18.0
 
   '@cordisjs/plugin-server@1.7.0(cordis@4.0.0-rc.12)':
     dependencies:
@@ -7340,6 +7477,19 @@ snapshots:
       '@solid-primitives/refs': 1.1.4(solid-js@1.9.18)
       '@solid-primitives/utils': 6.4.1(solid-js@1.9.18)
       solid-js: 1.9.18
+
+  '@minatojs/driver-sqlite@5.0.3(cordis@4.0.0-rc.12)(minato@4.0.1(cordis@4.0.0-rc.12))':
+    dependencies:
+      '@minatojs/sql-utils': 6.0.0(minato@4.0.1(cordis@4.0.0-rc.12))
+      cordis: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+      cosmokit: 1.8.1
+      minato: 4.0.1(cordis@4.0.0-rc.12)
+      schemastery: 3.18.0
+
+  '@minatojs/sql-utils@6.0.0(minato@4.0.1(cordis@4.0.0-rc.12))':
+    dependencies:
+      cosmokit: 1.8.1
+      minato: 4.0.1(cordis@4.0.0-rc.12)
 
   '@module-federation/bridge-react-webpack-plugin@2.9.2':
     dependencies:
@@ -9457,7 +9607,17 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
+  fast-string-truncated-width@3.0.3: {}
+
+  fast-string-width@3.0.2:
+    dependencies:
+      fast-string-truncated-width: 3.0.3
+
   fast-uri@3.1.9: {}
+
+  fast-wrap-ansi@0.2.2:
+    dependencies:
+      fast-string-width: 3.0.2
 
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
@@ -9818,6 +9978,11 @@ snapshots:
     dependencies:
       dom-walk: 0.1.2
 
+  minato@4.0.1(cordis@4.0.0-rc.12):
+    dependencies:
+      cordis: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+      cosmokit: 1.8.1
+
   minimatch@10.2.6:
     dependencies:
       brace-expansion: 5.0.12
@@ -9854,6 +10019,8 @@ snapshots:
   node-releases@2.0.61: {}
 
   nostics@1.3.0: {}
+
+  object-inspect@1.13.4: {}
 
   obug@2.2.1: {}
 
@@ -10057,6 +10224,12 @@ snapshots:
       unicode-match-property-ecmascript: 2.0.0
       unicode-match-property-value-ecmascript: 2.2.1
 
+  reggol@2.1.0:
+    dependencies:
+      cosmokit: 1.8.1
+      object-inspect: 1.13.4
+      supports-color: 10.2.2
+
   regjsgen@0.8.0: {}
 
   regjsparser@0.13.4:
@@ -10180,6 +10353,8 @@ snapshots:
 
   single-spa@5.9.5: {}
 
+  sisteransi@1.0.5: {}
+
   solid-js@1.9.18:
     dependencies:
       csstype: 3.2.3
@@ -10245,6 +10420,8 @@ snapshots:
   superjson@2.2.6:
     dependencies:
       copy-anything: 4.1.5
+
+  supports-color@10.2.2: {}
 
   supports-color@7.2.0:
     dependencies:
