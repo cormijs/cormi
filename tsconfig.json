@@ -62,6 +62,9 @@
       "path": "./plugins/plugin-cors"
     },
     {
+      "path": "./plugins/plugin-security"
+    },
+    {
       "path": "./plugins/plugin-tailwindcss"
     },
     {
