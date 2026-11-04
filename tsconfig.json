@@ -29,6 +29,9 @@
       "path": "./packages/cache"
     },
     {
+      "path": "./packages/cache-redis"
+    },
+    {
       "path": "./packages/create"
     },
     {
