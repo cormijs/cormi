@@ -90,6 +90,8 @@ const MARKET: { name: string; version: string; description: string; keywords: st
   },
   { name: 'cormi-plugin-undeclared', version: '0.1.0', description: 'declares nothing', keywords: ['cormi-plugin'] },
   { name: 'cormi-plugin-webpack', version: '1.0.0', description: 'a bundler', keywords: ['cormi-plugin', 'bundler:webpack', 'renderer:*', 'impl:bundler', 'impl:webpack'] },
+  // of the cordis ecosystem, with the manifest of the registry
+  { name: '@minatojs/driver-sqlite', version: '5.0.3', description: 'SQLite driver for minato', keywords: ['minato', 'database', 'required:model', 'impl:database'] },
 ]
 
 function serveRegistry() {
@@ -103,6 +105,7 @@ function serveRegistry() {
         links: { npm: `https://www.npmjs.com/package/${pkg.name}` },
         manifest: conclude(pkg),
         official: pkg.name === 'cormi-plugin-anywhere',
+        external: pkg.name.startsWith('@minatojs/') || undefined,
         downloads: { lastMonth: 1234 },
         verified: pkg.name === 'cormi-plugin-anywhere' ? { time: '2026-11-01T00:00:00.000Z', compat: {}, matches: true } : undefined,
       }))
@@ -289,6 +292,21 @@ const checks: Record<string, Check> = {
     assert.equal((await fetch(`${base}/storage/..%2Fcormi.yml`)).status, 404)
     assert.equal((await fetch(`${base}/api/files/${object.key}`, { method: 'DELETE' })).status, 204)
     assert.equal((await fetch(base + object.url)).status, 404)
+
+    // the console of dev mode: the API routes, and the database
+    if (!dev) return
+    await page.goto(`${base}/__cormi/api?path=/api/health`)
+    await page.waitForSelector('code:text-is("/api/todos/:id")')
+    await page.click('button:text-is("发送")')
+    await page.waitForSelector('[data-testid=response] >> text=200 OK')
+    assert.match((await page.textContent('[data-testid=response] pre'))!, /"ok": true/)
+    await page.click('.cc-nav-item >> text=数据库')
+    await page.waitForSelector('[data-testid=rows] >> text=Try Cormi')
+    await page.click('button:text-is("新建")')
+    await page.fill('.cc-split-detail textarea', JSON.stringify({ title: 'from the console', done: true, createdAt: new Date().toISOString() }))
+    await page.click('button:text-is("保存")')
+    await page.waitForSelector('[data-testid=rows] >> text=from the console')
+    assert.ok((await fetch(`${base}/api/todos`).then(res => res.json())).some((todo: any) => todo.title === 'from the console'))
   },
 
   async 'with-auth'(page, base) {
@@ -596,6 +614,7 @@ const examples: Record<string, Example> = {
         await item('cormi-plugin-anywhere').locator('text=已验证').waitFor()
         await item('cormi-plugin-anywhere').locator('text=月下载 1234').waitFor()
         await item('cormi-plugin-undeclared').locator('text=未声明兼容性').waitFor()
+        await item('@minatojs/driver-sqlite').locator('text=cordis 生态').waitFor()
         // the Vue plugin is hidden until asked for; its older version works here
         assert.equal(await item('cormi-plugin-vue-only').count(), 0)
         await page.click('text=显示它们')
