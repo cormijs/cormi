@@ -6,6 +6,6 @@
 - name: '@cormijs/plugin-mock'
   config:
     delay: 200
-    preview: true
+    production: true
 # cormi lint
 - name: '@cormijs/plugin-lint'

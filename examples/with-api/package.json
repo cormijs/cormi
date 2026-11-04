@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "cormi dev",
+    "build": "cormi build",
     "start": "cormi start"
   },
   "dependencies": {

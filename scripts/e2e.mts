@@ -2,7 +2,7 @@
 //
 //   node --import tsx scripts/e2e.mts [--dev] [--bundler rsbuild] [example ...]
 //
-// Without `--dev`, each example is built and served with `cormi preview`;
+// Without `--dev`, each example is built and served with `cormi start`;
 // with `--dev`, it is served by the dev server. With `--bundler`, the examples
 // that support another bundler run with it instead of Vite.
 import assert from 'node:assert/strict'
@@ -146,7 +146,7 @@ const checks: Record<string, Check> = {
     await noJs.goto(`${base}/about`)
     assert.match((await text(noJs, '#loader'))!, /^served by \w+ on \d{4}-\d{2}-\d{2}$/)
     // the loader's context is the app's
-    assert.equal(await text(noJs, '#mode'), `rendered in ${dev ? 'dev' : 'preview'} mode`)
+    assert.equal(await text(noJs, '#mode'), `rendered in ${dev ? 'dev' : 'start'} mode`)
     assert.equal(await noJs.evaluate(() => getComputedStyle(document.querySelector('nav')!).display), 'flex')
     assert.equal(await noJs.getAttribute('meta[name=generator]', 'content'), 'cormi')
     // file conventions: global.css, overrides.css (prefixed with body), public/favicon.svg
@@ -248,7 +248,7 @@ const checks: Record<string, Check> = {
     const health = await fetch(`${base}/api/health`, { headers: { 'x-request-id': 'e2e' } })
     assert.equal(health.headers.get('x-request-id'), 'e2e')
     assert.match(health.headers.get('server-timing')!, /^app;dur=/)
-    assert.deepEqual(await health.json(), { ok: true, mode: dev ? 'dev' : 'preview', requestId: 'e2e' })
+    assert.deepEqual(await health.json(), { ok: true, mode: dev ? 'dev' : 'start', requestId: 'e2e' })
 
     // the routes of the database answer 503 until it is there
     await waitFor(async () => (await fetch(`${base}/api/todos`)).status === 200)
@@ -653,7 +653,7 @@ for (const [index, name] of names.entries()) {
       }
       if (!dev) execFileSync(process.execPath, [cli, 'build', ...config], { cwd, env, stdio: 'ignore' })
       // in dev mode, run the worker directly instead of the daemon
-      const child = spawn(process.execPath, [cli, dev ? 'dev' : 'preview', ...config, '--port', bases[offset].split(':')[2]], {
+      const child = spawn(process.execPath, [cli, dev ? 'dev' : 'start', ...config, '--port', bases[offset].split(':')[2]], {
         cwd,
         env: { ...env, CORMI_WORKER: dev ? '1' : '' },
         stdio: ['ignore', 'pipe', 'pipe'],

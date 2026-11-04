@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cormi dev",
     "build": "cormi build",
-    "preview": "cormi preview",
+    "start": "cormi start",
     "setup": "cormi setup"
   },
   "dependencies": {

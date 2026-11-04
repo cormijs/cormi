@@ -11,4 +11,4 @@
 - name: '@cormijs/plugin-dva'
 - name: '@cormijs/plugin-mock'
   config:
-    preview: true
+    production: true

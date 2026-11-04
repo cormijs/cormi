@@ -10,4 +10,4 @@
 - name: '@cormijs/plugin-mock'
   config:
     delay: 100
-    preview: true
+    production: true
