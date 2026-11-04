@@ -1,0 +1,67 @@
+{
+  "name": "@cormijs/database",
+  "description": "The database of a Cormi app: minato's ctx.model and ctx.database, with any minato driver",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/database#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/database"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "database",
+    "minato",
+    "orm",
+    "bundler:*",
+    "renderer:*",
+    "impl:model",
+    "impl:database"
+  ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "model",
+        "database"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cordisjs/plugin-logger": "^1.0.2",
+    "@cormijs/core": "workspace:*",
+    "cordis": "4.0.0-rc.12",
+    "minato": "^4.0.1"
+  },
+  "devDependencies": {
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*"
+  }
+}
