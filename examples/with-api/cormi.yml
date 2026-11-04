@@ -5,3 +5,5 @@
 - name: '@minatojs/driver-sqlite'
   config:
     path: data/app.db
+# the cache of server/: ctx.cache, in memory; @cormijs/cache-redis or -database instead to share it
+- name: '@cormijs/cache'

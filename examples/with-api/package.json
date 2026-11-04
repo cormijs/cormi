@@ -8,6 +8,7 @@
     "start": "cormi start"
   },
   "dependencies": {
+    "@cormijs/cache": "workspace:*",
     "@cormijs/cormi": "workspace:*",
     "@cormijs/database": "workspace:*",
     "@cormijs/preset": "workspace:*",

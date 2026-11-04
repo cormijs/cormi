@@ -266,6 +266,12 @@ const checks: Record<string, Check> = {
     assert.equal(put.status, 405)
     assert.equal(put.headers.get('allow'), 'DELETE, GET, PATCH')
     assert.deepEqual(await fetch(`${base}/api/nothing`).then(res => res.json()), { error: 'not found' })
+
+    // ctx.cache: the count of the todos is cached, the visits are counted
+    const first = await fetch(`${base}/api/stats`).then(res => res.json())
+    const second = await fetch(`${base}/api/stats`).then(res => res.json())
+    assert.equal(first.todos, 1)
+    assert.equal(second.visits, first.visits + 1)
   },
 
   async 'with-model'(page, base) {
