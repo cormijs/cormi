@@ -12,6 +12,7 @@
     "@cormijs/cormi": "workspace:*",
     "@cormijs/database": "workspace:*",
     "@cormijs/preset": "workspace:*",
+    "@cormijs/storage": "workspace:*",
     "@minatojs/driver-sqlite": "^5.0.3",
     "minato": "^4.0.1"
   },

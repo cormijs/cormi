@@ -272,6 +272,23 @@ const checks: Record<string, Check> = {
     const second = await fetch(`${base}/api/stats`).then(res => res.json())
     assert.equal(first.todos, 1)
     assert.equal(second.visits, first.visits + 1)
+
+    // ctx.storage: an upload, public at its URL
+    const form = new FormData()
+    form.append('file', new File(['hello, storage'], '../my notes.txt', { type: 'text/plain' }))
+    const uploaded = await fetch(`${base}/api/files`, { method: 'POST', body: form })
+    assert.equal(uploaded.status, 201)
+    const object = await uploaded.json()
+    assert.match(object.key, /^uploads\/[\w-]+\/my-notes\.txt$/)
+    assert.equal(object.url, `/storage/${object.key}`)
+    const file = await fetch(base + object.url)
+    assert.equal(file.headers.get('content-type'), 'text/plain')
+    assert.equal(await file.text(), 'hello, storage')
+    assert.equal((await fetch(base + object.url, { headers: { 'if-none-match': file.headers.get('etag')! } })).status, 304)
+    assert.deepEqual((await fetch(`${base}/api/files`).then(res => res.json())).map((entry: any) => entry.key), [object.key])
+    assert.equal((await fetch(`${base}/storage/..%2Fcormi.yml`)).status, 404)
+    assert.equal((await fetch(`${base}/api/files/${object.key}`, { method: 'DELETE' })).status, 204)
+    assert.equal((await fetch(base + object.url)).status, 404)
   },
 
   async 'with-auth'(page, base) {
@@ -364,7 +381,7 @@ const checks: Record<string, Check> = {
 const examples: Record<string, Example> = {
   ...Object.fromEntries(Object.entries(checks).map(([name, check]) => [name, { check }])),
   'basic': { check: checks.basic, bundlers: ['vite', 'rsbuild'] },
-  'with-api': { check: checks['with-api'], ready: '/api/health', clean: ['data/app.db'] },
+  'with-api': { check: checks['with-api'], ready: '/api/health', clean: ['data/app.db', 'data/storage'] },
   'with-tailwind': { check: checks['with-tailwind'], bundlers: ['vite', 'rsbuild'] },
 
   'with-request': {
@@ -714,7 +731,7 @@ for (const [index, name] of names.entries()) {
   try {
     for (const [offset, server] of servers.entries()) {
       const cwd = `${root}examples/${server.dir}`
-      for (const file of example.clean ?? []) await rm(join(cwd, file), { force: true })
+      for (const file of example.clean ?? []) await rm(join(cwd, file), { recursive: true, force: true })
       const env = { ...process.env, ...server.env?.(bases) }
       const config: string[] = []
       if (bundler !== 'vite') {

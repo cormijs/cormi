@@ -7,3 +7,5 @@
     path: data/app.db
 # the cache of server/: ctx.cache, in memory; @cormijs/cache-redis or -database instead to share it
 - name: '@cormijs/cache'
+# the files of server/: ctx.storage, on the disk in data/storage, public at /storage; @cormijs/storage-s3 for S3
+- name: '@cormijs/storage'
