@@ -62,7 +62,7 @@ export function apply(ctx: Context, config: Config) {
       const file = path === '/404' && hasNotFound ? '404.html' : getOutputFile(path, config.htmlSuffix)
       try {
         // the loaders run at build time: the services of the server, e.g. the database, are not there
-        const context: LoaderContext = { ctx: ctx[Context.root], state: {} }
+        const context: LoaderContext = { ctx: ctx[Context.root], state: {}, ip: '' }
         const rendered = await entry.handler.render(new Request(origin + prefix + path), context)
         if (rendered instanceof Response) {
           logger.warn('%s redirects to %s, skipped', path, rendered.headers.get('location'))

@@ -26,7 +26,33 @@ export type ApiHandler<P = Params> = (request: Request, context: ApiContext<P>) 
 export interface ApiModule {
   /** the services the handlers use, as a plugin injects them */
   inject?: string[] | Record<string, unknown>
+  /**
+   * The route requires a signed-in user (`@cormijs/plugin-auth`): `true`, or
+   * a check of the user. The route waits for the `auth` service, so without
+   * it the route answers 503 rather than being open.
+   */
+  auth?: unknown
   [method: string]: unknown
+}
+
+/** An API route, as plugins see it. */
+export interface ApiRouteInfo {
+  /** e.g. `/api/users/:id` */
+  path: string
+  /** the source file, relative to the app root */
+  file: string
+  module: ApiModule
+}
+
+declare module 'cordis' {
+  interface Events {
+    /**
+     * An API route is requested: a response that a listener returns is sent
+     * instead of the handler's, e.g. a 401 of `@cormijs/plugin-auth`.
+     * @mode serial
+     */
+    'api/request'(route: ApiRouteInfo, request: Request, context: ApiContext): Response | void | Promise<Response | void>
+  }
 }
 
 interface ApiRoute {
@@ -56,6 +82,13 @@ function toPath(prefix: string, absPath: string) {
     .replace(/\[([^\]]+)\]/g, ':$1')
     .replace(/\/(index)?$/, '')
   return prefix + path
+}
+
+/** The services of a route: those it injects, and `auth` if it requires a user. */
+function getInject(module: ApiModule) {
+  const inject = module.inject ?? []
+  if (module.auth === undefined || module.auth === false) return inject
+  return Array.isArray(inject) ? [...new Set([...inject, 'auth'])] : { ...inject, auth: { required: true } }
 }
 
 /** The plugin of a module: its namespace with `apply`, or its default export. */
@@ -161,7 +194,7 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
         const module: ApiModule = await importModule(route.file)
         route.module = module
         // a route is a plugin: its handlers run with the services it injects
-        route.fiber = ctx.plugin({ name: `api ${route.path}`, inject: module.inject ?? [], apply: () => {} })
+        route.fiber = ctx.plugin({ name: `api ${route.path}`, inject: getInject(module), apply: () => {} })
         fibers.push(route.fiber)
       } catch (error) {
         route.error = error
@@ -235,8 +268,11 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
           const missing = Object.keys(fiber.inject).filter(name => !fiber.ctx.get(name as any))
           return Response.json({ error: `the route waits for ${missing.join(', ') || 'its services'}` }, { status: 503, headers: { 'retry-after': '1' } })
         }
-        const { request, state } = getRequestContext(req)
-        const result = await (handler as ApiHandler)(request, { params: matched.params, ctx: fiber.ctx, state })
+        const { request, state, ip } = getRequestContext(req)
+        const context: ApiContext = { params: matched.params, ctx: fiber.ctx, state, ip }
+        const denied = await ctx.serial('api/request', { path: route.path, file: route.file, module }, request, context)
+        if (denied) return denied
+        const result = await (handler as ApiHandler)(request, context)
         return result instanceof Response ? result : Response.json(result ?? null)
       }
       // the other routes of ctx.server (not the pages), then not found: an unknown path is not a method that is not allowed

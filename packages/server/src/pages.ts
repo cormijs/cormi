@@ -67,8 +67,8 @@ export function Pages(ctx: Context, config: Pages.Config) {
       let result: RenderResult | undefined
       if (config.ssr) {
         const entry = await bundler.loadServerEntry()
-        const { request, state } = getRequestContext(req)
-        const rendered: Response | RenderResult = await entry.handler.render(request, { ctx: ctx[Context.root], state } satisfies LoaderContext)
+        const { request, state, ip } = getRequestContext(req)
+        const rendered: Response | RenderResult = await entry.handler.render(request, { ctx: ctx[Context.root], state, ip } satisfies LoaderContext)
         if (rendered instanceof Response) return rendered
         if (cormi.mode === 'dev') rendered.head += bundler.devStyles?.(ctx.app.serverEntry) ?? ''
         result = rendered
@@ -93,8 +93,8 @@ export function Pages(ctx: Context, config: Pages.Config) {
       const url = req.query.get('url')
       if (!route || !url) return new Response('missing route or url', { status: 400 })
       const entry = await ctx.bundler.loadServerEntry()
-      const { state } = getRequestContext(req)
-      return entry.handler.loader(toRequest(req, url), route, { ctx: ctx[Context.root], state } satisfies LoaderContext)
+      const { state, ip } = getRequestContext(req)
+      return entry.handler.loader(toRequest(req, url), route, { ctx: ctx[Context.root], state, ip } satisfies LoaderContext)
     })
 
     // registered after the routes of `ctx.server`, so pages are the fallback

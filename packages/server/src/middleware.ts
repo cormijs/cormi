@@ -23,6 +23,8 @@ export interface State {}
 /** What a request carries besides itself, for middlewares, API routes and loaders. */
 export interface RequestContext {
   state: State
+  /** the address of the client; behind a proxy, the proxy's (see `x-forwarded-for`) */
+  ip: string
 }
 
 /**
@@ -41,15 +43,19 @@ interface Entry {
 type Awaitable<T> = T | Promise<T>
 
 // by the request of Node: the middlewares and the routes of `ctx.server` receive different objects for a request
-const requests = new WeakMap<object, { request: Request; state: State }>()
+const requests = new WeakMap<object, RequestContext & { request: Request }>()
 
 /**
- * The fetch API request and the state of a request of `ctx.server`: one of
- * each per request, so that the body is read once and the state is shared.
+ * The fetch API request, the state and the client of a request of
+ * `ctx.server`: one of each per request, so that the body is read once and
+ * the state is shared.
  */
-export function getRequestContext(req: ServerRequest): { request: Request; state: State } {
+export function getRequestContext(req: ServerRequest): RequestContext & { request: Request } {
   let value = requests.get(req._req)
-  if (!value) requests.set(req._req, value = { request: toRequest(req), state: {} as State })
+  if (!value) {
+    const ip = req._req.socket.remoteAddress?.replace(/^::ffff:/, '') ?? ''
+    requests.set(req._req, value = { request: toRequest(req), state: {} as State, ip })
+  }
   return value
 }
 
@@ -58,7 +64,15 @@ function toResponse(res: ServerResponse) {
   const status = res.status || 404
   // a null body status cannot have a body
   const body = [101, 204, 205, 304].includes(status) ? null : res.body
-  return new Response(body as BodyInit | null, { status, statusText: res.statusText, headers: res.headers })
+  const headers = new Headers(res.headers)
+  // the cookies are on the response of Node, see send()
+  for (const cookie of [res._res.getHeader('set-cookie') ?? []].flat()) headers.append('set-cookie', String(cookie))
+  return new Response(body as BodyInit | null, { status, statusText: res.statusText, headers })
+}
+
+/** A response whose headers a middleware can change: those of `fetch()` or `Response.redirect()` are immutable. */
+function toMutable(response: Response) {
+  return new Response(response.body, response)
 }
 
 function matches(path: string, pathname: string) {
@@ -80,9 +94,9 @@ export class MiddlewareService extends Service {
     ctx.server.use(async (req, res, next) => {
       const entries = this._entries.filter(entry => matches(entry.path, req.path))
       if (!entries.length) return next()
-      const { request, state } = getRequestContext(req)
+      const { request, state, ip } = getRequestContext(req)
       const run = async (index: number): Promise<Response> => {
-        if (index < entries.length) return entries[index].middleware(request, { state }, () => run(index + 1))
+        if (index < entries.length) return entries[index].middleware(request, { state, ip }, () => run(index + 1).then(toMutable))
         await next()
         return toResponse(res)
       }
