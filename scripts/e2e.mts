@@ -224,8 +224,11 @@ const checks: Record<string, Check> = {
     assert.equal(await noJs.getAttribute('.ant-picker input', 'placeholder'), '请选择日期')
 
     await page.goto(`${base}/`)
-    await page.click('.ant-btn-primary')
-    await page.waitForSelector('.ant-message-notice')
+    // server-rendered markup ignores clicks until it hydrates, later on a first visit that optimizes dependencies (CI)
+    for (let i = 0; i < 60 && !await page.locator('.ant-message-notice').count(); i++) {
+      await page.click('.ant-btn-primary')
+      await page.waitForTimeout(500)
+    }
     assert.equal(await text(page, '.ant-message-notice'), 'Thanks!')
     await page.click('text=About')
     await page.waitForSelector('text=only the antd plugin reloads')

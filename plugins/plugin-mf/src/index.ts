@@ -106,6 +106,8 @@ export function apply(ctx: Context, config: Config) {
         dts: config.dts && { generateTypes: true, consumeTypes: { deleteTypesFolder: false } },
         // the entry consumes the shared modules once they are loaded: no bootstrap module needed
         experiments: { asyncStartup: true },
+        // the types of remotes come with dts; the dev type hints need a server of their own (a WebSocket)
+        dev: { disableDynamicRemoteTypeHints: true },
       }, { environment: 'web' }), {
         name: 'cormi:mf',
         setup(api) {
