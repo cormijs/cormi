@@ -44,8 +44,37 @@ export interface ApiRouteInfo {
   module: ApiModule
 }
 
+/** An API route of an app that serves, as the console shows it. */
+export interface ApiRouteStatus {
+  path: string
+  /** the source file, relative to the app root */
+  file: string
+  /** the methods of its handlers; `*` for a `default` handler */
+  methods: string[]
+  /** `user`: it requires a signed-in user; `check`: a check of the user */
+  auth?: 'user' | 'check'
+  inject: string[]
+  /** `waiting`: for services (`waits`); `failed`: its module did not load (`error`) */
+  status: 'ready' | 'waiting' | 'failed'
+  waits?: string[]
+  error?: string
+}
+
+// by the root of the app (ctx.cormi is another object in each context): the routes it serves now
+const apps = new Map<string, () => ApiRouteStatus[]>()
+
+/** The API routes of an app that serves (`server/api`), with their status, e.g. for the console. */
+export function getApiRoutes(ctx: Context): ApiRouteStatus[] {
+  return apps.get(ctx.cormi.cwd)?.() ?? []
+}
+
 declare module 'cordis' {
   interface Events {
+    /**
+     * The server code was loaded (again): `getApiRoutes()` has the routes.
+     * @mode emit
+     */
+    'api/update'(): void
     /**
      * An API route is requested: a response that a listener returns is sent
      * instead of the handler's, e.g. a 401 of `@cormijs/plugin-auth`.
@@ -97,6 +126,26 @@ function scanApiFiles(dir: string, base = ''): [id: string, file: string][] {
     }
   }
   return result
+}
+
+function describeRoute(route: ApiRoute): ApiRouteStatus {
+  const { module, fiber } = route
+  const status: ApiRouteStatus = { path: route.path, file: route.file, methods: [], inject: [], status: 'ready' }
+  if (route.error || !module || !fiber) {
+    return { ...status, status: 'failed', error: String((route.error as Error)?.message ?? route.error).split('\n')[0] }
+  }
+  const order = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+  const rank = (method: string) => order.includes(method) ? order.indexOf(method) : order.length
+  status.methods = Object.keys(module).filter(key => /^[A-Z]+$/.test(key) && typeof module[key] === 'function').sort((a, b) => rank(a) - rank(b))
+  if (typeof module.default === 'function') status.methods.push('*')
+  if (module.auth === true) status.auth = 'user'
+  else if (typeof module.auth === 'function') status.auth = 'check'
+  status.inject = Object.keys(fiber.inject)
+  if (fiber.state !== ACTIVE) {
+    status.status = 'waiting'
+    status.waits = status.inject.filter(name => !fiber.ctx.get(name as any))
+  }
+  return status
 }
 
 /** The services of a route: those it injects, and `auth` if it requires a user. */
@@ -183,6 +232,10 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
   }
   let routes: ApiRoute[] = []
   let fibers: Fiber[] = []
+  ctx.effect(() => {
+    apps.set(cormi.cwd, () => routes.map(describeRoute))
+    return () => apps.delete(cormi.cwd)
+  }, 'the API routes, for the console')
 
   const load = async () => {
     const code = getCode()
@@ -213,6 +266,7 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
     // fewer parameters first, so `/api/users/me` wins over `/api/users/:id`
     const params = (path: string) => path.match(/[:*]/g)?.length ?? 0
     routes = found.sort((a, b) => params(a.path) - params(b.path) || b.path.length - a.path.length)
+    ctx.emit('api/update')
   }
 
   const unload = async () => {
