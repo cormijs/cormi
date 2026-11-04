@@ -28,8 +28,21 @@ const TYPES: Record<string, string> = {
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
   '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.ogg': 'audio/ogg',
+  '.mov': 'video/quicktime',
+  '.pdf': 'application/pdf',
+  '.zip': 'application/zip',
+  '.csv': 'text/csv; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8',
+  '.md': 'text/markdown; charset=utf-8',
   '.wasm': 'application/wasm',
   '.webmanifest': 'application/manifest+json',
+}
+
+/** The media type of a file by its extension, if it is a known one. */
+export function getContentType(path: string): string | undefined {
+  return TYPES[extname(path).toLowerCase()]
 }
 
 /** Directories of the build output that are not served: the server entry of the pages, the Node code of the app. */
@@ -53,7 +66,7 @@ export function Static(ctx: Context) {
     const stats = await stat(file).catch(() => undefined)
     if (!stats?.isFile()) return next()
     res.status = 200
-    res.headers.set('content-type', TYPES[extname(file)] ?? 'application/octet-stream')
+    res.headers.set('content-type', getContentType(file) ?? 'application/octet-stream')
     res.headers.set('content-length', String(stats.size))
     res.headers.set('cache-control', pathname.startsWith('/static/') ? 'public, max-age=31536000, immutable' : 'no-cache')
     res.body = req.method === 'HEAD' ? null : Readable.toWeb(createReadStream(file)) as ReadableStream
