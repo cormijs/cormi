@@ -50,6 +50,7 @@ export default defineConfig({
             { text: '中间件与代理', link: '/guide/middleware' },
             { text: '数据库', link: '/guide/database' },
             { text: '缓存', link: '/guide/cache' },
+            { text: '文件存储', link: '/guide/storage' },
             { text: '会话、鉴权与常用中间件', link: '/guide/auth' },
           ],
         },

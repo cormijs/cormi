@@ -73,6 +73,7 @@ cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名
 | `packages/server` | `ctx.server` 上的页面、loader 端点、`server/` 的代码与接口、`ctx.middleware`、静态资源 |
 | `packages/database` | 数据库：minato 的 `ctx.model`、`ctx.database`，只在提供服务时运行 |
 | `packages/cache*` | 缓存 `ctx.cache`：接口与内存实现（`cache`），Redis（`cache-redis`），数据库（`cache-database`） |
+| `packages/storage*` | 文件存储 `ctx.storage`：接口与本地磁盘实现（`storage`），S3 兼容服务（`storage-s3`） |
 | `packages/create` | 脚手架 `pnpm create @cormijs`：前端、后端、前后端、服务端渲染 |
 | `packages/runtime` | 与 UI 框架无关的浏览器 Context（`$app`、`$router` 契约）、loader 协议（`@cormijs/cormi/client`） |
 | `packages/react` | React：渲染器（`ctx.renderer`、`ctx.react`）与浏览器 API `@cormijs/react/client`、SSR |

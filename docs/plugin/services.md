@@ -298,6 +298,10 @@ if (ctx.cormi.mode === 'build') {
 
 实现另一种缓存，就是继承 `@cormijs/cache` 的 `Cache` 并实现 `get`、`set`、`delete`、`clear`、`keys`、`increment`；`getOrSet` 由基类提供。用 `packages/cache/tests/contract.ts` 的 `testCache()` 测试它，行为就与官方的实现一致。
 
+## ctx.storage
+
+`@cormijs/storage`（本地磁盘）或 `@cormijs/storage-s3` 提供的文件存储：`put`、`get`、`head`、`delete`、`list`、`url`、`response`，只在 dev 与 start 下存在，要 `inject: ['storage']`。见 [文件存储](/guide/storage)。实现另一种存储，就是继承 `@cormijs/storage` 的 `Storage`，用 `packages/storage/tests/contract.ts` 的 `testStorage()` 测试。
+
 ## ctx.session、ctx.auth
 
 `@cormijs/plugin-session` 与 `@cormijs/plugin-auth` 提供：`ctx.session.regenerate(state)`、`destroy(state)`，`ctx.auth.login(state, user)`、`logout(state)`、`hash()`、`verify()`。见 [会话、鉴权与常用中间件](/guide/auth)。
