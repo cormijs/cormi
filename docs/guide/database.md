@@ -34,6 +34,8 @@ pnpm add @cormijs/database minato @minatojs/driver-sqlite
 
 数据库只在应用提供服务时运行：`cormi build` 与生成器不会连接它。
 
+dev 模式下，[控制台](/guide/console#数据库) 的“数据库”页列出各张表的字段与索引，可以浏览和编辑数据。
+
 ## 表
 
 表在 `server/models/*.ts` 中声明，每个文件是一个注入 `model` 的插件；表的类型通过声明合并加入 `Tables`：

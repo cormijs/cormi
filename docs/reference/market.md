@@ -133,7 +133,9 @@ rsbuild     ✗ rsbuild  ✗ rsbuild
 
 ## 索引服务
 
-之后再做，与 koishi 的 registry 相同：抓取 `keywords:cormi-plugin` 的各个版本，用 `conclude()` 规范化，在沙箱中对第三方插件运行 `cormi plugin check` 得出“已验证”，加上下载量，生成 `index.json`。控制台的 `registry` 指向它，npm 搜索作为后备。第一版不需要它：关键词已经让一次搜索请求足够。
+[cormijs/registry](https://github.com/cormijs/registry) 每天同步一次：抓取 `keywords:cormi-plugin` 的最新版本，用 `conclude()` 规范化，在沙箱中运行 `cormi plugin check` 得出“已验证”，加上下载量，生成 `index.json`。控制台读取它，npm 搜索作为后备。
+
+没有关键词、却能在 Cormi 应用中使用的 cordis 生态的包，由 registry 收录并给出清单（`external: true`），例如 minato 的驱动：`category: database`，需要 `model` 服务，提供 `database`，适用于任何打包器与 UI 框架。它们的清单不是包自己的声明，所以不做检查。
 
 ## 官方插件的声明
 

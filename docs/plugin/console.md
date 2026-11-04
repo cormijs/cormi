@@ -60,6 +60,8 @@ export default (ctx: Context) => {
 
 `package.json` 的 `exports` 中加上 `"./console": "./console/index.tsx"`。用 `cormi g plugin <name> --console` 创建的插件包已经带有这些代码。
 
+发布到 npm 的包，控制台的页面从应用的根目录解析：页面导入的 `@cormijs/cormi/console` 要能从包的位置找到，所以把 `@cormijs/cormi` 写进 `peerDependencies`（pnpm 只为包链接它声明的依赖）。React 总是控制台自带的那一份，包只需要把它作为开发依赖，供类型检查使用。`@cormijs/database` 的数据库页就是这样提供的。
+
 ## Node 端：ctx.console
 
 | 方法 | 说明 |

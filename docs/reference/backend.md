@@ -1,6 +1,6 @@
 # 设计：后端服务
 
-> 状态：设计已定，第 1 阶段（服务端基础、数据库、脚手架）已完成，其余按阶段实施中。本页记录决策与理由。
+> 状态：五个阶段均已完成。本页记录决策与理由。
 
 目标：Cormi 不只渲染页面，也能独立作为后端服务——连接数据库、编写接口，并以插件的方式接入各种中间件与基础服务。
 
@@ -145,4 +145,4 @@ const { url } = await ctx.storage.put(`avatars/${id}.png`, file, { contentType: 
 2. **缓存**（已完成）：`@cormijs/cache`（接口与内存实现）、`@cormijs/cache-redis`、`@cormijs/cache-database`，三者运行同一组契约测试。
 3. **会话、鉴权与常用中间件**（已完成）：`@cormijs/plugin-session`、`-auth`、`-cors`、`-security`、`-rate-limit`，固定的 `order`；示例 `with-auth`。
 4. **对象存储**（已完成）：`@cormijs/storage`（接口与本地磁盘实现）、`@cormijs/storage-s3`（aws4fetch 签名，AWS、R2、MinIO 等），运行同一组契约测试。
-5. **控制台与文档**：数据库与接口页面，registry 收录 minato 驱动，指南。
+5. **控制台与文档**（已完成）：控制台的“接口”页（`getApiRoutes()`，可直接试用）与“数据库”页（由 `@cormijs/database` 以控制台扩展提供）；registry 把 minato 的驱动作为外部包收录（`external: true`）；指南按页面与服务端分组。

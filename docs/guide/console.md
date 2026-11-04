@@ -26,6 +26,8 @@ dev server :8000
 | 概览 | 应用名称、开发服务器地址、打包器与 UI 框架、已加载的插件、路由与服务的数量，最近的警告与错误，各依赖的版本 |
 | 插件 | `cormi.yml` 中的插件与它们的状态。启用、停用、移除、添加插件，用表单编辑配置；查看每个插件在 ctx 上注册了什么、依赖和提供了哪些服务 |
 | 应用 | 路由表、浏览器插件、全局导入、生成文件，以及打包器解析出的插件。点击文件在编辑器中打开 |
+| 接口 | `server/api` 的接口：方法、文件、等待的服务、是否要求登录；选中一个接口可以直接发请求试用。另列出插件在 `ctx.server` 上注册的路由 |
+| 数据库 | 有 `@cormijs/database` 时出现：各张表的字段、主键、唯一约束与索引，按页浏览数据，新建、编辑与删除行 |
 | 服务 | ctx 上的服务、提供者与依赖它的插件 |
 | 日志 | 开发进程的实时日志，可按级别和内容筛选 |
 | 工作区 | `plugins/` 下的插件包；新建插件，添加到 `cormi.yml` |
@@ -39,9 +41,19 @@ dev server :8000
 - “注册”列出插件及其子插件在 ctx 上注册的东西，例如 `ctx.app.entry("…")`、`ctx.bundler.plugin()`。停用插件，这些注册会一起撤回。
 - 停用 `@cormijs/preset`（或 `@cormijs/preset-react`）会卸载应用的服务，控制台也随之断开；控制台会提示确认。
 
+### 接口
+
+接口页的数据随服务端代码一起更新：修改 `server/api` 中的文件，列表随之变化；接口等待的服务就绪之前标为“等待服务”，模块加载失败时显示错误。
+
+“试一试”从控制台所在的页面发出请求：控制台由应用自己的服务器提供，所以请求带着应用的 cookie——在应用中登录之后，要求登录的接口也能直接试用。
+
+### 数据库
+
+数据库页由 `@cormijs/database` 提供：它在 dev 模式下注册控制台的页面，与 [扩展控制台](/plugin/console) 中插件的做法相同。新建或编辑一行时，以 JSON 编辑整行；时间类型的字段写成 ISO 字符串。修改直接写入数据库，只在 dev 模式下可用。
+
 ### 市场
 
-市场列出带有 `cormi-plugin` 关键字的 npm 包，数据来自 [Cormi registry](https://github.com/cormijs/registry)：它每天从 npm 同步一次，读取插件的兼容性声明，用 `cormi plugin check` 检查它们，并记下下载量——检查过且声明一致的插件标为“已验证”，Cormi 项目发布的标为“官方”。索引无法访问时（或 preset 的 `console.market` 为空），市场直接搜索 npm。安装使用应用自己的包管理器（根据 lock 文件判断 pnpm、yarn、bun 或 npm），输出写入日志；安装后即可添加到 `cormi.yml`。registry 默认与包管理器相同（`npm_config_registry`，例如 `.npmrc` 中配置的镜像），也可以在 preset 的 `console.registry` 中指定。
+市场列出带有 `cormi-plugin` 关键字的 npm 包，以及 registry 收录的 cordis 生态的包——例如 minato 的数据库驱动 `@minatojs/driver-*`，标为“cordis 生态”。数据来自 [Cormi registry](https://github.com/cormijs/registry)：它每天从 npm 同步一次，读取插件的兼容性声明，用 `cormi plugin check` 检查它们，并记下下载量——检查过且声明一致的插件标为“已验证”，Cormi 项目发布的标为“官方”。索引无法访问时（或 preset 的 `console.market` 为空），市场直接搜索 npm。安装使用应用自己的包管理器（根据 lock 文件判断 pnpm、yarn、bun 或 npm），输出写入日志；安装后即可添加到 `cormi.yml`。registry 默认与包管理器相同（`npm_config_registry`，例如 `.npmrc` 中配置的镜像），也可以在 preset 的 `console.registry` 中指定。
 
 每个插件旁边标出它支持的打包器与 UI 框架（`Vite · Rsbuild`、`React`；`通用` 表示不限），来自插件的 [兼容性声明](/plugin/#声明兼容性)：
 
