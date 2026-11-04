@@ -24,8 +24,10 @@ export namespace Cormi {
 
   export interface Paths {
     cwd: string
-    /** `src/` */
+    /** the pages, `src/`: bundled for the browser */
     src: string
+    /** the server code, `server/`: run by Node, when the app serves */
+    server: string
     /** generated files, `src/.cormi/` */
     tmp: string
     /** files served as-is, `public/` */
@@ -52,6 +54,7 @@ export class Cormi extends Service {
     this.paths = {
       cwd: this.cwd,
       src,
+      server: join(this.cwd, 'server'),
       tmp: join(src, '.cormi'),
       public: join(this.cwd, 'public'),
     }
@@ -60,6 +63,15 @@ export class Cormi extends Service {
   /** `NODE_ENV` of the app: `development` in dev mode, `production` otherwise */
   get env() {
     return this.mode === 'dev' ? 'development' : 'production'
+  }
+
+  /**
+   * Whether the app serves requests (`dev`, `preview`): the server side of the
+   * app, its code in `server/` and services such as the database, runs only
+   * then, not when it builds or writes files.
+   */
+  get serving() {
+    return this.mode === 'dev' || this.mode === 'preview'
   }
 
   /** Resolve a path against the app root. */
