@@ -1,0 +1,72 @@
+{
+  "name": "@cormijs/plugin-auth",
+  "description": "Signed-in users for Cormi apps: ctx.auth.login(), state.user, routes that require a user, password hashing",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/plugins/plugin-auth#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "plugins/plugin-auth"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "auth",
+    "login",
+    "password",
+    "bundler:*",
+    "renderer:*",
+    "required:session",
+    "required:middleware",
+    "impl:auth"
+  ],
+  "cormi": {
+    "service": {
+      "required": [
+        "session",
+        "middleware"
+      ],
+      "implements": [
+        "auth"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@cormijs/cache": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/plugin-session": "workspace:*"
+  },
+  "devDependencies": {
+    "@cormijs/cache": "workspace:*",
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/plugin-session": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*"
+  }
+}

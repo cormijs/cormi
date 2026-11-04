@@ -56,6 +56,9 @@
       "path": "./plugins/plugin-session"
     },
     {
+      "path": "./plugins/plugin-auth"
+    },
+    {
       "path": "./plugins/plugin-tailwindcss"
     },
     {
