@@ -65,7 +65,7 @@ ctx.effect(() => {
 
 ```ts
 export function apply(ctx: Context) {
-  // ctx.server 只在 dev 与 preview 下存在
+  // ctx.server 只在 dev 与 start 下存在
   ctx.inject(['server'], (ctx) => {
     ctx.server.get('/healthz', async () => new Response('ok'))
   })

@@ -11,7 +11,7 @@ dev server :8000
 └─ /__cormi/     控制台
 ```
 
-控制台只在 dev 模式下挂载，构建产物和 `cormi preview` 中都没有它。不需要时，在 preset 配置中关闭：
+控制台只在 dev 模式下挂载，构建产物和 `cormi start` 中都没有它。不需要时，在 preset 配置中关闭：
 
 ```yaml
 - name: '@cormijs/preset'

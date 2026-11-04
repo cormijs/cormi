@@ -7,8 +7,9 @@
 | | 页面 | 服务端 | 应用 |
 |---|---|---|---|
 | 目录 | `src/` | `server/` | `cormi.yml`、`plugin.ts`、`plugins/` |
-| 运行在 | 浏览器；开启 SSR 时也在服务端入口中渲染 | Node，直接运行源码 | Node：每条命令都会加载 |
-| 何时运行 | 打包之后 | 应用提供服务时：`cormi dev`、`cormi start` | 每条命令 |
+| 运行在 | 浏览器；开启 SSR 时也在服务端入口中渲染 | Node | Node：每条命令都会加载 |
+| 构建 | 打包器：`dist/` | esbuild：`dist/node` | 本地插件同样编译到 `dist/node` |
+| 何时运行 | 打包之后 | 应用提供服务时：`cormi dev`（源码）、`cormi start`（编译后的代码） | 每条命令 |
 | 由谁处理 | 打包器与 UI 框架（`ctx.bundler`、`ctx.renderer`） | `ctx.server`、`ctx.middleware` 与服务（`ctx.database`……） | cordis 的 loader |
 | 应用自己的插件 | `src/app.tsx` | `server/index.ts` | `plugin.ts` |
 | 生成器 | `cormi g page`、`cormi g component` | `cormi g api`、`cormi g model` | `cormi g plugin` |
@@ -18,12 +19,12 @@
 
 创建应用时选择的类型，就是选择它有哪一侧、页面在哪里渲染：
 
-| 类型 | 页面 | 服务端 | 构建 | 生产环境 |
-|---|---|---|---|---|
-| 前端 `web` | 在浏览器渲染 | — | `cormi build` 得到静态文件 | 任意静态托管 |
-| 后端 `api` | — | 接口与数据库 | 不需要 | `cormi start` |
-| 前后端 `fullstack` | 在浏览器渲染 | 接口与数据库 | `cormi build` | `cormi start`：页面与接口在同一个服务 |
-| 服务端渲染 `ssr` | 在服务端渲染 | 接口与数据库 | `cormi build` | `cormi start` |
+| 类型 | 页面 | 服务端 | 生产环境（`cormi build` 之后） |
+|---|---|---|---|
+| 前端 `web` | 在浏览器渲染 | — | 任意静态托管，或 `cormi start` |
+| 后端 `api` | — | 接口与数据库 | `cormi start` |
+| 前后端 `fullstack` | 在浏览器渲染 | 接口与数据库 | `cormi start`：页面与接口在同一个服务 |
+| 服务端渲染 `ssr` | 在服务端渲染 | 接口与数据库 | `cormi start` |
 
 类型不是一项配置，而是由 `cormi.yml` 与目录推出来的：有打包器与 UI 框架就有页面，preset 开启 `ssr` 页面就在服务端渲染，有 `server/` 就有服务端代码。所以应用可以从一种类型长成另一种：给前端应用加上 `server/api`，它就成了前后端应用；给后端加上打包器、UI 框架和 `src/pages`，它就有了页面。
 
@@ -65,7 +66,7 @@ services in a loader through `context.ctx`
 
 ## 服务端只在提供服务时运行
 
-`server/` 的代码、数据库这类服务端的服务，只在应用提供服务时运行：`cormi dev` 与 `cormi start`（以及 `cormi preview`）。`cormi build`、`cormi setup` 与生成器不会运行它们，也不会连接数据库，所以在没有数据库的 CI 中同样可以构建页面。
+`server/` 的代码、数据库这类服务端的服务，只在应用提供服务时运行：`cormi dev` 运行源码，`cormi start` 运行 `cormi build` 编译后的代码。`cormi build`、`cormi setup` 与生成器不会运行它们，也不会连接数据库，所以在没有数据库的 CI 中同样可以构建。
 
 插件用 `ctx.cormi.serving` 判断应用是否在提供服务，服务端插件据此决定是否连接外部系统，见 [Node 端服务](/plugin/services#ctx-cormi)。
 

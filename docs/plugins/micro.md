@@ -113,7 +113,7 @@ localStorage.setItem('cormi:packages', JSON.stringify(['http://localhost:8011/']
 ### 约束
 
 - 共享依赖要是应用的直接依赖（pnpm 下 `react-router`、`cordis` 也要写进 package.json），否则插件会警告：模块联邦按应用能解析的包来共享和预构建。
-- 子包部署的服务器需允许底座跨域读取（CORS）；`cormi dev` 与 `cormi preview` 已经允许。
+- 子包部署的服务器需允许底座跨域读取（CORS）；`cormi dev` 与 `cormi start` 已经允许。
 - 子包页面在浏览器中运行，用 `clientLoader` 获取数据；导出服务端 `loader` 的路由会在构建时警告。
 - 子包的顶层路由使用绝对路径，子包的页面宜放在自己的前缀下（如 `/orders`）。
 - 懒加载的子包注册 `ctx.wrap()` 包装器时，根组件会重新挂载一次；需要全局 Provider 的子包宜设为 `eager`。

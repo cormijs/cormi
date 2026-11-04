@@ -14,7 +14,7 @@ Cormi 是一个以 Cordis 4 为宿主的全栈框架。它不是 umi 的克隆�
 ## 启动
 
 ```
-cormi dev | build | preview | setup
+cormi dev | build | start | setup
   └─ root Context
      ├─ @cordisjs/plugin-logger-console
      ├─ @cordisjs/plugin-timer
@@ -43,7 +43,7 @@ cormi dev | build | preview | setup
 |---|---|
 | `dev` | daemon 进程监管 worker（koishi 模型）；HTTP 服务 + Vite 开发中间件 + 文件监听；常驻 |
 | `build` | 等待插件树加载完毕，生成文件，执行 `ctx.bundler.build()`，然后退出 |
-| `preview` | HTTP 服务，基于构建产物提供静态资源、SSR、loader 和 API |
+| `start` | 生产环境：HTTP 服务，基于构建产物提供静态资源、SSR、loader 和接口；Node 代码来自 `dist/node` |
 | `setup` | 只生成 `src/.cormi`（用于类型检查），然后退出 |
 
 `idle(ctx)` 等待插件树中没有正在加载或卸载的 fiber（包括 loader 正在导入的模块）。生成文件和创建 dev server 之前都会先等待它，因此一批同时加载的插件只触发一次生成、一次 Vite 启动。生成文件之前还会等待路由表的重新计算（UI 框架注册的扩展名会改变路由表）；等待期间到达的 Vite 注册已包含在新建 dev server 的配置中，不会再触发重启。
@@ -66,7 +66,7 @@ cormi dev | build | preview | setup
 
 `ctx.bundler` 与 `ctx.renderer` 是两个接缝（契约在 `@cormijs/core` 的 `bundler.ts`）：与打包器、UI 框架无关的插件只用它们；只适用于某个实现的插件 `inject: ['vite']` 或 `inject: ['react']`，换掉实现时自动转入 pending。打包器插件不能通用，`ctx.bundler.plugin({ vite, rsbuild })` 为每个打包器各给一个，键的类型由打包器包以声明合并加入 `Bundler.Plugins`；没有当前打包器的一项时抛出错误。React 渲染器、文件约定、tailwindcss、unocss、styled-components 都这样注册打包器插件，修改打包配置也写成插件（Vite 插件的 `config` 钩子）。
 
-`@cormijs/preset` 是一个普通插件，组合 router、html、app 服务，文件约定（`Conventions`），页面与 API 路由（`Pages`、`ApiRoutes`），以及 dev/preview 下的 HTTP 服务（`@cordisjs/plugin-server`）、代理、静态资源（`Static`）与 dev 下的控制台。preset 的配置是扁平的，各部分读取各自的字段。`@cormijs/preset-react` 是 `@cormijs/preset` + `@cormijs/vite` + `@cormijs/react` 的简写，三者的配置写在一起。
+`@cormijs/preset` 是一个普通插件，组合 router、html、app 服务，文件约定（`Conventions`），页面与 API 路由（`Pages`、`ApiRoutes`），以及 dev/start 下的 HTTP 服务（`@cordisjs/plugin-server`）、代理、静态资源（`Static`）与 dev 下的控制台。preset 的配置是扁平的，各部分读取各自的字段。`@cormijs/preset-react` 是 `@cormijs/preset` + `@cormijs/vite` + `@cormijs/react` 的简写，三者的配置写在一起。
 
 事件：
 
@@ -77,7 +77,7 @@ cormi dev | build | preview | setup
 | `build/before()` | parallel | 打包器构建开始之前 |
 | `build/after(result)` | parallel | 客户端与服务端 bundle 写入之后 |
 
-preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 preview 下生效，排在 mock 之后）、`crossorigin`；`targets`（umi 的浏览器版本写法或 esbuild 目标）、`alias`、`define`、`publicPath`、`outDir` 是 `@cormijs/vite` 的配置。
+preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 start 下生效，排在 mock 之后）、`crossorigin`；`targets`（umi 的浏览器版本写法或 esbuild 目标）、`alias`、`define`、`publicPath`、`outDir` 是 `@cormijs/vite` 的配置。
 
 ## 文件约定
 
@@ -93,7 +93,7 @@ preset 的配置还包括 `proxy`（基于 fetch 的转发，dev 与 preview 下
 
 ## 命令
 
-`dev`、`build`、`preview`、`setup` 由 CLI 内置；其他命令由插件通过 `ctx.cli.command()` 注册，执行时以 `setup` 模式加载插件树后运行。core 内置两个：`generate`（别名 `g`），分发给插件注册的生成器（preset 提供 page、component、api，plugin-mock 提供 mock）；`config`，列出插件树，或打印匹配插件解析后的配置。`cormi help` 会列出插件注册的命令。
+`dev`、`build`、`start`、`setup` 由 CLI 内置；其他命令由插件通过 `ctx.cli.command()` 注册，执行时以 `setup` 模式加载插件树后运行。core 内置两个：`generate`（别名 `g`），分发给插件注册的生成器（preset 提供 page、component、api，plugin-mock 提供 mock）；`config`，列出插件树，或打印匹配插件解析后的配置。`cormi help` 会列出插件注册的命令。
 
 ## 生成文件（`src/.cormi`）
 
@@ -215,7 +215,7 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 清单中的路由：子包的顶层布局（独立运行时的外框）与 404 页不进入底座，顶层路由使用绝对路径，id 加上 `<name>/` 前缀。约束：
 
 - 共享依赖需是应用的直接依赖（pnpm 下 `react-router`、`cordis` 也要写进 package.json），否则插件会警告：模块联邦按应用能解析的包来共享和预构建。
-- 子包部署的服务器需允许底座跨域读取（CORS）；`cormi dev` / `cormi preview` 已经允许。
+- 子包部署的服务器需允许底座跨域读取（CORS）；`cormi dev` / `cormi start` 已经允许。
 - 子包页面在浏览器中运行，数据用 `clientLoader` 获取；导出服务端 `loader` 的路由会在构建时警告。底座开启 SSR 时，子包路由由客户端渲染，替换服务端的 404。
 - 懒加载的子包通过 `ctx.wrap()` 添加包装器时会让根组件重新挂载一次；需要全局 Provider 的子包宜设为 `eager`。
 
@@ -236,7 +236,7 @@ qiankun 子应用的已知限制：ES 模块在真实的 `window` 上运行，�
 
 ## 与 umi 的覆盖情况
 
-已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置（title、metas、links、scripts、styles、favicons、crossorigin）；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载（`<Link prefetch>`）；exportStatic、MPA、legacy；dev、build、preview、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件；此外还有 umi 没有内置的联邦应用（federation）。
+已覆盖：约定式与配置式路由、全局布局、404、`clientLoader` 与服务端 `loader`、SSR、API 路由、mock、`proxy`；HTML 配置（title、metas、links、scripts、styles、favicons、crossorigin）；`base`、`publicPath`、`history`、`alias`、`define`、`targets`；`global`、`overrides`、`loading`、`favicon` 约定；路由预加载（`<Link prefetch>`）；exportStatic、MPA、legacy；dev、build、start、setup、generate、config、lint 命令；以及 antd、tailwindcss、unocss、styled-components、model、initial-state、dva、valtio、react-query、request、layout、analytics、qiankun、mf 插件；此外还有 umi 没有内置的联邦应用（federation）。
 
 尚未覆盖：access、locale 插件（按计划暂缓）。mfsu 这类与某个打包器深度绑定的功能有意不做；第二个打包器（Rsbuild）与 UI 框架（Vue）的计划见 [可选的打包器与 UI 框架](./reference/pluggable.md)。
 
@@ -268,7 +268,8 @@ pnpm build             # tsc -b
 pnpm typecheck:client  # 插件的浏览器端代码
 pnpm test              # 单元测试
 pnpm check:plugins     # 官方插件的兼容性声明与代码一致（cormi plugin check）
-pnpm e2e               # 构建并 preview 每个示例，在浏览器中断言
+pnpm e2e               # 构建并 start 每个示例，在浏览器中断言
+pnpm e2e:create        # 用脚手架创建每种应用，构建并在没有源码的情况下 start
 pnpm e2e:dev           # 同上，使用 dev server
 pnpm e2e --bundler rsbuild      # 支持 Rsbuild 的示例改用它运行
 pnpm e2e:dev --bundler rsbuild

@@ -57,8 +57,8 @@ dev 模式下，`cormi.yml` 的变化会被逐条应用，而不是重启整个�
 
 | 配置 | 默认值 | 说明 |
 |---|---|---|
-| `host` | `localhost`（或 `HOST`） | dev、start 与 preview 服务器的主机 |
-| `port` | `8000`（或 `PORT`） | dev、start 与 preview 服务器的端口，被占用时顺延 |
+| `host` | `localhost`（或 `HOST`） | dev 与 start 服务器的主机 |
+| `port` | `8000`（或 `PORT`） | dev 与 start 服务器的端口；dev 下被占用时顺延，start 下报错 |
 | `proxy` | — | 转发请求到其他服务器，见 [代理](/guide/middleware#代理) |
 
 | `console` | `{}` | dev 模式下的 [控制台](/guide/console)：`{ path, title, registry, market }`（`registry` 默认与包管理器相同，`market` 默认是 Cormi registry 的索引），或 `false` 关闭 |

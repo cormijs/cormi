@@ -69,7 +69,7 @@ pnpm add -D @types/react @types/react-dom typescript
   "scripts": {
     "dev": "cormi dev",
     "build": "cormi build",
-    "preview": "cormi preview",
+    "start": "cormi start",
     "setup": "cormi setup"
   }
 }

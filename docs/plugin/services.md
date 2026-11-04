@@ -13,7 +13,7 @@
 | `ctx.rsbuild` | `@cormijs/rsbuild` | `plugin()`、`configure()`、`input()` |
 | `ctx.react` | `@cormijs/react` | — |
 | `ctx.vue` | `@cormijs/vue` | — |
-| `ctx.server` | `@cordisjs/plugin-server`（dev 与 preview） | `get()`、`post()`、`all()`、`use()`、`ws()` |
+| `ctx.server` | `@cordisjs/plugin-server`（dev 与 start） | `get()`、`post()`、`all()`、`use()`、`ws()` |
 | `ctx.workspace` | `@cormijs/cormi`（根上提供） | `create()` |
 | `ctx.console` | `@cormijs/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
 
@@ -35,8 +35,9 @@
 | 成员 | 说明 |
 |---|---|
 | `cwd` | 应用根目录 |
-| `mode` | `dev`、`build`、`preview`（`cormi start` 与 `cormi preview`）或 `setup` |
-| `serving` | 应用是否在提供服务：`dev` 或 `preview` |
+| `mode` | `dev`、`build`、`start`（生产环境，`cormi start`）或 `setup` |
+| `serving` | 应用是否在提供服务：`dev` 或 `start` |
+| `build` | `start` 模式下，`cormi build` 编译的 Node 代码（`dist/node/manifest.json`） |
 | `env` | dev 下为 `development`，否则为 `production` |
 | `paths` | `{ cwd, src, server, tmp, public }`，`tmp` 即 `src/.cormi` |
 | `resolve(...paths)` | 相对于应用根目录解析路径 |
@@ -239,7 +240,7 @@ Rsbuild 特有的能力，`ctx.bundler` 在 Rsbuild 下就是它。应用分两�
 
 ## ctx.server
 
-`@cordisjs/plugin-server` 提供的 HTTP 服务，只在 dev 与 preview 下存在，所以要放进 `ctx.inject(['server'], ...)`。应用自己的中间件用更简单的 [`ctx.middleware`](#ctx-middleware)。
+`@cordisjs/plugin-server` 提供的 HTTP 服务，只在 dev 与 start 下存在，所以要放进 `ctx.inject(['server'], ...)`。应用自己的中间件用更简单的 [`ctx.middleware`](#ctx-middleware)。
 
 ```ts
 ctx.inject(['server'], (ctx) => {
@@ -256,7 +257,7 @@ ctx.inject(['server'], (ctx) => {
 
 ## ctx.middleware
 
-应用的中间件，只在 dev 与 preview 下存在，要 `inject: ['middleware']`。中间件基于 fetch，`order` 小的在外层，`path` 限定路径，`state` 是请求级的状态，见 [中间件与代理](/guide/middleware)。
+应用的中间件，只在 dev 与 start 下存在，要 `inject: ['middleware']`。中间件基于 fetch，`order` 小的在外层，`path` 限定路径，`state` 是请求级的状态，见 [中间件与代理](/guide/middleware)。
 
 ```ts
 export const inject = ['middleware']
@@ -274,7 +275,22 @@ export function apply(ctx: Context) {
 
 ## ctx.model、ctx.database
 
-`@cormijs/database` 提供的 minato 服务：`ctx.model` 声明表，`ctx.database` 查询，只在 dev 与 preview 下存在。见 [数据库](/guide/database)。
+`@cormijs/database` 提供的 minato 服务：`ctx.model` 声明表，`ctx.database` 查询，只在 dev 与 start 下存在。见 [数据库](/guide/database)。
+
+## build/node
+
+`cormi build` 编译应用自己的 Node 代码时触发：插件把需要在生产环境运行的源文件加入 `entries`，并可以在 `data` 中记录运行时需要的信息（例如接口的路由表），`start` 模式下从 `ctx.cormi.build.data` 读取。插件树中的本地插件与工作区插件包由 core 自动加入。
+
+```ts
+if (ctx.cormi.mode === 'build') {
+  ctx.on('build/node', (build) => {
+    build.entries.add(ctx.cormi.resolve('jobs/cleanup.ts'))
+    build.data.jobs = ['jobs/cleanup.ts']
+  })
+}
+```
+
+`start` 模式下，导入这些源文件的路径（`import(pathToFileURL(ctx.cormi.resolve('jobs/cleanup.ts')).href)`）得到的就是编译后的模块，即使源文件没有部署；`ctx.cormi.build.files` 是源文件到编译产物（相对于 `dist/node`）的对照。
 
 ## ctx.cli
 

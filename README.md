@@ -59,7 +59,7 @@ export default (ctx: Context) => {
 ```sh
 cormi dev              # 开发；控制台在 http://localhost:8000/__cormi/
 cormi build            # 构建客户端（和服务端）bundle
-cormi preview          # 运行构建产物
+cormi start            # 在生产环境运行构建产物
 cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名加载源码
 ```
 

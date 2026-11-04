@@ -23,7 +23,8 @@
 |---|---|---|
 | 数据层 | minato | cordis 原生的类型驱动 ORM：`Database` 是服务，驱动是插件，表的类型由声明合并得到（`interface Tables`）；koishi 用的就是它 |
 | 数据库驱动 | 直接使用 minato 的驱动包 | 它们本来就是 cordis 插件，写进 `cormi.yml` 即可；Cormi 只提供 `@cormijs/database`（服务、日志服务、控制台页面、生成器），registry 把 minato 驱动作为外部包收录。维护量最小 |
-| 接口代码 | 原生运行在 Node | `server/api/**` 由 tsx 直接加载，与工作区插件一样运行源码、按文件热重载；每个接口模块可以 `export const inject`，handler 拿到注入了这些服务的 `ctx`。不经过打包器：纯后端应用不需要 Vite 或 Rsbuild |
+| 接口代码 | 原生运行在 Node | `server/api/**` 在 dev 下直接运行源码、热重载；每个接口模块可以 `export const inject`，handler 拿到注入了这些服务的 `ctx`。不经过页面的打包器：纯后端应用不需要 Vite 或 Rsbuild |
+| 生产环境 | `cormi start` 运行编译后的代码 | `cormi build` 用 esbuild 把应用自己的 Node 代码（`server/`、本地插件、工作区插件包）编译到 `dist/node`；`start` 模式下插件树加载编译后的模块，不需要源码与 TypeScript。生产环境运行的就是构建、测试过的产物 |
 | 页面的服务端代码 | 通过 `context` 拿到 `ctx` | `loader` 仍在服务端入口（打包后的代码）里运行，Cormi 在调用时传入 `context: { ctx, state }` |
 | 中间件 | 基于 fetch，有顺序与路径 | `(request, context, next) => Response`；`order` 决定先后，`path` 限定作用范围；会话、登录用户等放在请求级的 `state` 中，中间件、接口与 `loader` 共享 |
 | 第一批能力 | 数据库与接口、会话与鉴权、中间件顺序与常用中间件、缓存、对象存储 | — |
@@ -71,7 +72,7 @@ export async function GET(request: Request, { params, ctx }: ApiContext) {
 
 - 每个接口模块是一个子插件：`inject` 的服务就绪之前，请求得到 503 并说明在等哪个服务；服务消失时，接口随之下线。
 - `server/` 中的文件变化时，服务端代码整体重新加载（旧的插件先卸载）；导入的应用内文件通过模块代数（`?cormi-v=N`）一并重新加载，`node_modules` 不变。
-- 生产环境同样直接运行源码（`cormi start`），不需要构建步骤。
+- 生产环境运行 `cormi build` 编译后的代码（`cormi start`），接口的路由表在构建时确定。
 - 服务端用到的服务的类型由 `server/env.d.ts` 引用（`/// <reference types="@cormijs/database" />`）：只做声明合并不会加载一个包的类型。
 - 页面的 `loader` 通过参数中的 `context.ctx` 访问服务、`context.state` 访问会话与登录用户。
 - `cormi g api users/[id]`、`cormi g model user` 生成上面的文件。

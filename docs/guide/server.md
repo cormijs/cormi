@@ -1,6 +1,6 @@
 # 服务端代码与接口
 
-`server/` 是应用的服务端：Node 直接运行它的源码，不经过打包器，所以没有页面的后端服务同样适用。它只在应用提供服务时运行（`cormi dev`、`cormi start`），见 [页面与服务端](/guide/sides)。
+`server/` 是应用的服务端，由 Node 运行，不经过页面的打包器，所以没有页面的后端服务同样适用：`cormi dev` 直接运行它的源码，`cormi build` 把它编译到 `dist/node`，`cormi start` 在生产环境运行编译后的代码。它只在应用提供服务时运行，见 [页面与服务端](/guide/sides)。
 
 ```
 server/
@@ -84,10 +84,11 @@ declare module '@cormijs/cormi' {
 ## 生产环境
 
 ```sh
-cormi start
+cormi build     # 编译 server/ 到 dist/node，接口的路由表一并确定
+cormi start     # 运行 dist/node 中编译后的代码
 ```
 
-`cormi start` 运行应用：服务端代码、构建好的页面（如果有）。服务端代码在生产环境同样直接运行源码，不需要构建；部署时带上 `server/` 与依赖即可，见 [构建与部署](/guide/deploy)。
+`server/index.ts`、`server/models/*.ts` 与每个接口模块各自编译为一个模块，共用的代码（例如几个接口都导入的 `server/lib/db.ts`）放进公共 chunk，所以模块级的状态在生产环境同样只有一份；`node_modules` 中的依赖保持导入。生产环境不需要源码，见 [构建与部署](/guide/deploy)。
 
 ## 生成器
 

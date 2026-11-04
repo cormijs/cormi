@@ -29,7 +29,7 @@ export default defineMock({
 |---|---|---|
 | `dir` | `mock` | mock 模块的目录 |
 | `delay` | `0` | 每个响应的延迟毫秒数 |
-| `preview` | `false` | 在 `cormi preview` 下也启用 |
+| `production` | `false` | 在生产环境（`cormi start`）下也启用，例如演示站点；mock 文件随 `cormi build` 编译 |
 
 `cormi g mock users` 创建 `mock/users.ts`。
 
