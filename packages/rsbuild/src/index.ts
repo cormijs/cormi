@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {} from '@cordisjs/plugin-server'
-import { type Bundler, idle, Refresher, Schema, winPath } from '@cormijs/core'
+import { type Bundler, checkServerImport, type Cormi, idle, Refresher, Schema, winPath } from '@cormijs/core'
 import {
   createRsbuild,
   type ManifestData,
@@ -323,6 +323,7 @@ export class Rsbuild extends Service implements Bundler {
       },
       // the documents are rendered by ctx.html
       tools: { htmlPlugin: false },
+      plugins: [rspackPlugin(new ServerBoundaryPlugin(paths))],
       environments,
     }
   }
@@ -409,6 +410,20 @@ export class Rsbuild extends Service implements Bundler {
 function isBundlerPlugin(value: Rsbuild.PluginInput | Bundler.Plugin): value is Bundler.Plugin {
   if (!value || typeof value !== 'object' || Array.isArray(value) || 'then' in value) return false
   return !('name' in value)
+}
+
+/** The pages do not import values of the server code, see {@link checkServerImport}. */
+class ServerBoundaryPlugin {
+  constructor(private paths: Cormi.Paths) {}
+
+  apply(compiler: Rspack.Compiler) {
+    compiler.hooks.normalModuleFactory.tap('cormi:server-boundary', (factory) => {
+      factory.hooks.beforeResolve.tap('cormi:server-boundary', (data) => {
+        const error = checkServerImport(this.paths, data.contextInfo.issuer, data.request)
+        if (error) throw new Error(error)
+      })
+    })
+  }
 }
 
 /** An Rspack plugin as an Rsbuild plugin. */

@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {} from '@cordisjs/plugin-server'
-import { type Bundler, idle, Refresher, Schema, winPath, type Workspace } from '@cormijs/core'
+import { type Bundler, checkServerImport, type Cormi, idle, Refresher, Schema, winPath, type Workspace } from '@cormijs/core'
 import { Context, Service } from 'cordis'
 import { Awaitable, Dict } from 'cosmokit'
 import { build, createServer, type InlineConfig, type Manifest, mergeConfig, type PluginOption, version, type ViteDevServer } from 'vite'
@@ -265,7 +265,7 @@ export class Vite extends Service implements Bundler {
         entries: [app.clientEntry, ...this.inputs.values()],
       },
       server: { fs: { strict: false } },
-      plugins: [workspacePlugin(this.ctx.get('workspace'))],
+      plugins: [workspacePlugin(this.ctx.get('workspace')), serverBoundaryPlugin(paths)],
       // one instance of the framework, shared by the server entry, the pages and the runtime plugins
       ssr: { external: ['@cormijs/cormi'] },
       build: {
@@ -356,6 +356,18 @@ function workspacePlugin(workspace: Workspace | undefined): PluginOption {
     resolveId(id, _importer, options) {
       if (!workspace || !Object.keys(workspace.packages).length) return
       return workspace.resolve(id, options?.ssr ? ['node', 'import'] : ['browser', 'import', 'module'])
+    },
+  }
+}
+
+/** The pages do not import values of the server code, see {@link checkServerImport}. */
+function serverBoundaryPlugin(paths: Cormi.Paths): PluginOption {
+  return {
+    name: 'cormi:server-boundary',
+    enforce: 'pre',
+    resolveId(id, importer) {
+      const error = checkServerImport(paths, importer, id)
+      if (error) this.error(error)
     },
   }
 }
