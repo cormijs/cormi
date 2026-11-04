@@ -1,15 +1,50 @@
-import { join, relative } from 'node:path'
+import { existsSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
 import { watch } from 'chokidar'
-import { getConventionRoutes, Schema, winPath } from '@cormijs/core'
-import { Context } from 'cordis'
+import { getConventionRoutes, ModuleReloader, Schema, winPath } from '@cormijs/core'
+import type { Context, Fiber } from 'cordis'
 import { match, type MatchFunction } from 'path-to-regexp'
-import { toRequest } from './http.ts'
+import type { ServerRequest } from './http.ts'
+import { getRequestContext, type RequestContext } from './middleware.ts'
+
+// `FiberState` is a const enum in cordis' typings
+const ACTIVE = 2
+
+type Params = Partial<Record<string, string | string[]>>
+
+/** What an API handler receives besides the request. */
+export interface ApiContext<P = Params> extends RequestContext {
+  params: P
+  /** the context of the route: the services its module injects (`export const inject`) */
+  ctx: Context
+}
+
+export type ApiHandler<P = Params> = (request: Request, context: ApiContext<P>) => unknown
+
+/** An API route module: handlers by method (`GET`, `POST`…), or `default` for every method. */
+export interface ApiModule {
+  /** the services the handlers use, as a plugin injects them */
+  inject?: string[] | Record<string, unknown>
+  [method: string]: unknown
+}
 
 interface ApiRoute {
   id: string
   path: string
   file: string
-  match: MatchFunction<Partial<Record<string, string | string[]>>>
+  match: MatchFunction<Params>
+  module?: ApiModule
+  fiber?: Fiber
+  /** the module could not be loaded */
+  error?: unknown
+}
+
+// by the request of Node, see getRequestContext()
+const apiRequests = new WeakSet<object>()
+
+/** Whether a request is below the prefix of the API routes: pages do not answer it. */
+export function isApiRequest(req: ServerRequest) {
+  return apiRequests.has(req._req)
 }
 
 /** `users/[id]` -> `/api/users/:id`, `files/[...path]` -> `/api/files/*path` */
@@ -22,96 +57,161 @@ function toPath(prefix: string, absPath: string) {
   return prefix + path
 }
 
-/** Handlers of an API route module, by method; `default` handles every method. */
-export interface ApiModule {
-  [method: string]: ApiHandler | undefined
+/** The plugin of a module: its namespace with `apply`, or its default export. */
+function unwrapPlugin(module: any) {
+  const plugin = typeof module?.apply === 'function' ? module : module?.default
+  if (typeof plugin === 'function' || typeof plugin?.apply === 'function') return plugin
 }
 
-export type ApiHandler = (request: Request, context: { params: Partial<Record<string, string | string[]>> }) => unknown
-
 /**
- * API routes: every module below `src/api` is a route
- * (`src/api/users/[id].ts` -> `/api/users/:id`) exporting handlers by
- * method (`GET`, `POST`, ...) or a `default` handler. A handler receives a
- * fetch API `Request` and returns a `Response`, or a value sent as JSON.
+ * The server code of the app (`server/`), run by Node from its sources:
  *
- * The modules are bundled into the server entry; requests are served by
- * `ctx.server` in dev and preview mode.
+ * - `server/index.ts`: the app's own plugin, like `src/app.ts` in the browser
+ * - `server/models/*.ts`: plugins, e.g. the tables of the database
+ * - `server/api/**`: API routes, `users/[id].ts` -> `/api/users/:id`
+ *
+ * An API module exports handlers by method (`GET`, `POST`…) or a `default`
+ * handler, and the services they use (`export const inject`): a handler
+ * receives a fetch API `Request` and `{ params, ctx, state }`, where `ctx`
+ * has those services, and returns a `Response` or a value sent as JSON.
+ * Until the services are there, the route answers 503.
+ *
+ * The code runs when the app serves (`cormi dev`, `cormi start`), not when
+ * it builds. In dev mode, a change below `server/` loads the code again,
+ * with the files of the app it imports.
  */
 export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
-  const dir = ctx.cormi.resolve(config.dir)
+  // the server code runs when the app serves, not when it builds or writes files
+  if (!ctx.cormi.serving) return
+  const root = ctx.cormi.paths.server
+  const apiDir = join(root, 'api')
+  if (existsSync(join(ctx.cormi.paths.src, 'api'))) {
+    ctx.logger('server').warn('src/api is not loaded: the API routes are in server/api now')
+  }
+  const reloader = new ModuleReloader(ctx.cormi.cwd)
   let routes: ApiRoute[] = []
-  let dispose: (() => void) | undefined
+  let fibers: Fiber[] = []
 
-  const scan = () => {
-    const found = Object.values(getConventionRoutes({ base: dir })).map((route) => {
-      const path = toPath(config.prefix, route.absPath ?? '')
-      return { id: route.id, path, file: winPath(join(dir, route.file!)), match: match(path, { decode: decodeURIComponent }) }
-    })
+  const load = async () => {
+    // the plugins of the app: server/index.ts, then the models
+    const files = [
+      ...['index.ts', 'index.js'].map(file => join(root, file)).filter(existsSync).slice(0, 1),
+      ...existsSync(join(root, 'models')) ? readdirSync(join(root, 'models')).filter(file => /\.[cm]?[jt]s$/.test(file)).sort().map(file => join(root, 'models', file)) : [],
+    ]
+    for (const file of files) {
+      try {
+        const plugin = unwrapPlugin(await reloader.import(file))
+        if (!plugin) throw new Error(`${winPath(file)} exports no plugin`)
+        fibers.push(ctx.plugin(plugin))
+      } catch (error) {
+        ctx.logger('server').error(error)
+      }
+    }
+
+    const found: ApiRoute[] = existsSync(apiDir)
+      ? Object.values(getConventionRoutes({ base: apiDir, extensions: ['.ts', '.js'] })).map((route) => {
+          const path = toPath(config.prefix, route.absPath ?? '')
+          return { id: route.id, path, file: winPath(join(apiDir, route.file!)), match: match(path, { decode: decodeURIComponent }) }
+        })
+      : []
+    for (const route of found) {
+      try {
+        const module: ApiModule = await reloader.import(route.file)
+        route.module = module
+        // a route is a plugin: its handlers run with the services it injects
+        route.fiber = ctx.plugin({ name: `api ${route.path}`, inject: module.inject ?? [], apply: () => {} })
+        fibers.push(route.fiber)
+      } catch (error) {
+        route.error = error
+        ctx.logger('server').error(error)
+      }
+    }
     // fewer parameters first, so `/api/users/me` wins over `/api/users/:id`
     const params = (path: string) => path.match(/[:*]/g)?.length ?? 0
     routes = found.sort((a, b) => params(a.path) - params(b.path) || b.path.length - a.path.length)
-    if (routes.length && !dispose) {
-      const disposeFile = ctx.app.file('api.ts', () => [
-        'export default {',
-        ...routes.map(route => `  ${JSON.stringify(route.id)}: () => import(${JSON.stringify(winPath(relative(ctx.app.dir, route.file)))}),`),
-        '}',
-        '',
-      ].join('\n'))
-      const disposeServer = ctx.app.server('api', join(ctx.app.dir, 'api.ts'))
-      dispose = () => {
-        disposeServer()
-        disposeFile()
-      }
-    } else if (!routes.length && dispose) {
-      dispose()
-      dispose = undefined
-    } else {
-      ctx.app.refresh()
-    }
   }
 
-  scan()
+  const unload = async () => {
+    const disposing = fibers
+    fibers = []
+    routes = []
+    await Promise.all(disposing.map(fiber => fiber.dispose()))
+  }
+
+  ctx.effect(() => {
+    const task = load()
+    return async () => {
+      await task
+      await unload()
+    }
+  }, 'load server code')
+
   if (ctx.cormi.mode === 'dev') {
+    // the code is loaded again as a whole: the old plugins go before the new ones come, so a service is not provided twice
+    let reloading: Promise<void> = Promise.resolve()
+    let timer: ReturnType<typeof setTimeout> | undefined
+    // changes in a burst (a save of several files) reload once
+    const reload = () => {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        reloading = reloading.then(async () => {
+          await unload()
+          reloader.invalidate()
+          await load()
+          ctx.logger('server').info('reloaded the server code')
+        })
+      }, 100)
+    }
     ctx.effect(() => {
-      const watcher = watch(dir, { ignoreInitial: true })
-      watcher.on('add', scan).on('unlink', scan)
-      return () => watcher.close()
-    }, 'watch api routes')
+      const watcher = watch(root, { ignoreInitial: true })
+      watcher.on('all', reload)
+      return () => {
+        clearTimeout(timer)
+        return watcher.close()
+      }
+    }, 'watch server code')
   }
 
   ctx.inject(['server'], (ctx) => {
     ctx.server.all(`${config.prefix}{/*rest}`, async (req, res, next) => {
+      apiRequests.add(req._req)
       const { pathname } = new URL(req.url, 'http://localhost')
       for (const route of routes) {
         const matched = route.match(pathname)
         if (!matched) continue
-        const entry = await ctx.bundler.loadServerEntry()
-        const module: ApiModule = await entry.modules.api.default[route.id]()
+        if (route.error || !route.module || !route.fiber) {
+          const message = ctx.cormi.mode === 'dev' ? String((route.error as Error)?.stack ?? route.error) : 'Internal Server Error'
+          return new Response(message, { status: 500 })
+        }
+        const { module, fiber } = route
         const handler = module[req.method] ?? (req.method === 'HEAD' ? module.GET : undefined) ?? module.default
         if (typeof handler !== 'function') {
-          return new Response(null, { status: 405, headers: { allow: Object.keys(module).filter(key => key !== 'default').join(', ') } })
+          const methods = Object.keys(module).filter(key => /^[A-Z]+$/.test(key) && typeof module[key] === 'function')
+          return new Response(null, { status: 405, headers: { allow: methods.join(', ') } })
         }
-        const result = await handler(toRequest(req), { params: matched.params })
+        if (fiber.state !== ACTIVE) {
+          const missing = Object.keys(fiber.inject).filter(name => !fiber.ctx.get(name as any))
+          return Response.json({ error: `the route waits for ${missing.join(', ') || 'its services'}` }, { status: 503, headers: { 'retry-after': '1' } })
+        }
+        const { request, state } = getRequestContext(req)
+        const result = await (handler as ApiHandler)(request, { params: matched.params, ctx: fiber.ctx, state })
         return result instanceof Response ? result : Response.json(result ?? null)
       }
-      return next()
+      // the other routes of ctx.server (not the pages), then not found: an unknown path is not a method that is not allowed
+      const response = await next()
+      if (response !== undefined || res.claimed) return response
+      return Response.json({ error: 'not found' }, { status: 404 })
     })
   })
 }
 
 export namespace ApiRoutes {
-  export const inject = ['app', 'bundler']
-
   export interface Config {
-    /** directory of API routes, relative to the app root */
-    dir: string
-    /** URL prefix of API routes */
+    /** URL prefix of the API routes of `server/api` */
     prefix: string
   }
 
   export const Config: Schema<Config> = Schema.object({
-    dir: Schema.string().default('src/api'),
-    prefix: Schema.string().default('/api'),
+    prefix: Schema.string().default('/api').description('URL prefix of the API routes of server/api'),
   })
 }

@@ -3,14 +3,16 @@ import type { Component } from 'vue'
 
 export type { HistoryType, RouteData } from '@cormijs/runtime'
 
-/** The arguments of a server `loader`. */
-export interface LoaderArgs {
+/** The arguments of a server `loader`: `LoaderArgs<LoaderContext>` with `LoaderContext` of `@cormijs/cormi`. */
+export interface LoaderArgs<Context = any> {
   request: Request
   params: Record<string, string | string[]>
+  /** on the server: the context of the app (`ctx`) and the state of the request */
+  context: Context
 }
 
 /** The arguments of a `clientLoader`: `serverLoader()` fetches the data of the route's `loader`. */
-export interface ClientLoaderArgs extends LoaderArgs {
+export interface ClientLoaderArgs extends Omit<LoaderArgs, 'context'> {
   serverLoader: () => Promise<unknown>
 }
 

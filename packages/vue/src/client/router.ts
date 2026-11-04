@@ -56,6 +56,8 @@ export interface CreateRouterOptions {
   hydrated?: LoaderData
   /** origin of the URLs given to loaders */
   origin: string
+  /** the `context` of loaders on the server: the context of the app and the state of the request */
+  context?: unknown
   /** called for a redirect of a loader, which then aborts the navigation; by default the router follows it */
   onRedirect?: (location: string) => void
 }
@@ -150,7 +152,7 @@ export class RouterService extends BaseRouterService<RouteModule> {
       try {
         const entries = await Promise.all(to.matched.map(async (record) => {
           const id = record.name as string
-          const value = await this._runLoader(id, new Request(url), to, options.env, hydrated)
+          const value = await this._runLoader(id, new Request(url), to, options.env, hydrated, options.context)
           return [id, value] as const
         }))
         hydrated = undefined
@@ -171,13 +173,13 @@ export class RouterService extends BaseRouterService<RouteModule> {
     return router
   }
 
-  private async _runLoader(id: string, request: Request, to: RouteLocationNormalized, env: 'client' | 'server', hydrated?: LoaderData) {
+  private async _runLoader(id: string, request: Request, to: RouteLocationNormalized, env: 'client' | 'server', hydrated?: LoaderData, context?: unknown) {
     const route = this.routes[id]
     if (!route?.hasLoader && !route?.hasClientLoader) return
     const params = to.params as Record<string, string | string[]>
     if (env === 'server') {
       if (!route.hasLoader) return
-      return unwrap(await (await this.load(id)).loader!({ request, params }))
+      return unwrap(await (await this.load(id)).loader!({ request, params, context }))
     }
     const serverLoader = () => hydrated && id in hydrated
       ? Promise.resolve(hydrated[id])

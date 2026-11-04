@@ -1,6 +1,6 @@
 {
   "name": "@cormijs/server",
-  "description": "Request handling of Cormi on ctx.server: pages (SSR), server loaders, API routes and static files",
+  "description": "Request handling of Cormi on ctx.server: pages (SSR), server loaders, the server code (server/), middlewares and static files",
   "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",

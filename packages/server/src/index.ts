@@ -1,5 +1,6 @@
 export * from './api.ts'
 export * from './http.ts'
+export * from './middleware.ts'
 export * from './pages.ts'
 export * from './proxy.ts'
 export * from './static.ts'

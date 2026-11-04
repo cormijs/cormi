@@ -17,10 +17,10 @@ export interface RenderResult {
 }
 
 export interface RequestHandler {
-  /** Run the server `loader` of a route for the loader endpoint. */
-  loader(request: Request, routeId: string): Promise<Response>
+  /** Run the server `loader` of a route for the loader endpoint; `context` is the `context` of loaders. */
+  loader(request: Request, routeId: string, context?: unknown): Promise<Response>
   /** Render a page; a `Response` is returned for redirects. */
-  render(request: Request): Promise<Response | RenderResult>
+  render(request: Request, context?: unknown): Promise<Response | RenderResult>
 }
 
 const ESCAPED: Record<string, string> = { '&': '\\u0026', '>': '\\u003e', '<': '\\u003c', '\u2028': '\\u2028', '\u2029': '\\u2029' }
@@ -68,9 +68,9 @@ export function createRequestHandler(ctx: Context): RequestHandler {
   const handler = createStaticHandler(ctx.$router.createRoutes('server'), { basename: ctx.$router.base })
 
   return {
-    async loader(request, routeId) {
+    async loader(request, routeId, context) {
       try {
-        const result = await handler.queryRoute(request, { routeId })
+        const result = await handler.queryRoute(request, { routeId, requestContext: context })
         if (result instanceof Response) return toLoaderResponse(result)
         return Response.json(result ?? null)
       } catch (error) {
@@ -82,8 +82,8 @@ export function createRequestHandler(ctx: Context): RequestHandler {
       }
     },
 
-    async render(request) {
-      const context = await handler.query(request)
+    async render(request, requestContext) {
+      const context = await handler.query(request, { requestContext })
       if (context instanceof Response) return context
       const router = createStaticRouter(handler.dataRoutes, context)
       const inserted: (() => ReactNode)[] = []

@@ -16,10 +16,10 @@ export interface RenderResult {
 }
 
 export interface RequestHandler {
-  /** Run the server `loader` of a route for the loader endpoint. */
-  loader(request: Request, routeId: string): Promise<Response>
+  /** Run the server `loader` of a route for the loader endpoint; `context` is the `context` of loaders. */
+  loader(request: Request, routeId: string, context?: unknown): Promise<Response>
   /** Render a page; a `Response` is returned for redirects. */
-  render(request: Request): Promise<Response | RenderResult>
+  render(request: Request, context?: unknown): Promise<Response | RenderResult>
 }
 
 const ESCAPED: Record<string, string> = { '&': '\\u0026', '>': '\\u003e', '<': '\\u003c', '\u2028': '\\u2028', '\u2029': '\\u2029' }
@@ -50,13 +50,13 @@ export function createRequestHandler(ctx: Context): RequestHandler {
   let resolver: Router | undefined
 
   return {
-    async loader(request, routeId) {
+    async loader(request, routeId, context) {
       const route = $router.routes[routeId]
       if (!route?.hasLoader) return new Response(`route ${routeId} has no loader`, { status: 404 })
       resolver ??= createRouter({ history: createMemoryHistory(), routes: $router.createRoutes() })
       const params = resolver.resolve(toPath(new URL(request.url))).params as Record<string, string | string[]>
       try {
-        const result = await (await $router.load(routeId)).loader!({ request, params })
+        const result = await (await $router.load(routeId)).loader!({ request, params, context })
         return result instanceof Response ? toLoaderResponse(result) : Response.json(result ?? null)
       } catch (error) {
         if (error instanceof Response) return toLoaderResponse(error)
@@ -64,7 +64,7 @@ export function createRequestHandler(ctx: Context): RequestHandler {
       }
     },
 
-    async render(request) {
+    async render(request, context) {
       const url = new URL(request.url)
       const data = shallowReactive<LoaderData>({})
       let location: string | undefined
@@ -73,6 +73,7 @@ export function createRequestHandler(ctx: Context): RequestHandler {
         history: createMemoryHistory($router.base),
         data,
         origin: url.origin,
+        context,
         onRedirect: (target) => {
           location = target
         },

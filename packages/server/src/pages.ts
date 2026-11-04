@@ -3,7 +3,9 @@ import { join } from 'node:path'
 import { LOADER_ENDPOINT } from '@cormijs/runtime/constants'
 import { type Html, Schema } from '@cormijs/core'
 import { Context } from 'cordis'
+import { isApiRequest } from './api.ts'
 import { getOrigin, send, type ServerRequest, toRequest } from './http.ts'
+import { getRequestContext, type RequestContext } from './middleware.ts'
 
 type Assets = Pick<Html.RenderOptions, 'scripts' | 'styles' | 'preloads'>
 
@@ -21,11 +23,23 @@ async function getAssets(ctx: Context): Promise<Assets> {
   return { scripts: js, styles: css, preloads: preload }
 }
 
-/** Pages are the fallback of GET requests accepting HTML, including `fetch()` defaults (`*\/*`), e.g. a qiankun master. */
+/**
+ * Pages are the fallback of GET requests accepting HTML, including `fetch()`
+ * defaults (`*\/*`), e.g. a qiankun master; not of the API routes' paths.
+ */
 function isPageRequest(req: ServerRequest) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return false
+  if (isApiRequest(req)) return false
   const accept = req.headers.get('accept')
   return !accept || accept.includes('text/html') || accept.includes('*/*')
+}
+
+/**
+ * What the loaders of pages receive as `context` on the server: the root
+ * context of the app (its services) and the state of the request.
+ */
+export interface LoaderContext extends RequestContext {
+  ctx: Context
 }
 
 const STARTING = '<!DOCTYPE html><meta http-equiv="refresh" content="1"><p>Cormi is starting…</p>'
@@ -53,7 +67,8 @@ export function Pages(ctx: Context, config: Pages.Config) {
       let result: RenderResult | undefined
       if (config.ssr) {
         const entry = await bundler.loadServerEntry()
-        const rendered: Response | RenderResult = await entry.handler.render(toRequest(req))
+        const { request, state } = getRequestContext(req)
+        const rendered: Response | RenderResult = await entry.handler.render(request, { ctx: ctx[Context.root], state } satisfies LoaderContext)
         if (rendered instanceof Response) return rendered
         if (cormi.mode === 'dev') rendered.head += bundler.devStyles?.(ctx.app.serverEntry) ?? ''
         result = rendered
@@ -78,7 +93,8 @@ export function Pages(ctx: Context, config: Pages.Config) {
       const url = req.query.get('url')
       if (!route || !url) return new Response('missing route or url', { status: 400 })
       const entry = await ctx.bundler.loadServerEntry()
-      return entry.handler.loader(toRequest(req, url), route)
+      const { state } = getRequestContext(req)
+      return entry.handler.loader(toRequest(req, url), route, { ctx: ctx[Context.root], state } satisfies LoaderContext)
     })
 
     // registered after the routes of `ctx.server`, so pages are the fallback

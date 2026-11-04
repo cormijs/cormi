@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { type Context, type Route, Schema } from '@cormijs/cormi'
+import { Context, type LoaderContext, type Route, Schema } from '@cormijs/cormi'
 
 export const name = 'export-static'
 export const inject = ['app', 'router', 'html', 'bundler']
@@ -61,7 +61,9 @@ export function apply(ctx: Context, config: Config) {
     for (const path of pages) {
       const file = path === '/404' && hasNotFound ? '404.html' : getOutputFile(path, config.htmlSuffix)
       try {
-        const rendered = await entry.handler.render(new Request(origin + prefix + path))
+        // the loaders run at build time: the services of the server, e.g. the database, are not there
+        const context: LoaderContext = { ctx: ctx[Context.root], state: {} }
+        const rendered = await entry.handler.render(new Request(origin + prefix + path), context)
         if (rendered instanceof Response) {
           logger.warn('%s redirects to %s, skipped', path, rendered.headers.get('location'))
           continue
