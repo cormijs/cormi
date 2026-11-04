@@ -121,7 +121,7 @@ const code = await ctx.cache.get('captcha', id)
 const { url } = await ctx.storage.put(`avatars/${id}.png`, file, { contentType: 'image/png' })
 ```
 
-- `@cormijs/cache` 提供 `ctx.cache`（按表分区，带过期时间），驱动：`@cormijs/cache-memory`（默认）、`@cormijs/cache-redis`、`@cormijs/cache-database`（存在 minato 中）。
+- `@cormijs/cache` 提供 `ctx.cache` 的接口（按表分区，带过期时间，`increment`、`getOrSet`）与内存实现；`@cormijs/cache-redis`、`@cormijs/cache-database`（存在 minato 中）是另外两种实现。实现本身提供服务，与 `ctx.bundler` 的做法相同：`cormi.yml` 中写哪一个，`ctx.cache` 就是哪一个。值一律以 JSON 保存，换实现时读到的值不变。
 - `@cormijs/storage` 提供 `ctx.storage`（`put`、`get`、`delete`、`list`、`url`），驱动：`@cormijs/storage-local`（目录，由 `ctx.server` 提供公开访问）、`@cormijs/storage-s3`（S3 兼容：AWS、R2、MinIO、OSS 等）。
 
 ## 纯后端应用
@@ -141,7 +141,7 @@ const { url } = await ctx.storage.put(`avatars/${id}.png`, file, { contentType: 
 ## 实施阶段
 
 1. **服务端基础**（已完成）：`server/` 约定与原生运行的接口（`inject`、热重载、503）；`loader` 的 `context`；`ctx.middleware`（顺序、路径、`state`）；纯后端应用与 `cormi start`；`@cormijs/database`；页面与服务端的界限；`@cormijs/create`；示例 `with-api` 与 e2e。
-2. **缓存**：`@cormijs/cache` 与内存、Redis、数据库驱动。
+2. **缓存**（已完成）：`@cormijs/cache`（接口与内存实现）、`@cormijs/cache-redis`、`@cormijs/cache-database`，三者运行同一组契约测试。
 3. **会话、鉴权与常用中间件**：session、auth、cors、security、rate-limit。
 4. **对象存储**：`@cormijs/storage` 与本地、S3 驱动。
 5. **控制台与文档**：数据库与接口页面，registry 收录 minato 驱动，指南。

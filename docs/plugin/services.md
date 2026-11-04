@@ -292,6 +292,12 @@ if (ctx.cormi.mode === 'build') {
 
 `start` 模式下，导入这些源文件的路径（`import(pathToFileURL(ctx.cormi.resolve('jobs/cleanup.ts')).href)`）得到的就是编译后的模块，即使源文件没有部署；`ctx.cormi.build.files` 是源文件到编译产物（相对于 `dist/node`）的对照。
 
+## ctx.cache
+
+`@cormijs/cache`（内存）、`@cormijs/cache-redis` 或 `@cormijs/cache-database` 提供的键值缓存，按表分开、可以过期，只在 dev 与 start 下存在，要 `inject: ['cache']`。见 [缓存](/guide/cache)。
+
+实现另一种缓存，就是继承 `@cormijs/cache` 的 `Cache` 并实现 `get`、`set`、`delete`、`clear`、`keys`、`increment`；`getOrSet` 由基类提供。用 `packages/cache/tests/contract.ts` 的 `testCache()` 测试它，行为就与官方的实现一致。
+
 ## ctx.cli
 
 命令行。注册的命令以 `setup` 模式加载插件树后运行。

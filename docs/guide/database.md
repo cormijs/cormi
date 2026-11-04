@@ -114,4 +114,4 @@ export async function loader({ context }: LoaderFunctionArgs<LoaderContext>) {
 }
 ```
 
-修改数据仍然通过接口完成。页面只导入表的类型（`import type { Todo } from '../../server/models/todo'`），见 [页面与服务端](/guide/sides#两侧只在三处相遇)。
+修改数据仍然通过接口完成。查询开销大时，可以用 [缓存](/guide/cache) 的 `getOrSet` 存一段时间。页面只导入表的类型（`import type { Todo } from '../../server/models/todo'`），见 [页面与服务端](/guide/sides#两侧只在三处相遇)。

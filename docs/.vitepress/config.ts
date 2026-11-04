@@ -49,6 +49,7 @@ export default defineConfig({
             { text: '服务端代码与接口', link: '/guide/server' },
             { text: '中间件与代理', link: '/guide/middleware' },
             { text: '数据库', link: '/guide/database' },
+            { text: '缓存', link: '/guide/cache' },
           ],
         },
         {

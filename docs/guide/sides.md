@@ -13,7 +13,7 @@
 | 由谁处理 | 打包器与 UI 框架（`ctx.bundler`、`ctx.renderer`） | `ctx.server`、`ctx.middleware` 与服务（`ctx.database`……） | cordis 的 loader |
 | 应用自己的插件 | `src/app.tsx` | `server/index.ts` | `plugin.ts` |
 | 生成器 | `cormi g page`、`cormi g component` | `cormi g api`、`cormi g model` | `cormi g plugin` |
-| 文档 | [目录与约定](/guide/conventions)、[路由与数据](/guide/routing)、[打包器与 UI 框架](/guide/stack) | [服务端代码与接口](/guide/server)、[中间件与代理](/guide/middleware)、[数据库](/guide/database) | [cormi.yml](/guide/config)、[命令行](/guide/cli)、[构建与部署](/guide/deploy) |
+| 文档 | [目录与约定](/guide/conventions)、[路由与数据](/guide/routing)、[打包器与 UI 框架](/guide/stack) | [服务端代码与接口](/guide/server)、[中间件与代理](/guide/middleware)、[数据库](/guide/database)、[缓存](/guide/cache) | [cormi.yml](/guide/config)、[命令行](/guide/cli)、[构建与部署](/guide/deploy) |
 
 ## 四种应用
 
@@ -77,7 +77,7 @@ services in a loader through `context.ctx`
 | 一侧 | 插件 |
 |---|---|
 | 页面 | 打包器与 UI 框架，`@cormijs/plugin-antd`、`-tailwindcss`、`-model`、`-request`、`-layout`…… |
-| 服务端 | `@cormijs/database` 与 minato 的驱动；之后的会话、鉴权、缓存与对象存储 |
+| 服务端 | `@cormijs/database` 与 minato 的驱动，`@cormijs/cache` 及其 Redis、数据库实现；之后的会话、鉴权与对象存储 |
 | 应用 | `@cormijs/preset`、`@cormijs/plugin-mock`、`-lint`，以及应用自己的 `plugin.ts` |
 
 ```yaml
