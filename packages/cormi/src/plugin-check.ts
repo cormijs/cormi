@@ -70,6 +70,9 @@ export interface CheckReport {
   keywords: boolean
 }
 
+/** The error of `importPeer()` for an optional peer dependency that is not installed. */
+const MISSING_PEER = / needs \S+: add it to the dependencies of the app$/
+
 const isMap = (value: any) => !!value && typeof value === 'object' && !Array.isArray(value) && !('name' in value) && !('then' in value)
 
 /** An error on one line, without its stack. */
@@ -155,7 +158,10 @@ async function runCell(modules: { preset: any; bundler: any; renderer: any }, na
       try {
         await flushPlugins(ctx, names.bundler)
       } catch (error) {
-        return { status: 'failed', error: toMessage(error).replace(/^\w*Error: /, ''), keys, entries }
+        const message = toMessage(error).replace(/^\w*Error: /, '')
+        // an integration the plugin imports when it is used (importPeer) is missing here: the plugin is not at fault
+        if (MISSING_PEER.test(message)) return { status: 'skipped', reason: message, keys, entries }
+        return { status: 'failed', error: message, keys, entries }
       }
       return { status: 'ok', keys, entries }
     }
@@ -172,19 +178,39 @@ async function runCell(modules: { preset: any; bundler: any; renderer: any }, na
   }
 }
 
-/** The bundlers (or UI frameworks) a plugin supports, from its cells; `undefined` for any. */
-function inferDimension(dimension: Dimension, export_: { cells: Dict<Dict<Cell>>; inject: string[]; keys: string[][] }, tested: { bundler: string[]; renderer: string[] }): string[] | undefined | null {
-  const injected = export_.inject.filter(name => KNOWN[dimension].includes(name) || tested[dimension].includes(name))
-  if (injected.length) return injected
-  if (dimension === 'bundler' && export_.keys.length) {
+/**
+ * What a plugin supports, from its cells: `undefined` for any, `null` when
+ * it loads nowhere. `inject` (a service of a bundler or UI framework) and the
+ * maps of `ctx.bundler.plugin()` are what the plugin requires; otherwise a
+ * bundler is judged by the cells of the UI frameworks the plugin supports,
+ * and a UI framework by those of the bundlers it supports — a React plugin
+ * that waits for `react` with Vue says nothing about Vite.
+ */
+export function inferCompat(cells: Dict<Dict<Cell>>, inject: string[], keys: string[][], names: Record<Dimension, string[]>) {
+  const required = (dimension: Dimension) => {
+    const injected = inject.filter(name => KNOWN[dimension].includes(name) || names[dimension].includes(name))
+    if (injected.length) return injected
     // every map of the plugin must have the bundler
-    return export_.keys.reduce((common, keys) => common.filter(key => keys.includes(key)))
+    if (dimension === 'bundler' && keys.length) return keys.reduce((common, list) => common.filter(key => list.includes(key)))
   }
-  const ok = tested[dimension].filter(name => Object.entries(export_.cells).some(([bundler, row]) => Object.entries(row).some(([renderer, cell]) => {
-    return cell.status === 'ok' && (dimension === 'bundler' ? bundler : renderer) === name
-  })))
-  if (!ok.length) return null
-  return ok.length === tested[dimension].length ? undefined : ok
+  const supports = (list: string[] | null | undefined, name: string) => !list || list.includes(name)
+  const judge = (dimension: Dimension, other: string[] | null | undefined): string[] | null | undefined => {
+    const tested = new Set<string>()
+    const ok = new Set<string>()
+    for (const [bundler, row] of Object.entries(cells)) {
+      for (const [renderer, cell] of Object.entries(row)) {
+        const [name, otherName] = dimension === 'bundler' ? [bundler, renderer] : [renderer, bundler]
+        if (cell.status === 'skipped' || !supports(other, otherName)) continue
+        tested.add(name)
+        if (cell.status === 'ok') ok.add(name)
+      }
+    }
+    if (!ok.size) return null
+    return ok.size === tested.size ? undefined : [...ok]
+  }
+  const renderer = required('renderer')
+  const bundler = required('bundler') ?? judge('bundler', renderer)
+  return { bundler, renderer: renderer ?? judge('renderer', bundler) }
 }
 
 /** Whether two lists of a dimension are the same; `undefined` (any) is only the same as itself. */
@@ -277,8 +303,9 @@ export async function checkPlugin(dir: string): Promise<CheckReport> {
   const exports: ExportReport[] = checked.map(({ inject, keys, ...item }) => {
     const report: ExportReport = { ...item }
     const compat: Manifest.Compat = {}
+    const inferred = inferCompat(item.cells, inject, keys, tested)
     for (const dimension of DIMENSIONS) {
-      const names = inferDimension(dimension, { cells: item.cells, inject, keys }, tested)
+      const names = inferred[dimension]
       if (names === null) {
         report.error = `${pkg.name}${item.subpath.slice(1)} loads with no ${dimension === 'bundler' ? 'bundler' : 'UI framework'} checked`
       } else if (names) {

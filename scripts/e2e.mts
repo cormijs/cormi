@@ -630,6 +630,11 @@ for (const [index, name] of names.entries()) {
   } catch (error) {
     failed++
     console.log(`✗ ${name}\n${(error as Error).stack ?? error}\n--- browser errors ---\n${errors.join('\n')}\n--- server output ---\n${output}`)
+    // in GitHub Actions, an annotation: readable without access to the logs
+    if (process.env.GITHUB_ACTIONS) {
+      const text = [(error as Error).message ?? String(error), '--- browser errors ---', ...errors, '--- server output (end) ---', output.slice(-3000)].join('\n')
+      console.log(`::error title=e2e ${name} (${bundler}${dev ? ', dev' : ''})::${text.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`)
+    }
   } finally {
     await page.close()
     for (const child of processes) {

@@ -251,4 +251,6 @@ export interface RegistryObject {
     /** the package declares the same */
     matches: boolean
   }
+  /** why the registry could not check it */
+  checkError?: string
 }
