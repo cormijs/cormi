@@ -1,0 +1,21 @@
+- name: '@cormijs/preset'
+  config:
+    title: Cormi · auth
+    ssr: true
+- name: '@cormijs/vite'
+- name: '@cormijs/react'
+# sessions in the cache (in memory), the signed-in user in the session
+- name: '@cormijs/cache'
+- name: '@cormijs/plugin-session'
+- name: '@cormijs/plugin-auth'
+# security headers on every response; another origin may call the API with cookies
+- name: '@cormijs/plugin-security'
+- name: '@cormijs/plugin-cors'
+  config:
+    origin: [http://localhost:5173]
+    credentials: true
+# 5 attempts to sign in per minute
+- name: '@cormijs/plugin-rate-limit'
+  config:
+    path: /api/login
+    max: 5

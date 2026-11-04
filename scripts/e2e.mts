@@ -274,6 +274,70 @@ const checks: Record<string, Check> = {
     assert.equal(second.visits, first.visits + 1)
   },
 
+  async 'with-auth'(page, base) {
+    // security headers on the pages and the API; HSTS in production only
+    const home = await fetch(base, { headers: { accept: 'text/html' } })
+    assert.equal(home.headers.get('x-content-type-options'), 'nosniff')
+    assert.equal(home.headers.get('x-frame-options'), 'SAMEORIGIN')
+    assert.equal(home.headers.has('strict-transport-security'), !dev)
+
+    // a route of `export const auth`, the session of a login
+    assert.equal((await fetch(`${base}/api/me`)).status, 401)
+    const login = (name: string, password: string, cookie = '') => fetch(`${base}/api/login`, { method: 'POST', body: JSON.stringify({ name, password }), headers: { cookie } })
+    const wrong = await login('bob', 'nope')
+    assert.equal(wrong.status, 401)
+    assert.equal(wrong.headers.get('set-cookie'), null, 'no session without data')
+    const signed = await login('bob', 'cormi')
+    const cookie = signed.headers.get('set-cookie')!
+    assert.match(cookie, /^cormi\.sid=[\w-]{32}; Max-Age=604800; Path=\/; HttpOnly; SameSite=Lax$/)
+    const sid = cookie.split(';')[0]
+    assert.deepEqual(await fetch(`${base}/api/me`, { headers: { cookie: sid } }).then(res => res.json()), { name: 'bob', role: 'member' })
+    assert.equal((await fetch(`${base}/api/admin/stats`, { headers: { cookie: sid } })).status, 403)
+    // the session gets a new id at a login: the one before is gone
+    const again = (await login('bob', 'cormi', sid)).headers.get('set-cookie')!.split(';')[0]
+    assert.notEqual(again, sid)
+    assert.equal((await fetch(`${base}/api/me`, { headers: { cookie: sid } })).status, 401)
+    const logout = await fetch(`${base}/api/logout`, { method: 'POST', headers: { cookie: again } })
+    assert.match(logout.headers.get('set-cookie')!, /^cormi\.sid=; Max-Age=0;/)
+    assert.equal((await fetch(`${base}/api/me`, { headers: { cookie: again } })).status, 401)
+
+    // CORS: the listed origin, with credentials; in dev, the dev server of Vite answers preflights itself
+    const preflight = await fetch(`${base}/api/me`, { method: 'OPTIONS', headers: { 'origin': 'http://localhost:5173', 'access-control-request-method': 'GET' } })
+    assert.equal(preflight.status, 204)
+    assert.equal(preflight.headers.get('access-control-allow-origin'), 'http://localhost:5173')
+    if (!dev) assert.equal(preflight.headers.get('access-control-allow-credentials'), 'true')
+    assert.equal((await fetch(`${base}/api/me`, { headers: { origin: 'http://evil.test' } })).headers.get('access-control-allow-origin'), null)
+
+    // the pages: the loaders read the user of the session, on the server
+    await page.goto(`${base}/admin`)
+    await page.waitForURL(/\/login$/)
+    await page.fill('input[name=name]', 'alice')
+    await page.fill('input[name=password]', 'cormi')
+    for (let i = 0; i < 50 && new URL(page.url()).pathname !== '/'; i++) {
+      await page.click('button[type=submit]').catch(() => {})
+      await page.waitForTimeout(200)
+    }
+    await page.waitForSelector('#user:text("Signed in as alice (admin)")')
+    await page.click('text=Admin')
+    await page.waitForSelector('#admin:text("Admin of alice")')
+    const [{ value }] = (await page.context().cookies()).filter(cookie => cookie.name === 'cormi.sid')
+    const html = await fetch(base, { headers: { accept: 'text/html', cookie: `cormi.sid=${value}` } }).then(res => res.text())
+    assert.match(html, /Signed in as <!-- -->alice/)
+    await page.goto(base)
+    await page.click('text=Sign out')
+    await page.waitForSelector('#user:text("Not signed in")')
+
+    // 5 attempts to sign in a minute (a window may begin meanwhile)
+    let limited: Response | undefined
+    for (let i = 0; i < 12 && !limited; i++) {
+      const res = await login('alice', 'nope')
+      if (res.status === 429) limited = res
+    }
+    assert.ok(limited, 'the attempts are limited')
+    assert.match(limited.headers.get('retry-after')!, /^\d+$/)
+    assert.equal(limited.headers.get('ratelimit-remaining'), '0')
+  },
+
   async 'with-model'(page, base) {
     await page.goto(`${base}/`)
     await page.waitForFunction(() => document.querySelector('#user')?.textContent?.startsWith('signed in'))
