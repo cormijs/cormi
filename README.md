@@ -81,6 +81,6 @@ cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名
 | `packages/preset-react` | `@cormijs/preset` + `@cormijs/vite` + `@cormijs/react` 的简写 |
 | `packages/console` | dev 模式下的控制台（`/__cormi/`）：插件树管理、应用内部、日志、工作区与市场 |
 | `packages/cormi` | CLI（命令 `cormi`），Node 端 API（`@cormijs/cormi`）与 UI 框架无关的浏览器 API（`@cormijs/cormi/client`） |
-| `plugins/*` | 官方插件：mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
+| `plugins/*` | 官方插件：session、auth、security、cors、rate-limit、mock、tailwindcss、unocss、styled-components、antd、layout、model、initial-state、dva、valtio、react-query、request、analytics、export-static、legacy、mpa、mf、federation、qiankun、lint |
 | `docs` | 官网兼文档站（VitePress） |
-| `examples/*` | with-console（控制台与工作区插件）、basic、with-api（纯后端）、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave、with-vue |
+| `examples/*` | with-console（控制台与工作区插件）、basic、with-api（纯后端）、with-auth（会话与登录）、with-tailwind、with-antd、with-model、with-request、with-styles、with-data、with-layout、with-mpa、mf-host + mf-remote、federation-host + federation-users + federation-orders、qiankun-master + qiankun-slave、with-vue |

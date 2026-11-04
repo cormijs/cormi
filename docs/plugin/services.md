@@ -298,6 +298,20 @@ if (ctx.cormi.mode === 'build') {
 
 实现另一种缓存，就是继承 `@cormijs/cache` 的 `Cache` 并实现 `get`、`set`、`delete`、`clear`、`keys`、`increment`；`getOrSet` 由基类提供。用 `packages/cache/tests/contract.ts` 的 `testCache()` 测试它，行为就与官方的实现一致。
 
+## ctx.session、ctx.auth
+
+`@cormijs/plugin-session` 与 `@cormijs/plugin-auth` 提供：`ctx.session.regenerate(state)`、`destroy(state)`，`ctx.auth.login(state, user)`、`logout(state)`、`hash()`、`verify()`。见 [会话、鉴权与常用中间件](/guide/auth)。
+
+## api/request
+
+接口被请求、处理器运行之前触发（serial）：监听器返回的响应代替处理器的响应。`@cormijs/plugin-auth` 用它检查接口模块导出的 `auth`；插件可以用同样的方式实现按接口生效的规则，`route.module` 是接口模块的全部导出。
+
+```ts
+ctx.on('api/request', (route, request, { state }) => {
+  if (route.module.beta && !state.user?.beta) return Response.json({ error: 'not yet' }, { status: 404 })
+})
+```
+
 ## ctx.cli
 
 命令行。注册的命令以 `setup` 模式加载插件树后运行。

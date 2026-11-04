@@ -24,6 +24,12 @@
 | [`@cormijs/plugin-mpa`](/plugins/build#mpa) | 多页应用：每个页面一个 HTML | React |
 | [`@cormijs/plugin-analytics`](/plugins/build#analytics) | Google Analytics 4 与百度统计 | — |
 | [`@cormijs/plugin-lint`](/plugins/build#lint) | `cormi lint` | — |
+| **服务端** | | |
+| [`@cormijs/plugin-session`](/guide/auth#会话) | cookie 会话，`state.session`，存在 `ctx.cache` | — |
+| [`@cormijs/plugin-auth`](/guide/auth#登录) | 登录用户 `state.user`，要求登录的接口，密码散列 | — |
+| [`@cormijs/plugin-security`](/guide/auth#安全响应头) | 安全响应头 | — |
+| [`@cormijs/plugin-cors`](/guide/auth#跨域) | 接口的跨域请求 | — |
+| [`@cormijs/plugin-rate-limit`](/guide/auth#限流) | 按客户端与时间窗口限流，计数存在 `ctx.cache` | — |
 | **微前端与联邦** | | |
 | [`@cormijs/plugin-federation`](/plugins/micro#federation) | 联邦应用：子包单独构建、部署，底座按 URL 汇集成一个应用 | React · Vite |
 | [`@cormijs/plugin-mf`](/plugins/micro#mf) | 模块联邦 | Vite、Rsbuild¹ |

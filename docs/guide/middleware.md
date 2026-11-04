@@ -2,10 +2,12 @@
 
 `cormi dev`、`cormi start` 运行一个 HTTP 服务（`@cordisjs/plugin-server`）。一个请求依次经过：
 
-1. 应用的中间件（`ctx.middleware`），按 `order` 从外到内；
-2. 插件注册的处理：mock、代理、静态资源；
+1. 文件与转发：开发服务器提供的模块（dev）、构建产物中的静态资源（start）、mock、代理。它们直接回答，不经过下面的中间件；
+2. 应用的中间件（`ctx.middleware`），按 `order` 从外到内；
 3. 路由：接口（`server/api`）、`loader` 端点、插件注册的路由；
 4. 页面：GET 请求的回退，开启 SSR 时在服务端渲染。
+
+所以中间件包裹的是应用自己的请求——接口、`loader` 与页面——会话、鉴权、限流只作用于它们，而不会为每个脚本、图片读一次会话。
 
 ## 中间件
 
@@ -35,7 +37,30 @@ export function apply(ctx: Context) {
 | `order` | `0` | 小的在外层：先看到请求、后看到响应 |
 | `path` | `/` | 只处理这个路径之下的请求 |
 
-`ctx.middleware.use()` 是调用方插件的 effect：插件卸载（或热重载）时，中间件随之移除。中间件包裹的是整个应用，所以前端应用同样可以使用，例如统一添加响应头。
+`ctx.middleware.use()` 是调用方插件的 effect：插件卸载（或热重载）时，中间件随之移除。`next()` 返回的响应总可以修改响应头，即使它来自 `fetch()` 或 `Response.redirect()`。前端应用同样可以使用中间件，例如统一添加响应头。
+
+官方的中间件插件有各自的位置，应用自己的中间件（默认 0）在它们之内，能读到会话与登录用户：
+
+| `order` | 插件 |
+|---|---|
+| -400 | `@cormijs/plugin-security`：安全响应头 |
+| -300 | `@cormijs/plugin-cors`：跨域 |
+| -200 | `@cormijs/plugin-rate-limit`：限流 |
+| -100 | `@cormijs/plugin-session`：`state.session` |
+| -90 | `@cormijs/plugin-auth`：`state.user` |
+
+见 [会话、鉴权与常用中间件](/guide/auth)。
+
+## 请求的上下文
+
+中间件的第二个参数，与接口的 `ApiContext`、`loader` 的 `context` 一样，包含：
+
+| 成员 | 说明 |
+|---|---|
+| `state` | 请求级的状态，见下文 |
+| `ip` | 客户端的地址；应用在代理之后时是代理的地址，客户端在 `x-forwarded-for` 中 |
+
+读写 cookie 用 `@cormijs/cormi` 的 `getCookies(request)` 与 `setCookie(response, name, value, options)`；一个响应可以设置多个 cookie。
 
 ## 请求状态
 

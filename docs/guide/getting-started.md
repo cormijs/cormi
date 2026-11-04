@@ -136,6 +136,7 @@ pnpm dev            # http://localhost:8000
 |---|---|
 | `basic` | 约定式路由、布局、服务端 `loader` 与它的 `context`、SSR、接口、代理、本地插件、静态导出 |
 | `with-api` | 纯后端：SQLite 数据库、表、增删改查的接口、中间件与请求状态、缓存 |
+| `with-auth` | 会话与登录：服务端渲染的页面读取 `state.user`、要求登录或管理员的接口与页面、安全头、跨域、限流 |
 | `with-tailwind` | Tailwind CSS、legacy 构建、`crossorigin` |
 | `with-antd` | Ant Design 主题与服务端样式抽取 |
 | `with-model` | 模型、初始状态、mock、`cormi lint` |

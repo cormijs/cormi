@@ -45,10 +45,13 @@ export async function GET(request: Request, { params, ctx }: ApiContext<{ id: st
 | `params` | 路径参数，`[...path]` 是数组 |
 | `ctx` | 这个接口的上下文：可以使用 `inject` 声明的服务 |
 | `state` | 请求级的状态，与中间件、页面的 `loader` 共享，见 [中间件](/guide/middleware#请求状态) |
+| `ip` | 客户端的地址 |
 
 - 每个接口模块是一个插件：`inject` 的服务就绪之前，请求得到 503，并说明在等哪个服务；服务消失时，接口随之等待。没有声明的服务不能使用（cordis 会报 `cannot get property "database" without inject`）。
 - 参数更少的路由优先匹配：`/api/users/me` 先于 `/api/users/:id`。
 - 模块没有导出请求方法对应的处理器时返回 405，并带上 `allow` 头；没有匹配的接口时返回 404。
+
+要求登录的接口导出 `auth`（`true`，或对用户的检查），见 [会话、鉴权与常用中间件](/guide/auth#要求登录的接口)。
 
 开发阶段需要假数据时，用 [`@cormijs/plugin-mock`](/plugins/build#mock)，它的路由优先于真实的接口。
 

@@ -109,8 +109,9 @@ ctx.middleware.use(async (request, { state }, next) => {
 
 ## 会话与鉴权
 
-- `@cormijs/plugin-session`：cookie 会话，`state.session` 可读写，存储在 `ctx.cache`（没有缓存服务时在内存中）。
-- `@cormijs/plugin-auth`：`ctx.auth.login(state, user)`、`logout()`，`state.user` 是当前用户；接口模块 `export const auth = true` 即要求登录（否则 401）；提供密码散列与校验（scrypt）。用户存在哪里由应用决定。
+- `@cormijs/plugin-session`：cookie 会话，`state.session` 可读写，存储在 `ctx.cache`。会话要求有缓存服务，而不是在没有时退回内存：退回是悄悄的，多进程部署时会话各在各的进程里，问题要到生产环境才出现；写一行 `@cormijs/cache` 则是明确的。
+- `@cormijs/plugin-auth`：`ctx.auth.login(state, user)`、`logout()`，`state.user` 是当前用户；接口模块 `export const auth = true`（或对用户的检查）即要求登录，否则 401 / 403；提供密码散列与校验（scrypt）。用户存在哪里由应用决定。导出 `auth` 的接口会等待 `auth` 服务：漏了鉴权插件时接口返回 503，而不是对所有人开放。
+- 中间件只包裹应用自己的请求（接口、`loader`、页面）：开发服务器的模块、静态资源、mock 与代理在它们之前回答，会话不会为每个静态文件读取一次。
 
 ## 缓存与对象存储
 
@@ -142,6 +143,6 @@ const { url } = await ctx.storage.put(`avatars/${id}.png`, file, { contentType: 
 
 1. **服务端基础**（已完成）：`server/` 约定与原生运行的接口（`inject`、热重载、503）；`loader` 的 `context`；`ctx.middleware`（顺序、路径、`state`）；纯后端应用与 `cormi start`；`@cormijs/database`；页面与服务端的界限；`@cormijs/create`；示例 `with-api` 与 e2e。
 2. **缓存**（已完成）：`@cormijs/cache`（接口与内存实现）、`@cormijs/cache-redis`、`@cormijs/cache-database`，三者运行同一组契约测试。
-3. **会话、鉴权与常用中间件**：session、auth、cors、security、rate-limit。
+3. **会话、鉴权与常用中间件**（已完成）：`@cormijs/plugin-session`、`-auth`、`-cors`、`-security`、`-rate-limit`，固定的 `order`；示例 `with-auth`。
 4. **对象存储**：`@cormijs/storage` 与本地、S3 驱动。
 5. **控制台与文档**：数据库与接口页面，registry 收录 minato 驱动，指南。
