@@ -1,7 +1,7 @@
 import Server from '@cordisjs/plugin-server'
 import { Console } from '@cormijs/console'
 import { App, Html, Router, Schema } from '@cormijs/core'
-import { ApiRoutes, Pages, Proxy, Static } from '@cormijs/server'
+import { ApiRoutes, MiddlewareService, Pages, Proxy, Static } from '@cormijs/server'
 import { Context } from 'cordis'
 import { Conventions } from './conventions.ts'
 import { Generators } from './generators.ts'
@@ -36,8 +36,11 @@ export const Config: Schema<Config> = Schema.intersect([
 
 /**
  * The app, without its bundler and its UI framework: the router, html and
- * app services, the file conventions, pages and API routes, and — in dev and
- * preview mode — the HTTP server, with the console in dev mode.
+ * app services, the file conventions, pages, the server code (`server/`:
+ * the app's plugin, models and API routes), and — in dev and preview mode —
+ * the HTTP server and its middlewares, with the console in dev mode.
+ * Without a bundler and a UI framework, the app is a backend: it has no
+ * pages.
  *
  * Add a bundler (`@cormijs/vite`) and a UI framework (`@cormijs/react`) next to
  * it in cormi.yml, or use a preset of both, e.g. `@cormijs/preset-react`.
@@ -56,6 +59,7 @@ export function apply(ctx: Context, config: Config) {
     const host = process.env.CORMI_HOST || config.host
     const port = Number(process.env.CORMI_PORT) || config.port
     ctx.plugin(Server, { host, port, maxPort: port + 99 })
+    ctx.plugin(MiddlewareService)
     ctx.plugin(Proxy, config.proxy)
     if (mode === 'preview') ctx.plugin(Static)
     if (mode === 'dev' && config.console) ctx.plugin(Console, config.console)

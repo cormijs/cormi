@@ -11,8 +11,9 @@ import { checkPlugin, formatReport, writeDeclaration } from './plugin-check.ts'
 
 const BUILTIN_COMMANDS: [string, string][] = [
   ['dev', 'serve the app with the dev server'],
-  ['build', 'write the client and server bundles'],
-  ['preview', 'serve the build output'],
+  ['build', 'write the bundles of the pages'],
+  ['start', 'serve the app in production: the built pages and the server code'],
+  ['preview', 'the same as start, to try the build output locally'],
   ['setup', 'write the generated files (src/.cormi) only'],
   ['plugin check', 'check a plugin package with each bundler and UI framework (--write, --json)'],
 ]
@@ -149,7 +150,18 @@ async function checkPluginCommand(cwd: string, write: boolean, json: boolean) {
   throw new CommandError(`package.json ${what}: run cormi plugin check --write`)
 }
 
+/** `node:sqlite`, which `@minatojs/driver-sqlite` uses, warns that it is experimental on every start. */
+function ignoreSqliteWarning() {
+  const emitWarning = process.emitWarning
+  process.emitWarning = ((warning: string | Error, ...args: any[]) => {
+    const type = typeof args[0] === 'string' ? args[0] : args[0]?.type
+    if (type === 'ExperimentalWarning' && String(warning).startsWith('SQLite')) return
+    return emitWarning.call(process, warning, ...args)
+  }) as typeof process.emitWarning
+}
+
 export async function run(argv = process.argv.slice(2)) {
+  ignoreSqliteWarning()
   if (Number(process.versions.node.split('.')[0]) < MIN_NODE_VERSION) {
     throw new CommandError(`Cormi requires node >= ${MIN_NODE_VERSION}, current is ${process.versions.node}`)
   }
@@ -175,9 +187,16 @@ export async function run(argv = process.argv.slice(2)) {
       if (process.env.CORMI_WORKER) return serve(cwd, 'dev')
       return daemon(argv)
     case 'preview':
+    case 'start':
       return serve(cwd, 'preview')
     case 'build':
-      return once(cwd, 'build', ctx => getService(ctx, 'bundler').build())
+      return once(cwd, 'build', async (ctx) => {
+        // a backend has no pages: its server code runs from the sources
+        if (ctx.get('app') && !ctx.get('bundler') && !ctx.get('renderer')) {
+          return ctx.logger('cormi').info('the app has no pages (no bundler or UI framework in cormi.yml): nothing to build')
+        }
+        await getService(ctx, 'bundler').build()
+      })
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())
     case 'plugin':

@@ -1,6 +1,6 @@
 {
   "name": "@cormijs/cormi",
-  "description": "A React full-stack framework built on Cordis: the CLI, the node API for plugins and the browser API (cormi/client)",
+  "description": "A full-stack framework built on Cordis: the CLI, the node API for plugins and the browser API (cormi/client)",
   "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",
