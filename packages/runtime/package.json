@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/runtime",
   "description": "The browser runtime of Cormi without a UI framework: the cordis context, the app's lifecycle, the route table and the loader protocol",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

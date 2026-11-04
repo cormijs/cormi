@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-model",
   "description": "Global data models for Cormi apps: React hooks shared through useModel()",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

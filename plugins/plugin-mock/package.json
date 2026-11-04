@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-mock",
   "description": "Mocked API routes for Cormi apps in dev mode",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/plugin-styled-components",
   "description": "styled-components for Cormi apps: theme and server-rendered styles",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

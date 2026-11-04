@@ -1,7 +1,7 @@
 {
   "name": "@cormijs/core",
   "description": "Cormi core: the app environment and the router, html and runtime services, started with the official cordis loader",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
