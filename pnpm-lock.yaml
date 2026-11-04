@@ -381,6 +381,9 @@ importers:
 
   examples/with-api:
     dependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
       '@cormijs/cormi':
         specifier: workspace:*
         version: link:../../packages/cormi
@@ -730,6 +733,111 @@ importers:
       vue-tsc:
         specifier: ^3.2.0
         version: 3.3.14(typescript@5.9.3)
+
+  packages/cache:
+    dependencies:
+      '@cormijs/core':
+        specifier: workspace:*
+        version: link:../core
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../vue
+
+  packages/cache-database:
+    dependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../cache
+      '@cormijs/core':
+        specifier: workspace:*
+        version: link:../core
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+    devDependencies:
+      '@cordisjs/plugin-logger':
+        specifier: ^1.0.2
+        version: 1.0.2(cordis@4.0.0-rc.12)
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../cormi
+      '@cormijs/database':
+        specifier: workspace:*
+        version: link:../database
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../vue
+      '@minatojs/driver-sqlite':
+        specifier: ^5.0.3
+        version: 5.0.3(cordis@4.0.0-rc.12)(minato@4.0.1(cordis@4.0.0-rc.12))
+      minato:
+        specifier: ^4.0.1
+        version: 4.0.1(cordis@4.0.0-rc.12)
+
+  packages/cache-redis:
+    dependencies:
+      '@cormijs/cache':
+        specifier: workspace:*
+        version: link:../cache
+      '@cormijs/core':
+        specifier: workspace:*
+        version: link:../core
+      '@redis/client':
+        specifier: ^6.3.1
+        version: 6.3.1
+      cordis:
+        specifier: 4.0.0-rc.12
+        version: 4.0.0-rc.12(@cordisjs/plugin-include@1.2.0)(@cordisjs/plugin-loader@1.0.0-rc.9)
+    devDependencies:
+      '@cormijs/cormi':
+        specifier: workspace:*
+        version: link:../cormi
+      '@cormijs/preset':
+        specifier: workspace:*
+        version: link:../preset
+      '@cormijs/react':
+        specifier: workspace:*
+        version: link:../react
+      '@cormijs/rsbuild':
+        specifier: workspace:*
+        version: link:../rsbuild
+      '@cormijs/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@cormijs/vue':
+        specifier: workspace:*
+        version: link:../vue
 
   packages/console:
     dependencies:
@@ -3503,6 +3611,18 @@ packages:
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
+
+  '@redis/client@6.3.1':
+    resolution: {integrity: sha512-masbfVKULdoAofwddepZxRhWa4w6zvBHn6TRn90TRPrRkVIlGCur3pFqwWaCbMxtYI9twepkz63e/T/tEH8GjA==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@node-rs/xxhash': ^1.1.0
+      '@opentelemetry/api': '>=1 <2'
+    peerDependenciesMeta:
+      '@node-rs/xxhash':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
 
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
@@ -8073,6 +8193,8 @@ snapshots:
       clsx: 2.1.1
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
+
+  '@redis/client@6.3.1': {}
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 

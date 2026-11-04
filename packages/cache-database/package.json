@@ -1,0 +1,74 @@
+{
+  "name": "@cormijs/cache-database",
+  "description": "The cache of a Cormi app (ctx.cache) in its database, with @cormijs/database",
+  "version": "0.1.0-rc.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/cache-database#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/cache-database"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "cache",
+    "database",
+    "bundler:*",
+    "renderer:*",
+    "required:database",
+    "impl:cache"
+  ],
+  "cormi": {
+    "service": {
+      "required": [
+        "database"
+      ],
+      "implements": [
+        "cache"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cormijs/cache": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "cordis": "4.0.0-rc.12"
+  },
+  "peerDependencies": {
+    "@cormijs/database": "workspace:*"
+  },
+  "devDependencies": {
+    "@cordisjs/plugin-logger": "^1.0.2",
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/database": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*",
+    "@minatojs/driver-sqlite": "^5.0.3",
+    "minato": "^4.0.1"
+  }
+}
