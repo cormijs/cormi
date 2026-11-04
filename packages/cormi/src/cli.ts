@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type {} from '@cordisjs/plugin-loader'
-import { CommandError, idle, type Mode, settle, start, stop } from '@cormijs/core'
+import { CommandError, compileNode, idle, type Mode, NODE_DIR, settle, start, stop } from '@cormijs/core'
 import type { Context } from 'cordis'
 import parse from 'yargs-parser'
 import { MIN_NODE_VERSION, RESTART_EXIT_CODE } from './constants.ts'
@@ -11,9 +11,8 @@ import { checkPlugin, formatReport, writeDeclaration } from './plugin-check.ts'
 
 const BUILTIN_COMMANDS: [string, string][] = [
   ['dev', 'serve the app with the dev server'],
-  ['build', 'write the bundles of the pages'],
-  ['start', 'serve the app in production: the built pages and the server code'],
-  ['preview', 'the same as start, to try the build output locally'],
+  ['build', 'write the bundles of the pages and compile the node code into dist/'],
+  ['start', 'serve the app in production, from the output of build (alias: preview)'],
   ['setup', 'write the generated files (src/.cormi) only'],
   ['plugin check', 'check a plugin package with each bundler and UI framework (--write, --json)'],
 ]
@@ -30,8 +29,8 @@ ${COMMANDS}
 
 Options:
   --config <file> the plugin tree, instead of cormi.yml
-  --port <port>   port of the dev and preview server, over cormi.yml
-  --host <host>   host of the dev and preview server, over cormi.yml
+  --port <port>   port of the dev and production server, over cormi.yml
+  --host <host>   host of the dev and production server, over cormi.yml
   -v, --version
   -h, --help`
 
@@ -80,8 +79,10 @@ async function getPluginCommands(cwd: string) {
 }
 
 /** Load the app and keep it running until the process is interrupted. */
-async function serve(cwd: string, mode: 'dev' | 'preview') {
-  await registerTypeScript()
+async function serve(cwd: string, mode: 'dev' | 'start') {
+  // in dev mode, the app runs from its sources; in production, from the output of cormi build
+  if (mode === 'dev') await registerTypeScript()
+  else process.setSourceMapsEnabled(true)
   const ctx = await start({ cwd, mode, hmr: mode === 'dev', config: process.env.CORMI_CONFIG })
   let exiting = false
   const exit = (code: number) => {
@@ -186,16 +187,21 @@ export async function run(argv = process.argv.slice(2)) {
     case 'dev':
       if (process.env.CORMI_WORKER) return serve(cwd, 'dev')
       return daemon(argv)
-    case 'preview':
     case 'start':
-      return serve(cwd, 'preview')
+    case 'preview':
+      return serve(cwd, 'start')
     case 'build':
       return once(cwd, 'build', async (ctx) => {
-        // a backend has no pages: its server code runs from the sources
+        const logger = ctx.logger('cormi')
+        // the pages, unless the app is a backend
         if (ctx.get('app') && !ctx.get('bundler') && !ctx.get('renderer')) {
-          return ctx.logger('cormi').info('the app has no pages (no bundler or UI framework in cormi.yml): nothing to build')
+          logger.info('the app has no pages (no bundler or UI framework in cormi.yml)')
+        } else {
+          await getService(ctx, 'bundler').build()
         }
-        await getService(ctx, 'bundler').build()
+        // the Node code: the server code and the app's own plugins, which cormi start runs
+        const build = await compileNode(ctx)
+        logger.info('compiled the node code into %s: %d modules', NODE_DIR, Object.keys(build.files).length)
       })
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())

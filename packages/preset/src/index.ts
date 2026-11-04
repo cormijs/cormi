@@ -12,11 +12,11 @@ export * from './generators.ts'
 export const name = 'preset'
 
 export interface Config extends Router.Config, Html.Config, App.Config {
-  /** host of the dev and preview server */
+  /** host of the dev and production server */
   host: string
-  /** port of the dev and preview server; the next free port is used if taken */
+  /** port of the dev and production server; in dev mode, the next free port is used if taken */
   port: number
-  /** forward requests to other servers in dev and preview mode: `{ '/api': 'http://localhost:3000' }` */
+  /** forward requests to other servers in dev and start mode: `{ '/api': 'http://localhost:3000' }` */
   proxy: Proxy.Config
   /** the console at `/__cormi/` in dev mode, or `false` */
   console: false | Console.Config
@@ -24,9 +24,9 @@ export interface Config extends Router.Config, Html.Config, App.Config {
 
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
-    host: Schema.string().default(process.env.HOST ?? 'localhost').description('host of the dev and preview server'),
-    port: Schema.natural().max(65535).default(Number(process.env.PORT) || 8000).description('port of the dev and preview server'),
-    proxy: Proxy.Config.description('forward requests to other servers in dev and preview mode'),
+    host: Schema.string().default(process.env.HOST ?? 'localhost').description('host of the dev and production server'),
+    port: Schema.natural().max(65535).default(Number(process.env.PORT) || 8000).description('port of the dev and production server'),
+    proxy: Proxy.Config.description('forward requests to other servers in dev and start mode'),
     console: Schema.union([Schema.const(false), Console.Config]).default(Console.Config({} as Console.Config)).description('the console in dev mode, or false'),
   }),
   App.Config,
@@ -37,7 +37,7 @@ export const Config: Schema<Config> = Schema.intersect([
 /**
  * The app, without its bundler and its UI framework: the router, html and
  * app services, the file conventions, pages, the server code (`server/`:
- * the app's plugin, models and API routes), and — in dev and preview mode —
+ * the app's plugin, models and API routes), and — in dev and start mode —
  * the HTTP server and its middlewares, with the console in dev mode.
  * Without a bundler and a UI framework, the app is a backend: it has no
  * pages.
@@ -54,14 +54,15 @@ export function apply(ctx: Context, config: Config) {
   ctx.plugin(Generators)
   ctx.plugin(Pages, { ssr: config.ssr, base: config.base })
   ctx.plugin(ApiRoutes)
-  if (mode === 'dev' || mode === 'preview') {
+  if (ctx.cormi.serving) {
     // `cormi dev --port` and `--host` win over the config
     const host = process.env.CORMI_HOST || config.host
     const port = Number(process.env.CORMI_PORT) || config.port
-    ctx.plugin(Server, { host, port, maxPort: port + 99 })
+    // in production, a port that is taken is an error rather than the next one
+    ctx.plugin(Server, { host, port, maxPort: mode === 'dev' ? port + 99 : port })
     ctx.plugin(MiddlewareService)
     ctx.plugin(Proxy, config.proxy)
-    if (mode === 'preview') ctx.plugin(Static)
+    if (mode === 'start') ctx.plugin(Static)
     if (mode === 'dev' && config.console) ctx.plugin(Console, config.console)
   }
 }

@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { watch } from 'chokidar'
-import { type Context, createFile, Schema, send, toRequest } from '@cormijs/cormi'
+import { type Context, createFile, Schema, send, toRequest, winPath } from '@cormijs/cormi'
 import { match, type MatchFunction } from 'path-to-regexp'
 
 export const name = 'mock'
@@ -27,14 +27,14 @@ export interface Config {
   dir: string
   /** delay of every mocked response, in milliseconds */
   delay: number
-  /** mock in preview mode as well */
-  preview: boolean
+  /** mock in production (`cormi start`) as well, e.g. for a demo */
+  production: boolean
 }
 
 export const Config: Schema<Config> = Schema.object({
   dir: Schema.string().default('mock').description('directory of mock modules'),
   delay: Schema.natural().role('ms').default(0).description('delay of every mocked response'),
-  preview: Schema.boolean().default(false).description('mock in preview mode as well'),
+  production: Schema.boolean().default(false).description('mock in production (cormi start) as well'),
 })
 
 interface MockRoute {
@@ -46,7 +46,8 @@ interface MockRoute {
 const MODULE_RE = /\.[cm]?[jt]s$/
 
 /**
- * Mock API routes in dev mode. Every module below `mock/` default-exports
+ * Mock API routes in dev mode (and with `production`, in production, compiled
+ * by `cormi build`). Every module below `mock/` default-exports
  * `defineMock({ ... })`; mocked routes take precedence over the app's API
  * routes, and editing a mock module applies on the next request.
  */
@@ -66,18 +67,28 @@ export function apply(ctx: Context, config: Config) {
     },
   })
 
-  const { mode } = ctx.cormi
-  if (mode !== 'dev' && !(mode === 'preview' && config.preview)) return
+  const { mode, cwd } = ctx.cormi
+  const listFiles = () => existsSync(dir)
+    ? (readdirSync(dir, { recursive: true }) as string[]).filter(file => MODULE_RE.test(file) && !file.endsWith('.d.ts')).sort().map(file => join(dir, file))
+    : []
+  // in production, the mock modules are compiled with the Node code of the app
+  if (mode === 'build' && config.production) {
+    ctx.on('build/node', (build) => {
+      const files = listFiles()
+      for (const file of files) build.entries.add(file)
+      build.data.mock = files.map(file => winPath(relative(cwd, file)))
+    })
+  }
+  if (mode !== 'dev' && !(mode === 'start' && config.production)) return
   let routes: Promise<MockRoute[]> | undefined
 
   const load = async () => {
-    if (!existsSync(dir)) return []
-    const files = (readdirSync(dir, { recursive: true }) as string[]).filter(file => MODULE_RE.test(file) && !file.endsWith('.d.ts'))
+    const files: string[] = mode === 'start' ? (ctx.cormi.build?.data.mock ?? []).map((file: string) => ctx.cormi.resolve(file)) : listFiles()
     const result: MockRoute[] = []
-    for (const file of files.sort()) {
-      // node code, loaded like node plugins; the mtime busts the module cache after edits
-      const path = join(dir, file)
-      const module = await import(`${pathToFileURL(path).href}?t=${statSync(path).mtimeMs}`)
+    for (const path of files) {
+      // node code, loaded like node plugins: in dev, the mtime busts the module cache after edits;
+      // in production, the source resolves to its compiled module
+      const module = await import(pathToFileURL(path).href + (mode === 'dev' ? `?t=${statSync(path).mtimeMs}` : ''))
       for (const [key, value] of Object.entries<unknown>(module.default ?? {})) {
         const [method, pathname] = key.includes(' ') ? key.trim().split(/\s+/) : [undefined, key]
         result.push({ method: method?.toUpperCase(), match: match(pathname, { decode: decodeURIComponent }), value })

@@ -32,11 +32,11 @@ const TYPES: Record<string, string> = {
   '.webmanifest': 'application/manifest+json',
 }
 
-/** Directories of the build output that are not served. */
-const PRIVATE = ['server', '.vite']
+/** Directories of the build output that are not served: the server entry of the pages, the Node code of the app. */
+const PRIVATE = ['server', 'node', '.vite']
 
 /**
- * Serve the build output (preview mode). Hashed assets below `static/` are
+ * Serve the build output (start mode). Hashed assets below `static/` are
  * cached forever; everything else is revalidated.
  */
 export function Static(ctx: Context) {
