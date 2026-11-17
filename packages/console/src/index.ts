@@ -1,3 +1,4 @@
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type {} from '@cordisjs/plugin-loader'
 import type {} from '@cordisjs/plugin-server'
@@ -7,6 +8,7 @@ import { Awaitable } from 'cosmokit'
 import { Builtin } from './builtin.ts'
 import { CLIENT, type ConsoleServer, createConsoleServer, ENTRY_URL } from './vite.ts'
 
+export * from './agent.ts'
 export * from './builtin.ts'
 
 declare module 'cordis' {
@@ -49,6 +51,7 @@ export class Console extends Service {
 
   private _sources = new Map<string, Console.Source>()
   private _methods = new Map<string, Console.Method>()
+  private _tools = new Map<string, Console.Tool>()
   private _sockets = new Set<Socket>()
   // the context of the console: `this.ctx` is the caller's in methods
   private _ctx: Context
@@ -68,22 +71,24 @@ export class Console extends Service {
       ;(await this._server)?.reloadEntry()
     }, 50, error => ctx.logger('console').warn(error))
 
-    ctx.effect(() => {
-      const server = this._server = createConsoleServer({
-        base,
-        cwd: ctx.cormi.cwd,
-        http: ctx.server._http,
-        workspace: ctx.get('workspace'),
-        entry: () => this._loaded = render(),
-      }).catch((error) => {
-        ctx.logger('console').error(error)
-        return undefined
-      })
-      return async () => {
-        this._reload.dispose()
-        await (await server)?.close()
-      }
-    }, 'console dev server')
+    if (ctx.cormi.mode === 'dev') {
+      ctx.effect(() => {
+        const server = this._server = createConsoleServer({
+          base,
+          cwd: ctx.cormi.cwd,
+          http: ctx.server._http,
+          workspace: ctx.get('workspace'),
+          entry: () => this._loaded = render(),
+        }).catch((error) => {
+          ctx.logger('console').error(error)
+          return undefined
+        })
+        return async () => {
+          this._reload.dispose()
+          await (await server)?.close()
+        }
+      }, 'console dev server')
+    }
 
     // the modules of the console, below its path; other requests (e.g. to the loaders of the app) go on
     ctx.server.use(async (req, res, next) => {
@@ -126,9 +131,74 @@ export class Console extends Service {
       this._accept(socket)
     })
 
+    // the tools of AI agents, which `cormi mcp` lists and calls through the socket of the console
+    const tools = this.data('tools', () => this.listTools())
+    this._refreshTools = () => tools.refresh()
+    this.method('tool/call', (name: string, args: unknown) => this.callTool(name, args))
+
+    // where `cormi mcp` finds the dev server
+    if (ctx.cormi.mode === 'dev') {
+      ctx.effect(() => {
+        const file = join(ctx.cormi.cwd, DEV_FILE)
+        mkdirSync(join(file, '..'), { recursive: true })
+        const info: Console.DevInfo = { url: getServerUrl(ctx), console: base, pid: process.pid, started: new Date().toISOString() }
+        writeFileSync(file, JSON.stringify(info, null, 2) + '\n')
+        return () => rmSync(file, { force: true })
+      }, 'node_modules/.cormi/dev.json')
+    }
+
     ctx.plugin(Builtin, config)
     this.entry(join(CLIENT, 'builtin/index.tsx'))
-    ctx.logger('console').info('the console is available at %C', getServerUrl(ctx) + base)
+    if (ctx.cormi.mode === 'dev') {
+      ctx.logger('console').info('the console is available at %C', getServerUrl(ctx) + base)
+    }
+  }
+
+  private _refreshTools = () => {}
+
+  /**
+   * Give AI agents a tool, through `cormi mcp`: e.g. to read the state of
+   * the app, or to act on it. `input` is the JSON Schema of the arguments;
+   * the handler returns a string, or a value sent as JSON.
+   */
+  tool(name: string, tool: Console.Tool) {
+    return this.ctx.effect(() => {
+      if (this._tools.has(name)) throw new Error(`tool ${name} is registered twice`)
+      this._tools.set(name, tool)
+      this._refreshTools()
+      return () => {
+        if (this._tools.get(name) === tool) this._tools.delete(name)
+        this._refreshTools()
+      }
+    }, `ctx.console.tool(${JSON.stringify(name)})`)
+  }
+
+  /** The registered AI agent tools and their JSON Schemas. */
+  listTools() {
+    return [...this._tools].map(([name, tool]) => ({
+      name,
+      description: tool.description,
+      inputSchema: tool.input ?? { type: 'object' as const, properties: {} },
+    }))
+  }
+
+  /** Run a registered AI agent tool by name. */
+  async callTool(name: string, args: unknown): Promise<{ text: string; isError?: boolean }> {
+    const tool = this._tools.get(name)
+    if (!tool) return { text: `unknown tool ${name}`, isError: true }
+    try {
+      const value = await tool.handler(args ?? {})
+      return { text: typeof value === 'string' ? value : JSON.stringify(value, null, 2) ?? '' }
+    } catch (error) {
+      return { text: error instanceof Error ? error.message : String(error), isError: true }
+    }
+  }
+
+  /** Call a registered console method on the server. */
+  async call<T = unknown>(name: string, ...args: any[]): Promise<T> {
+    const handler = this._methods.get(name)
+    if (!handler) throw new Error(`unknown console method ${name}`)
+    return await handler(...args) as T
   }
 
   /** the path of the console, ending with `/` */
@@ -265,7 +335,29 @@ export namespace Console {
   }
 
   export type Method = (...args: any[]) => Awaitable<unknown>
+
+  /** A tool of AI agents, see `ctx.console.tool()`. */
+  export interface Tool {
+    /** what it does and when to use it, for the agent */
+    description: string
+    /** the JSON Schema of the arguments, an object */
+    input?: { type: 'object'; properties: Record<string, unknown>; required?: string[] }
+    handler(args: any): Awaitable<unknown>
+  }
+
+  /** The running dev server, in `node_modules/.cormi/dev.json`. */
+  export interface DevInfo {
+    /** e.g. `http://localhost:8000` */
+    url: string
+    /** the path of the console */
+    console: string
+    pid: number
+    started: string
+  }
 }
+
+/** Where the dev server tells where it runs, below the app root. */
+export const DEV_FILE = 'node_modules/.cormi/dev.json'
 
 /** The URL of the dev server, for links. */
 export function getServerUrl(ctx: Context) {

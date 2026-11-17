@@ -10,6 +10,9 @@ cormi <command> [options]
 | `cormi build` | 构建页面的 bundle（客户端，以及服务端入口），并把应用自己的 Node 代码编译到 `dist/node`，然后退出 |
 | `cormi start` | 在生产环境运行构建产物，别名 `preview` |
 | `cormi setup` | 只写入 `src/.cormi` 下的生成文件，然后退出 |
+| `cormi info [--json]` | 输出应用类型、技术栈、页面路由、接口路由、服务与插件状态 |
+| `cormi check [--json]` | 一次性结构化诊断：TypeScript 类型检查、越界导入检查、插件状态、配置校验与声明合并检查 |
+| `cormi mcp [--url <url>]` | 启动控制台的 Model Context Protocol (MCP) 服务器，供 AI Agent 调用 |
 | `cormi generate <type> <name>` | 由生成器创建文件，别名 `g` |
 | `cormi config [name]` | 列出插件树，或打印匹配插件解析后的配置 |
 | `cormi plugin check [--write] [--json]` | 在插件包中运行：用每个打包器与 UI 框架加载插件，推断它支持什么，与 package.json 的声明比较（见 [声明兼容性](/plugin/#声明兼容性)） |
@@ -69,7 +72,7 @@ cormi config antd
 
 ## 插件注册的命令
 
-`dev`、`build`、`start`、`setup` 之外的命令都由插件注册，执行时以 `setup` 模式加载插件树，然后运行。例如 `@cormijs/plugin-lint` 提供了 `cormi lint`：
+`dev`、`build`、`start`、`setup`、`info`、`check`、`mcp` 之外的命令都由插件注册，执行时以 `setup` 模式加载插件树，然后运行。例如 `@cormijs/plugin-lint` 提供了 `cormi lint`：
 
 ```sh
 cormi lint            # 检查 src、mock、plugin.ts
@@ -77,3 +80,35 @@ cormi lint --fix
 ```
 
 插件注册命令与生成器的方式见 [Node 端服务](/plugin/services#ctx-cli)。
+
+## info
+
+一次输出当前应用的类型（`web`、`api`、`fullstack`、`ssr`）、打包器与 UI 框架、页面路由、接口路由、服务以及 `cormi.yml` 中各插件的状态（包括 pending 插件在等哪个服务及原因）：
+
+```sh
+cormi info
+cormi info --json
+```
+
+## check
+
+把 TypeScript 类型检查、`src/` 到 `server/` 的越界导入检查、插件加载状态与栈兼容性检查、`cormi.yml` 配置 Schema 校验，以及 `server/env.d.ts` 与 `declare module` 声明合并检查合并在一条命令中，每条诊断都带错误码（`CORMI_*`）与可执行的修法：
+
+```sh
+cormi check
+cormi check --json
+cormi check --skip-typecheck   # 跳过 tsc，只跑结构与配置诊断
+```
+
+`cormi check` 还会主动报警“配置看起来没生效”的静默失败，例如未识别的配置键（`CORMI_CONFIG_UNKNOWN`）、空数组或空对象配置（`CORMI_CONFIG_EMPTY`）、漏写 `export const inject`（`CORMI_API_INJECT_MISSING`）、漏写 `server/env.d.ts` 引用（`CORMI_ENV_TYPES`）或声明合并写错了目标包名（`CORMI_DECLARATION_TARGET`）。
+
+## mcp
+
+启动符合 Model Context Protocol（MCP）标准的 stdio 服务器，把开发控制台的数据与操作能力暴露给 AI Agent：
+
+```sh
+cormi mcp
+cormi mcp --url http://localhost:8000
+```
+
+若 `cormi dev` 正在运行（通过 `node_modules/.cormi/dev.json` 发现），`cormi mcp` 会连接控制台的 WebSocket 实时操作开发服务器；否则自动在进程内以 `test` 模式启动应用并提供工具。详情见 [AI Native 与 `@cormijs/ai`](/guide/ai#2-cormi-info-与-cormi-mcp：把控制台变成-agent-的眼睛和手)。

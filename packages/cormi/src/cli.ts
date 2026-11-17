@@ -3,10 +3,13 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type {} from '@cordisjs/plugin-loader'
+import { formatAppInfo, getAppInfo } from '@cormijs/console'
 import { CommandError, compileNode, idle, type Mode, NODE_DIR, settle, start, stop } from '@cormijs/core'
 import type { Context } from 'cordis'
 import parse from 'yargs-parser'
+import { checkApp, formatAppCheck } from './check.ts'
 import { MIN_NODE_VERSION, RESTART_EXIT_CODE } from './constants.ts'
+import { runMcpServer } from './mcp.ts'
 import { checkPlugin, formatReport, writeDeclaration } from './plugin-check.ts'
 
 const BUILTIN_COMMANDS: [string, string][] = [
@@ -14,6 +17,9 @@ const BUILTIN_COMMANDS: [string, string][] = [
   ['build', 'write the bundles of the pages and compile the node code into dist/'],
   ['start', 'serve the app in production, from the output of build (alias: preview)'],
   ['setup', 'write the generated files (src/.cormi) only'],
+  ['info', 'show the kind, stack, routes and services of the app (--json)'],
+  ['check', 'check types, boundary imports, plugins, config and declarations (--json)'],
+  ['mcp', 'run the MCP server of the console for AI agents (--url)'],
   ['plugin check', 'check a plugin package with each bundler and UI framework (--write, --json)'],
 ]
 
@@ -168,8 +174,8 @@ export async function run(argv = process.argv.slice(2)) {
   }
   const args = parse(argv, {
     alias: { version: ['v'], help: ['h'] },
-    boolean: ['version', 'help', 'write', 'json'],
-    string: ['config', 'host', 'port'],
+    boolean: ['version', 'help', 'write', 'json', 'skip-typecheck'],
+    string: ['config', 'host', 'port', 'url'],
   })
   if (args.version) return console.log(getVersion())
   // the options of the command line win over cormi.yml; the worker of the dev server inherits them
@@ -205,6 +211,26 @@ export async function run(argv = process.argv.slice(2)) {
       })
     case 'setup':
       return once(cwd, 'setup', ctx => getService(ctx, 'app').flush())
+    case 'info':
+      return once(cwd, 'setup', async (ctx) => {
+        await ctx.get('app')?.flush()
+        const info = getAppInfo(ctx)
+        console.log(args.json ? JSON.stringify(info, null, 2) : formatAppInfo(info))
+      }, { strict: false, logger: false })
+    case 'check': {
+      await registerTypeScript()
+      const report = await checkApp(cwd, { config: args.config, skipTypecheck: !!args['skip-typecheck'] })
+      if (args.json) {
+        console.log(JSON.stringify(report, null, 2))
+      } else {
+        console.log(formatAppCheck(report))
+      }
+      if (!report.ok) throw new CommandError(`cormi check found ${report.errors} error(s)`)
+      return
+    }
+    case 'mcp':
+      await registerTypeScript()
+      return runMcpServer({ cwd, url: args.url, version: getVersion() })
     case 'plugin':
       if (args._[1] !== 'check') throw new CommandError('usage: cormi plugin check [--write] [--json]')
       return checkPluginCommand(cwd, !!args.write, !!args.json)

@@ -15,7 +15,9 @@
 | `ctx.vue` | `@cormijs/vue` | — |
 | `ctx.server` | `@cordisjs/plugin-server`（dev 与 start） | `get()`、`post()`、`all()`、`use()`、`ws()` |
 | `ctx.workspace` | `@cormijs/cormi`（根上提供） | `create()` |
-| `ctx.console` | `@cormijs/preset`（dev） | `entry()`、`data()`、`method()`，见 [扩展控制台](/plugin/console) |
+| `ctx.storage` | `@cormijs/storage`（本地磁盘）或 `@cormijs/storage-s3` | `put()`、`get()`、`head()`、`delete()`、`list()`、`url()`、`response()` |
+| `ctx.ai` | `@cormijs/ai`、`@cormijs/ai-openai` 或 `@cormijs/ai-anthropic` | `chat()`、`stream()`、`tool()`、`tools()` |
+| `ctx.console` | `@cormijs/preset`（dev） | `entry()`、`data()`、`method()`、`tool()`，见 [扩展控制台](/plugin/console) |
 
 只用 `ctx.bundler`、`ctx.renderer` 等通用服务的插件，适用于任何打包器与 UI 框架；需要某个实现的特有能力时，注入它的具名服务——`inject: ['vite']`、`inject: ['react']`。在不支持的组合中，这样的插件会转入 pending，控制台会显示它在等待的服务。
 
@@ -35,8 +37,8 @@
 | 成员 | 说明 |
 |---|---|
 | `cwd` | 应用根目录 |
-| `mode` | `dev`、`build`、`start`（生产环境，`cormi start`）或 `setup` |
-| `serving` | 应用是否在提供服务：`dev` 或 `start` |
+| `mode` | `dev`、`build`、`start`（生产环境，`cormi start`）、`setup` 或 `test`（进程内测试 `createApp()`） |
+| `serving` | 应用是否在提供服务：`dev`、`start` 或 `test` |
 | `build` | `start` 模式下，`cormi build` 编译的 Node 代码（`dist/node/manifest.json`） |
 | `env` | dev 下为 `development`，否则为 `production` |
 | `paths` | `{ cwd, src, server, tmp, public }`，`tmp` 即 `src/.cormi` |
@@ -301,6 +303,10 @@ if (ctx.cormi.mode === 'build') {
 ## ctx.storage
 
 `@cormijs/storage`（本地磁盘）或 `@cormijs/storage-s3` 提供的文件存储：`put`、`get`、`head`、`delete`、`list`、`url`、`response`，只在 dev 与 start 下存在，要 `inject: ['storage']`。见 [文件存储](/guide/storage)。实现另一种存储，就是继承 `@cormijs/storage` 的 `Storage`，用 `packages/storage/tests/contract.ts` 的 `testStorage()` 测试。
+
+## ctx.ai
+
+`@cormijs/ai`（支持 OpenAI 兼容与 Anthropic）、`@cormijs/ai-openai` 或 `@cormijs/ai-anthropic` 提供的 AI 服务，只在 `serving` 时提供，要 `inject: ['ai']`。`ctx.ai.chat()` 支持自动工具调用循环，`ctx.ai.stream()` 返回 `ChatStream`（可直接从 `server/api` 处理器返回以流式发送 SSE），`ctx.ai.tool()` 注册自定义工具，并且默认将应用的 `server/api` 路由自动暴露为 HTTP MCP 工具（`POST /mcp`）。实现另一种模型后端时，继承 `@cormijs/ai` 的 `AI` 并实现 `_complete()` 与 `_streamChunks()`。见 [AI Native 与 `@cormijs/ai`](/guide/ai)。
 
 ## ctx.session、ctx.auth
 

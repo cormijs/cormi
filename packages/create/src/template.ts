@@ -127,6 +127,7 @@ export function render(options: Options): Record<string, string> {
     'tsconfig.json': renderTsconfig(options),
     '.gitignore': renderGitignore(options),
     'README.md': renderReadme(options),
+    'AGENTS.md': renderAgents(options),
   }
   if (kind.pages) Object.assign(files, options.ui === 'react' ? renderReactPages(options) : renderVuePages(options))
   if (kind.server) Object.assign(files, renderServer(options))
@@ -299,6 +300,102 @@ function renderReadme(options: Options) {
   }
   sections.push('', 'See https://cormi.js.org for the guide.')
   return sections.join('\n') + '\n'
+}
+
+export function renderAgents(options: Options) {
+  const kind = KINDS[options.kind]
+  const ext = options.ui === 'react' ? 'tsx' : 'vue'
+  const devCmd = runScript(options.pm, 'dev')
+  const buildCmd = runScript(options.pm, 'build')
+  const startCmd = runScript(options.pm, 'start')
+
+  return [
+    `# AGENTS.md — ${options.name}`,
+    '',
+    `This is a **Cormi** application (\`${options.kind}\`${kind.pages ? `, ${UIS[options.ui]} + ${BUNDLERS[options.bundler]}${kind.pages === 'server' ? ' with SSR' : ''}` : ''}${hasDatabase(options) ? `, ${DATABASES[options.database].label} database` : ''}).`,
+    'Cormi is a full-stack framework built on Cordis: every capability is a plugin in `cormi.yml` and every capability is exposed as a service on `ctx`.',
+    '',
+    '## Project Conventions',
+    '',
+    '### 1. `src/` vs `server/` (Two Sides)',
+    '',
+    '- **`cormi.yml`**: The plugin tree. Adding, removing, or configuring a plugin in `cormi.yml` hot-reloads only that plugin in dev mode.',
+    `- **\`src/\` (Pages)**: Bundled for the browser${kind.pages === 'server' ? ' and rendered on the server (SSR)' : ''}.`,
+    `  - \`src/pages/**\`: File-based routes (\`src/pages/about.${ext}\` -> \`/about\`, \`src/pages/users/[id].${ext}\` -> \`/users/:id\`).`,
+    `  - \`src/layouts/index.${ext}\`: Global layout wrapping all pages.`,
+    `  - \`src/app.ts\` / \`src/app.${ext}\`: Browser-side Cordis runtime plugin.`,
+    '- **`server/` (Server)**: Executed directly by Node when serving (`cormi dev`, `cormi start`, `createApp()`).',
+    '  - `server/index.ts`: Server-side Cordis plugin (e.g. `ctx.middleware.use(...)`).',
+    '  - `server/models/*.ts`: Database table plugins (`ctx.model.extend(...)`).',
+    '  - `server/api/**`: File-based API routes (`server/api/todos/[id].ts` -> `/api/todos/:id`). Export HTTP method handlers (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, or `default`).',
+    '',
+    '**Boundary Rule**: Files in `src/` must **never** import runtime values from `server/`. The two sides meet in three ways only:',
+    '1. **HTTP / Typed RPC**: Call `api` from `@cormijs/cormi/client` (e.g. `await api.get(\'/api/todos\')` or `await api.todos.$get()`) or `fetch(\'/api/...\')`. Types are inferred automatically via `src/.cormi/api.d.ts`.',
+    '2. **Server `loader`**: In `src/pages/**`, `export async function loader({ context })` runs on the server and accesses services via `context.ctx` and request state via `context.state`.',
+    '3. **Types**: Import server types with `import type` only (`import type { Todo } from \'../../server/models/todo\'`).',
+    '',
+    '### 2. Services & `inject`',
+    '',
+    '- Every plugin (`server/index.ts`, `server/models/*.ts`) and every `server/api/**` module must declare the services it uses:',
+    '  ```ts',
+    '  export const inject = [\'database\'] // or [\'model\', \'database\'], [\'cache\'], [\'storage\'], [\'auth\'], [\'ai\']',
+    '  ```',
+    '- Accessing `ctx.<service>` without declaring it in `inject` throws `cannot get property "..." without inject`.',
+    '- Until all injected services are active, an API route automatically responds with `503 Service Unavailable`.',
+    '- To require a signed-in user (`@cormijs/plugin-auth`) on an API route, export `export const auth = true` or `export const auth = (user: User) => user.role === \'admin\'`.',
+    '',
+    '### 3. `server/env.d.ts` & Declaration Merging',
+    '',
+    '- `server/env.d.ts` references the TypeScript declarations of server service plugins enabled in `cormi.yml`:',
+    '  ```ts',
+    '  /// <reference types="@cormijs/database" />',
+    '  /// <reference types="@cormijs/cache" />',
+    '  /// <reference types="@cormijs/storage" />',
+    '  /// <reference types="@cormijs/plugin-session" />',
+    '  /// <reference types="@cormijs/plugin-auth" />',
+    '  /// <reference types="@cormijs/ai" />',
+    '  ```',
+    '  Whenever you add a service plugin to `cormi.yml`, add its `/// <reference types="..." />` line to `server/env.d.ts`.',
+    '- Extend types via declaration merging on the owning package:',
+    '  - Database tables: `declare module \'@cormijs/database\' { interface Tables { todo: Todo } }`',
+    '  - Cache tables: `declare module \'@cormijs/cache\' { interface Tables { stats: number } }`',
+    '  - Auth user: `declare module \'@cormijs/plugin-auth\' { interface User { id: number; name: string } }`',
+    '  - Request state: `declare module \'@cormijs/cormi\' { interface State { requestId: string } }`',
+    '',
+    '## Common Commands',
+    '',
+    '```sh',
+    `${devCmd.padEnd(28)}# Start dev server (http://localhost:8000) & console (/__cormi/)`,
+    `${buildCmd.padEnd(28)}# Build client bundles and compile server code to dist/`,
+    `${startCmd.padEnd(28)}# Run production build from dist/`,
+    'npx cormi info --json       # Output app kind, stack, routes, plugins and services as JSON',
+    'npx cormi check             # Structured diagnostics: types, boundary imports, plugins, config (--json)',
+    'npx cormi mcp               # Start MCP server bridging AI agents to the console and dev server',
+    'npx cormi g <type> <name>   # Generate files: page, component, api, model, plugin',
+    '```',
+    '',
+    '## How to Verify After Making Changes',
+    '',
+    '1. **Static & Structural Check**: Run `npx cormi check` (or `npx cormi check --json`). Fix any reported `CORMI_*` error codes using their `fix` instructions.',
+    '2. **In-Process API Testing (No Port or Dev Server Needed)**:',
+    '   Test API routes and middlewares directly in-process with `createApp()` and `app.fetch()`:',
+    '   ```ts',
+    '   import { createApp } from \'@cormijs/cormi\'',
+    '',
+    '   const app = await createApp()',
+    '   const res = await app.fetch(\'/api/todos\')',
+    '   const data = await res.json()',
+    '   await app.close()',
+    '   ```',
+    '3. **Live Dev Server Inspection (`cormi mcp`)**:',
+    '   When `cormi dev` is running, use the MCP tools (`diagnostics`, `request` with persistent cookie sessions, `logs`, `database_tables`, `database_query`, `database_write`, `plugins`, `market`) to inspect and verify runtime state.',
+    '',
+    '## Documentation for LLMs',
+    '',
+    '- Summary & index: https://cormi.js.org/llms.txt',
+    '- Full reference & recipes: https://cormi.js.org/llms-full.txt',
+    '',
+  ].join('\n')
 }
 
 // --- pages ---

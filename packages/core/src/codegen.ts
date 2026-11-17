@@ -1,8 +1,8 @@
-import { isAbsolute, relative } from 'node:path'
+import { isAbsolute, join, relative } from 'node:path'
 import type { Dict } from 'cosmokit'
 import type { App } from './app.ts'
 import type { Route } from './types.ts'
-import { winPath } from './utils/index.ts'
+import { readJSON, resolvePackageDir, winPath } from './utils/index.ts'
 import type { Workspace } from './workspace.ts'
 import { resolveExport } from './workspace-exports.ts'
 
@@ -77,6 +77,14 @@ export function renderEntries(dir: string, entries: Iterable<App.Entry>) {
 /** Paths of the workspace packages, relative to the generated directory: their sources are typed like the app's. */
 export function getWorkspacePaths(dir: string, packages: Dict<Workspace.Package>) {
   const paths: Dict<string[]> = {}
+  const cwd = join(dir, '../..')
+  const runtimeDir = resolvePackageDir('@cormijs/runtime', cwd)
+    ?? (resolvePackageDir('@cormijs/cormi', cwd) && resolvePackageDir('@cormijs/runtime', resolvePackageDir('@cormijs/cormi', cwd)!))
+  if (runtimeDir) {
+    const meta = readJSON(join(runtimeDir, 'package.json'))
+    const main = meta && resolveExport({ name: '@cormijs/runtime', dir: runtimeDir, exports: meta.exports, main: meta.main }, '.', ['import'])
+    if (main) paths['@cormijs/runtime'] = [winPath(relative(dir, main))]
+  }
   for (const pkg of Object.values(packages)) {
     const main = resolveExport(pkg, '.', ['import'])
     if (main) paths[pkg.name] = [winPath(relative(dir, main))]

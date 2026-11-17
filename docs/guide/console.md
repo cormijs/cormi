@@ -104,3 +104,13 @@ cormi g plugin hello --no-client  # 只有 Node 端
 也可以在控制台的“工作区”页面新建，并直接添加到 `cormi.yml`。dev 模式下，新增或删除 `plugins/*/package.json` 会立即生效。
 
 工作区包就是普通的 npm 包：它的 `package.json` 已经写好 `exports`（`source` 指向源码，`default` 指向构建产物 `lib/`），准备发布时编译 `src/` 到 `lib/` 即可。
+
+## MCP 工具（`cormi mcp`）
+
+控制台中积累的数据与操作能力同时也通过 `cormi mcp` 作为标准 MCP 工具暴露给 AI Agent，包括：
+
+- **诊断与概览**：`overview`、`diagnostics`、`routes`、`logs`
+- **插件与市场管理**：`plugins`（支持启用、停用、添加、移除、配置）与 `market`（搜索与安装）
+- **接口与数据调试**：`request`（带持久 Cookie 会话发请求并返回服务端日志）、`database_tables` / `database_query` / `database_write`、`generate`
+
+插件也可以通过 `ctx.console.tool()` 注册自己的 MCP 工具，见 [扩展控制台](/plugin/console)。

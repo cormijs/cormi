@@ -48,6 +48,8 @@ cd my-app
 pnpm dev              # http://localhost:8000，控制台在 /__cormi/
 ```
 
+生成的项目还会附带 `AGENTS.md`，写明 `src/` 与 `server/` 的划分、`inject` 约定、`server/env.d.ts`、常用命令以及如何通过 `cormi check`、`createApp()` 与 `cormi mcp` 验证改动，便于 AI 编码助手直接上手。
+
 前后端应用的首页是一个待办列表：页面通过接口读写 SQLite 中的数据；服务端渲染的应用由 `loader` 直接读取数据库，HTML 里就带着数据。
 
 ### 手动创建

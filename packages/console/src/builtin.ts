@@ -8,6 +8,7 @@ import { type ApiRouteStatus, getApiRoutes } from '@cormijs/server'
 import type {} from '@cormijs/vite'
 import { type Context, type Fiber, Logger, type Message } from 'cordis'
 import { compare, prerelease, rcompare, valid } from 'semver'
+import { AgentTools } from './agent.ts'
 import { type Console, getServerUrl } from './index.ts'
 
 const STATES = ['pending', 'loading', 'active', 'failed', 'disposed', 'unloading'] as const
@@ -114,6 +115,8 @@ export interface MarketResolution {
 export interface CompatInfo {
   bundler?: string[]
   renderer?: string[]
+  /** services the plugin requires */
+  required?: string[]
   /** services it provides: a bundler or a UI framework is `bundler` or `renderer` */
   implements?: string[]
   /** the part of the stack it provides: `{ bundler: 'rsbuild' }` */
@@ -131,6 +134,7 @@ export function toCompat(manifest: Manifest, stack: Stack): CompatInfo {
   return {
     bundler: manifest.bundler,
     renderer: manifest.renderer,
+    required: manifest.service?.required,
     implements: manifest.service?.implements,
     provides: providedStack(manifest),
     source: manifest.source,
@@ -139,7 +143,7 @@ export function toCompat(manifest: Manifest, stack: Stack): CompatInfo {
 }
 
 /** The entries of cormi.yml: the tree of the include plugin. */
-function getTree(ctx: Context): EntryTree | undefined {
+export function getTree(ctx: Context): EntryTree | undefined {
   for (const entry of ctx.loader.entries()) {
     if (entry.options.name === 'cordis:include') return entry.subtree
   }
@@ -176,6 +180,11 @@ function packageOf(ctx: Context, name: string, stack = getStack(ctx)): Pick<Plug
   }
 }
 
+function getDescendantFibers(fiber: Fiber, fibers: Fiber[]): Fiber[] {
+  const children = fibers.filter(child => child.parent.fiber.uid === fiber.uid)
+  return [fiber, ...children.flatMap(child => getDescendantFibers(child, fibers))]
+}
+
 export function getPlugins(ctx: Context): PluginInfo[] {
   const tree = getTree(ctx)
   if (!tree) return []
@@ -187,19 +196,33 @@ export function getPlugins(ctx: Context): PluginInfo[] {
       const entry: Entry | undefined = tree.store[options.id]
       const fiber = entry?.fiber
       const disabled = !!options.disabled
+      const pkgInfo = packageOf(ctx, options.name, stack)
+      const descendants = fiber ? getDescendantFibers(fiber, fibers) : []
+      const provides = [...new Set(descendants.flatMap(f => [...f.provisions].map(impl => impl.name)))]
+      const allProvides = new Set([...provides, ...(pkgInfo.compat?.implements ?? [])])
+      const inject = [...new Set([
+        ...descendants.flatMap(f => Object.keys(f.inject)),
+        ...(pkgInfo.compat?.required ?? []),
+      ])].filter(name => !allProvides.has(name))
+      let state: PluginInfo['state'] = disabled ? 'disabled' : STATES[fiber?.state ?? 0]
+      if (state === 'active' && descendants.some(f => STATES[f.state] === 'failed')) {
+        state = 'failed'
+      } else if (state === 'active' && ctx.cormi.serving && descendants.some(f => STATES[f.state] === 'pending' && Object.keys(f.inject).some(s => !allProvides.has(s) && !ctx.get(s as any)))) {
+        state = 'pending'
+      }
       result.push({
         id: options.id,
         name: options.name,
         depth,
         group: !!options.group,
         disabled,
-        state: disabled ? 'disabled' : STATES[fiber?.state ?? 0],
+        state,
         config: options.config ?? {},
         schema: (fiber?.runtime?.Config as { toJSON?(): unknown } | undefined)?.toJSON?.(),
-        ...packageOf(ctx, options.name, stack),
+        ...pkgInfo,
         effects: fiber ? getFiberEffects(fiber, fibers) : [],
-        inject: fiber ? Object.keys(fiber.inject) : [],
-        provides: fiber ? [...fiber.provisions].map(impl => impl.name) : [],
+        inject,
+        provides,
       })
       if (entry?.subgroup) walk(entry.subgroup, depth + 1)
     }
@@ -238,6 +261,13 @@ export function detectPackageManager(cwd: string) {
     if (parent === dir) return 'npm'
     dir = parent
   }
+}
+
+const exporter = { colors: false as const, export: () => {} }
+
+/** A message of the logger, as the console shows it. */
+export function toRecord(message: Message): LogRecord {
+  return { sn: message.sn, ts: message.ts, type: message.type, name: message.name, text: Logger.format(exporter, message) }
 }
 
 /** The data and methods of the console's built-in pages. */
@@ -307,15 +337,9 @@ export function Builtin(ctx: Context, config: Console.Config) {
   ctx.on('api/update', () => api.refresh())
   ctx.on('internal/status', () => api.refresh())
 
+  ctx.plugin(AgentTools)
+
   // logs: the recent ones when a client connects, then each as it comes
-  const exporter = { colors: false as const, export: () => {} }
-  const toRecord = (message: Message): LogRecord => ({
-    sn: message.sn,
-    ts: message.ts,
-    type: message.type,
-    name: message.name,
-    text: Logger.format(exporter, message),
-  })
   ctx.console.data('logs', () => ctx.logger.buffer.map(toRecord))
   ctx.logger.exporter({
     colors: false,
@@ -476,7 +500,7 @@ export function Builtin(ctx: Context, config: Console.Config) {
     return { latest, compat }
   })
 
-  ctx.console.method('market/install', (spec: string) => install(ctx, spec))
+  ctx.console.method('market/install', (spec: string) => installPackage(ctx, spec))
 }
 
 export namespace Builtin {
@@ -484,7 +508,7 @@ export namespace Builtin {
 }
 
 /** Install a package with the app's package manager; its output goes to the logs. */
-function install(ctx: Context, spec: string) {
+export function installPackage(ctx: Context, spec: string) {
   if (!/^(@[\w.-]+\/)?[\w.-]+(@[\w.^~<>=|* -]+)?$/.test(spec)) throw new Error(`invalid package: ${spec}`)
   const manager = detectPackageManager(ctx.cormi.cwd)
   const args = manager === 'npm' ? ['install', spec] : ['add', spec]

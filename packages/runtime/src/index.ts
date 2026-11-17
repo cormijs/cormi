@@ -1,3 +1,4 @@
+export * from './api.ts'
 export { AppService } from './app.ts'
 export { Context } from './context.ts'
 export { LOADER_ENDPOINT, REDIRECT_HEADER } from './constants.ts'

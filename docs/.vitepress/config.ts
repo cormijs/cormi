@@ -52,6 +52,7 @@ export default defineConfig({
             { text: '缓存', link: '/guide/cache' },
             { text: '文件存储', link: '/guide/storage' },
             { text: '会话、鉴权与常用中间件', link: '/guide/auth' },
+            { text: 'AI Native 与 @cormijs/ai', link: '/guide/ai' },
           ],
         },
         {
@@ -59,6 +60,7 @@ export default defineConfig({
           items: [
             { text: 'cormi.yml', link: '/guide/config' },
             { text: '命令行', link: '/guide/cli' },
+            { text: '常用任务手册（Recipes）', link: '/guide/recipes' },
             { text: '构建与部署', link: '/guide/deploy' },
             { text: '控制台与工作区', link: '/guide/console' },
           ],
@@ -92,6 +94,7 @@ export default defineConfig({
         {
           text: '参考',
           items: [
+            { text: 'English API Reference', link: '/reference/api-en' },
             { text: '从 umi 迁移', link: '/reference/umi' },
             { text: '架构说明', link: '/architecture' },
             { text: '设计：可选的打包器与 UI 框架', link: '/reference/pluggable' },
@@ -104,6 +107,7 @@ export default defineConfig({
         {
           text: '参考',
           items: [
+            { text: 'English API Reference', link: '/reference/api-en' },
             { text: '从 umi 迁移', link: '/reference/umi' },
             { text: '架构说明', link: '/architecture' },
             { text: '设计：可选的打包器与 UI 框架', link: '/reference/pluggable' },

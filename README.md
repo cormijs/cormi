@@ -60,6 +60,9 @@ export default (ctx: Context) => {
 cormi dev              # 开发；控制台在 http://localhost:8000/__cormi/
 cormi build            # 构建客户端（和服务端）bundle
 cormi start            # 在生产环境运行构建产物
+cormi info --json      # 输出应用类型、技术栈、路由、插件与服务
+cormi check            # 一次检查类型、越界导入、插件状态、配置与声明合并
+cormi mcp              # 启动控制台的 MCP 服务器，供 AI Agent 读日志、查表、调接口、管插件
 cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名加载源码
 ```
 
@@ -70,12 +73,13 @@ cormi g plugin hello   # 在 plugins/ 下新建一个工作区插件，按包名
 | `packages/core` | `ctx.cormi`、`ctx.router`、`ctx.html`、`ctx.app`、`ctx.workspace`（`plugins/*` 工作区插件），以及基于官方 loader 的启动 |
 | `packages/vite` | 打包器 `ctx.bundler` 的 Vite 实现（同时提供 `ctx.vite`）：dev server 与构建 |
 | `packages/rsbuild` | 打包器 `ctx.bundler` 的 Rsbuild 实现（同时提供 `ctx.rsbuild`）：web 与 node 两个环境 |
-| `packages/server` | `ctx.server` 上的页面、loader 端点、`server/` 的代码与接口、`ctx.middleware`、静态资源 |
+| `packages/server` | `ctx.server` 上的页面、loader 端点、`server/` 的代码与接口、`ctx.middleware`、静态资源、进程内测试 `createApp()` |
 | `packages/database` | 数据库：minato 的 `ctx.model`、`ctx.database`，只在提供服务时运行 |
 | `packages/cache*` | 缓存 `ctx.cache`：接口与内存实现（`cache`），Redis（`cache-redis`），数据库（`cache-database`） |
 | `packages/storage*` | 文件存储 `ctx.storage`：接口与本地磁盘实现（`storage`），S3 兼容服务（`storage-s3`） |
-| `packages/create` | 脚手架 `pnpm create @cormijs`：前端、后端、前后端、服务端渲染 |
-| `packages/runtime` | 与 UI 框架无关的浏览器 Context（`$app`、`$router` 契约）、loader 协议（`@cormijs/cormi/client`） |
+| `packages/ai*` | AI 服务 `ctx.ai`：接口、流式响应与 `server/api` 自动暴露为 MCP（`ai`），OpenAI 兼容实现（`ai-openai`），Anthropic Claude 实现（`ai-anthropic`） |
+| `packages/create` | 脚手架 `pnpm create @cormijs`：前端、后端、前后端、服务端渲染（附带 `AGENTS.md`） |
+| `packages/runtime` | 与 UI 框架无关的浏览器 Context（`$app`、`$router` 契约）、loader 协议、前后端类型化 RPC 客户端 `api`（`@cormijs/cormi/client`） |
 | `packages/react` | React：渲染器（`ctx.renderer`、`ctx.react`）与浏览器 API `@cormijs/react/client`、SSR |
 | `packages/vue` | Vue：渲染器（`ctx.renderer`、`ctx.vue`）与浏览器 API `@cormijs/vue/client`（Vue Router）、SSR |
 | `packages/preset` | 应用本身：路由、HTML、页面、API、服务器与控制台，不含打包器与 UI 框架 |

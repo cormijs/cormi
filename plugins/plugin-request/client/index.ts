@@ -1,6 +1,6 @@
 import { useRequest as useAhooksRequest } from 'ahooks'
 import type { Options, Plugin, Result } from 'ahooks/lib/useRequest/src/types'
-import type { Context } from '@cormijs/react/client'
+import type { Context, InferRouteInput, InferRouteOutput } from '@cormijs/react/client'
 import type { ClientConfig } from '../src/types.ts'
 
 declare module 'cordis' {
@@ -147,17 +147,24 @@ async function send(url: string | URL, options: RequestConfig = {}): Promise<any
   return responseType === 'response' ? response : result
 }
 
-type Method = <T = any>(url: string | URL, config?: RequestConfig) => Promise<T>
-type MethodWithData = <T = any>(url: string | URL, data?: unknown, config?: RequestConfig) => Promise<T>
+type Method<M extends 'GET' | 'DELETE' | 'HEAD'> = {
+  <T = never, P extends string = string>(url: P, config?: RequestConfig): Promise<[T] extends [never] ? InferRouteOutput<P, M> : T>
+  <T = any>(url: URL, config?: RequestConfig): Promise<T>
+}
+type MethodWithData<M extends 'POST' | 'PUT' | 'PATCH'> = {
+  <T = never, P extends string = string>(url: P, data?: InferRouteInput<P, M>, config?: RequestConfig): Promise<[T] extends [never] ? InferRouteOutput<P, M> : T>
+  <T = any>(url: URL, data?: unknown, config?: RequestConfig): Promise<T>
+}
 
 export interface Request {
-  <T = any>(url: string | URL, config?: RequestConfig): Promise<T>
-  get: Method
-  delete: Method
-  head: Method
-  post: MethodWithData
-  put: MethodWithData
-  patch: MethodWithData
+  <T = never, P extends string = string>(url: P, config?: RequestConfig): Promise<[T] extends [never] ? InferRouteOutput<P, 'GET'> : T>
+  <T = any>(url: URL, config?: RequestConfig): Promise<T>
+  get: Method<'GET'>
+  delete: Method<'DELETE'>
+  head: Method<'HEAD'>
+  post: MethodWithData<'POST'>
+  put: MethodWithData<'PUT'>
+  patch: MethodWithData<'PATCH'>
 }
 
 /** Send a request; resolves with the body of the response, rejects with a `RequestError`. */

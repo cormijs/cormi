@@ -63,6 +63,6 @@ export function apply(ctx: Context, config: Config) {
     ctx.plugin(MiddlewareService)
     ctx.plugin(Proxy, config.proxy)
     if (mode === 'start') ctx.plugin(Static)
-    if (mode === 'dev' && config.console) ctx.plugin(Console, config.console)
+    if ((mode === 'dev' || mode === 'test') && config.console) ctx.plugin(Console, config.console)
   }
 }

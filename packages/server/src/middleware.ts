@@ -53,14 +53,19 @@ const requests = new WeakMap<object, RequestContext & { request: Request }>()
 export function getRequestContext(req: ServerRequest): RequestContext & { request: Request } {
   let value = requests.get(req._req)
   if (!value) {
-    const ip = req._req.socket.remoteAddress?.replace(/^::ffff:/, '') ?? ''
+    const ip = req._req.socket?.remoteAddress?.replace(/^::ffff:/, '') ?? '127.0.0.1'
     requests.set(req._req, value = { request: toRequest(req), state: {} as State, ip })
   }
   return value
 }
 
+/** Pre-populate the request context for an in-process `server.fetch()` call. */
+export function setRequestContext(raw: object, context: RequestContext & { request: Request }) {
+  requests.set(raw, context)
+}
+
 /** The response that `ctx.server` holds for a request, as a fetch API response. */
-function toResponse(res: ServerResponse) {
+export function toResponse(res: ServerResponse) {
   const status = res.status || 404
   // a null body status cannot have a body
   const body = [101, 204, 205, 304].includes(status) ? null : res.body

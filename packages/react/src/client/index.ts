@@ -4,6 +4,22 @@ export { Context } from './context.ts'
 export { ServerInsertedHTMLContext, useServerInsertedHTML } from './inserted.tsx'
 export { Link, type LinkProps, type PrefetchMode } from './link.tsx'
 export { render, renderPage, type RenderOptions } from './render.tsx'
-export { fetchLoader, LOADER_ENDPOINT, REDIRECT_HEADER, unwrapExports } from '@cormijs/runtime'
+export {
+  api,
+  type ApiClient,
+  type ApiClientOptions,
+  type ApiRequest,
+  type ApiRequestOptions,
+  type ApiRouteContract,
+  type ApiRoutes,
+  createApiClient,
+  fetchLoader,
+  type InferRouteInput,
+  type InferRouteOutput,
+  LOADER_ENDPOINT,
+  REDIRECT_HEADER,
+  type TypedResponse,
+  unwrapExports,
+} from '@cormijs/runtime'
 export { type HistoryType, RouterService, type RouterOptions } from './router.ts'
 export type * from './types.ts'

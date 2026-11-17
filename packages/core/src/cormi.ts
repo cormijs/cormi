@@ -13,8 +13,9 @@ declare module 'cordis' {
  * - `build`: write the bundles of the pages and compile the Node code, then exit
  * - `start`: serve the app in production, from the output of `build`
  * - `setup`: write the generated files only (e.g. before type checking)
+ * - `test`: serve the app in-process from its sources (`app.fetch()`), without listening on a port
  */
-export type Mode = 'dev' | 'build' | 'start' | 'setup'
+export type Mode = 'dev' | 'build' | 'start' | 'setup' | 'test'
 
 export namespace Cormi {
   export interface Options {
@@ -68,16 +69,16 @@ export class Cormi extends Service {
 
   /** `NODE_ENV` of the app: `development` in dev mode, `production` otherwise */
   get env() {
-    return this.mode === 'dev' ? 'development' : 'production'
+    return this.mode === 'dev' || this.mode === 'test' ? 'development' : 'production'
   }
 
   /**
-   * Whether the app serves requests (`dev`, `start`): the server side of the
-   * app, its code in `server/` and services such as the database, runs only
-   * then, not when it builds or writes files.
+   * Whether the app serves requests (`dev`, `start`, `test`): the server side
+   * of the app, its code in `server/` and services such as the database, runs
+   * only then, not when it builds or writes files.
    */
   get serving() {
-    return this.mode === 'dev' || this.mode === 'start'
+    return this.mode === 'dev' || this.mode === 'start' || this.mode === 'test'
   }
 
   /** Resolve a path against the app root. */

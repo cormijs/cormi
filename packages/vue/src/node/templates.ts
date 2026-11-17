@@ -108,7 +108,7 @@ export function renderTsconfig(paths: Dict<string[]> = {}) {
         ...paths,
       },
     },
-    include: ['../**/*', '../**/*.vue'],
+    include: ['../**/*', '../**/*.vue', '../../server/**/*'],
   }, null, 2) + '\n'
 }
 

@@ -39,7 +39,7 @@ pnpm create @cormijs my-app -t ssr     # 直接指定类型
 
 页面不导入服务端的代码，服务端也不渲染页面的组件。两侧之间只有三条路：
 
-1. **HTTP**：页面用 `fetch('/api/todos')` 调用 `server/api` 的接口。这条路在两侧分开部署时同样成立。
+1. **HTTP / 类型化 RPC**：页面用类型化客户端 `api`（从 `@cormijs/cormi/client` 导入，类型自动从 `server/api` 推导）或 `fetch('/api/todos')` 调用 `server/api` 的接口。这条路在两侧分开部署时同样成立。
 2. **`loader` 的 `context`**：页面的服务端 `loader` 运行在服务端，通过 `context.ctx` 使用服务端的服务，通过 `context.state` 读取中间件写入的请求状态：
 
    ```tsx
@@ -66,7 +66,7 @@ services in a loader through `context.ctx`
 
 ## 服务端只在提供服务时运行
 
-`server/` 的代码、数据库这类服务端的服务，只在应用提供服务时运行：`cormi dev` 运行源码，`cormi start` 运行 `cormi build` 编译后的代码。`cormi build`、`cormi setup` 与生成器不会运行它们，也不会连接数据库，所以在没有数据库的 CI 中同样可以构建。
+`server/` 的代码、数据库这类服务端的服务，只在应用提供服务时运行：`cormi dev` 运行源码，`cormi start` 运行 `cormi build` 编译后的代码，`createApp()` 以 `test` 模式在进程内运行测试（不绑定端口）。`cormi build`、`cormi setup` 与生成器不会运行它们，也不会连接数据库，所以在没有数据库的 CI 中同样可以构建。
 
 插件用 `ctx.cormi.serving` 判断应用是否在提供服务，服务端插件据此决定是否连接外部系统，见 [Node 端服务](/plugin/services#ctx-cormi)。
 
@@ -77,7 +77,7 @@ services in a loader through `context.ctx`
 | 一侧 | 插件 |
 |---|---|
 | 页面 | 打包器与 UI 框架，`@cormijs/plugin-antd`、`-tailwindcss`、`-model`、`-request`、`-layout`…… |
-| 服务端 | `@cormijs/database` 与 minato 的驱动，`@cormijs/cache` 及其 Redis、数据库实现，`@cormijs/storage` 与 `@cormijs/storage-s3`，`@cormijs/plugin-session`、`-auth`、`-security`、`-cors`、`-rate-limit` |
+| 服务端 | `@cormijs/database` 与 minato 的驱动，`@cormijs/cache` 及其 Redis、数据库实现，`@cormijs/storage` 与 `@cormijs/storage-s3`，`@cormijs/ai` 及其 OpenAI、Anthropic 实现，`@cormijs/plugin-session`、`-auth`、`-security`、`-cors`、`-rate-limit` |
 | 应用 | `@cormijs/preset`、`@cormijs/plugin-mock`、`-lint`，以及应用自己的 `plugin.ts` |
 
 ```yaml

@@ -41,6 +41,15 @@
       "path": "./packages/storage-s3"
     },
     {
+      "path": "./packages/ai"
+    },
+    {
+      "path": "./packages/ai-openai"
+    },
+    {
+      "path": "./packages/ai-anthropic"
+    },
+    {
       "path": "./packages/create"
     },
     {

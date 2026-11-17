@@ -1,0 +1,65 @@
+{
+  "name": "@cormijs/ai-openai",
+  "description": "The AI service of a Cormi app (ctx.ai) with OpenAI or an OpenAI-compatible API: DeepSeek, Qwen, Ollama, vLLM, OpenRouter…",
+  "version": "0.1.0-rc.3",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cormijs/cormi/tree/main/packages/ai-openai#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cormijs/cormi.git",
+    "directory": "packages/ai-openai"
+  },
+  "bugs": {
+    "url": "https://github.com/cormijs/cormi/issues"
+  },
+  "keywords": [
+    "cormi",
+    "cormi-plugin",
+    "cordis",
+    "ai",
+    "openai",
+    "deepseek",
+    "ollama",
+    "bundler:*",
+    "renderer:*",
+    "impl:ai"
+  ],
+  "cormi": {
+    "service": {
+      "implements": [
+        "ai"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cormijs/ai": "workspace:*",
+    "@cormijs/core": "workspace:*",
+    "cordis": "4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@cormijs/cormi": "workspace:*",
+    "@cormijs/preset": "workspace:*",
+    "@cormijs/react": "workspace:*",
+    "@cormijs/rsbuild": "workspace:*",
+    "@cormijs/vite": "workspace:*",
+    "@cormijs/vue": "workspace:*"
+  }
+}

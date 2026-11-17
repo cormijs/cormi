@@ -14,10 +14,11 @@ const ACTIVE = 2
 type Params = Partial<Record<string, string | string[]>>
 
 /** What an API handler receives besides the request. */
-export interface ApiContext<P = Params> extends RequestContext {
+export interface ApiContext<P = Params, B = any> extends RequestContext {
   params: P
   /** the context of the route: the services its module injects (`export const inject`) */
   ctx: Context
+  readonly _body?: B
 }
 
 export type ApiHandler<P = Params> = (request: Request, context: ApiContext<P>) => unknown
@@ -60,12 +61,20 @@ export interface ApiRouteStatus {
   error?: string
 }
 
-// by the root of the app (ctx.cormi is another object in each context): the routes it serves now
-const apps = new Map<string, () => ApiRouteStatus[]>()
+// by the root of the app (shared across src/ and lib/ module instances): the routes it serves now
+const APPS_KEY = Symbol.for('cormi.apiRoutes')
+const MODULES_KEY = Symbol.for('cormi.apiRouteModules')
+const apps: Map<string, () => ApiRouteStatus[]> = ((globalThis as any)[APPS_KEY] ??= new Map())
+const appModules: Map<string, () => ApiRouteInfo[]> = ((globalThis as any)[MODULES_KEY] ??= new Map())
 
 /** The API routes of an app that serves (`server/api`), with their status, e.g. for the console. */
 export function getApiRoutes(ctx: Context): ApiRouteStatus[] {
   return apps.get(ctx.cormi.cwd)?.() ?? []
+}
+
+/** The loaded API route modules of an app that serves (`server/api`). */
+export function getApiRouteModules(ctx: Context): ApiRouteInfo[] {
+  return appModules.get(ctx.cormi.cwd)?.() ?? []
 }
 
 declare module 'cordis' {
@@ -162,14 +171,14 @@ function unwrapPlugin(module: any) {
 }
 
 /** The files of the server code, by their paths relative to the app root. */
-interface ServerCode {
+export interface ServerCode {
   /** `server/index.ts`, then `server/models/*.ts` */
   plugins: string[]
   routes: { id: string; path: string; file: string }[]
 }
 
-/** The server code of the sources, in dev mode and for builds. */
-function scanServerCode(ctx: Context, prefix: string): ServerCode {
+/** The server code of the sources: the plugins and API routes of `server/`, e.g. for `cormi info`. */
+export function scanServerCode(ctx: Context, prefix = '/api'): ServerCode {
   const { cwd, paths } = ctx.cormi
   const root = paths.server
   const apiDir = join(root, 'api')
@@ -180,6 +189,28 @@ function scanServerCode(ctx: Context, prefix: string): ServerCode {
   ]
   const routes = scanApiFiles(apiDir).map(([id, file]) => ({ id, path: toApiPath(prefix, id), file: toRelative(file) }))
   return { plugins: plugins.map(toRelative), routes }
+}
+
+/** Generate `src/.cormi/api.d.ts` so the pages can call `server/api` with end-to-end types. */
+export function renderApiTypes(ctx: Context, prefix = '/api') {
+  const app = ctx.get('app')
+  if (!app) return
+  const { routes } = scanServerCode(ctx, prefix)
+  if (!routes.length) return
+  const toImport = (file: string) => {
+    const path = winPath(relative(app.dir, ctx.cormi.resolve(file)))
+    return path.startsWith('.') ? path : `./${path}`
+  }
+  return [
+    `import type { ApiRouteContract } from '@cormijs/runtime'`,
+    '',
+    `declare module '@cormijs/runtime' {`,
+    `  interface ApiRoutes {`,
+    ...routes.map(route => `    ${JSON.stringify(route.path)}: ApiRouteContract<typeof import(${JSON.stringify(toImport(route.file))}), ${JSON.stringify(route.path)}>`),
+    `  }`,
+    `}`,
+    '',
+  ].join('\n')
 }
 
 /**
@@ -199,8 +230,13 @@ function scanServerCode(ctx: Context, prefix: string): ServerCode {
  * change below `server/` loads it again, with the files of the app it
  * imports; in production (`cormi start`) as `cormi build` compiled it.
  */
-export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
+export async function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
   const { cormi } = ctx
+  if (cormi.mode !== 'start') {
+    ctx.inject(['app'], (ctx) => {
+      ctx.app.file('api.d.ts', () => renderApiTypes(ctx, config.prefix))
+    })
+  }
   if (cormi.mode === 'build') {
     // compiled with the Node code of the app; the routes are known from the build in production
     ctx.on('build/node', (build) => {
@@ -234,7 +270,11 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
   let fibers: Fiber[] = []
   ctx.effect(() => {
     apps.set(cormi.cwd, () => routes.map(describeRoute))
-    return () => apps.delete(cormi.cwd)
+    appModules.set(cormi.cwd, () => routes.filter(route => route.module && !route.error).map(route => ({ path: route.path, file: route.file, module: route.module! })))
+    return () => {
+      apps.delete(cormi.cwd)
+      appModules.delete(cormi.cwd)
+    }
   }, 'the API routes, for the console')
 
   const load = async () => {
@@ -276,12 +316,10 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
     await Promise.all(disposing.map(fiber => fiber.dispose()))
   }
 
-  ctx.effect(() => {
-    const task = load()
-    return async () => {
-      await task
-      await unload()
-    }
+  let disposed = false
+  ctx.effect(() => () => {
+    disposed = true
+    return unload()
   }, 'load server code')
 
   if (ctx.cormi.mode === 'dev') {
@@ -289,20 +327,21 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
     let reloading: Promise<void> = Promise.resolve()
     let timer: ReturnType<typeof setTimeout> | undefined
     // changes in a burst (a save of several files) reload once
-    const reload = () => {
+    const onReload = () => {
       clearTimeout(timer)
       timer = setTimeout(() => {
         reloading = reloading.then(async () => {
           await unload()
           reload()
           await load()
+          ctx.get('app')?.refresh()
           ctx.logger('server').info('reloaded the server code')
         })
       }, 100)
     }
     ctx.effect(() => {
       const watcher = watch(cormi.paths.server, { ignoreInitial: true })
-      watcher.on('all', reload)
+      watcher.on('all', onReload)
       return () => {
         clearTimeout(timer)
         return watcher.close()
@@ -336,7 +375,14 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
         const denied = await ctx.serial('api/request', { path: route.path, file: route.file, module }, request, context)
         if (denied) return denied
         const result = await (handler as ApiHandler)(request, context)
-        return result instanceof Response ? result : Response.json(result ?? null)
+        const response = result instanceof Response
+          ? result
+          : result && typeof (result as { toResponse?: () => Response }).toResponse === 'function'
+            ? (result as { toResponse: () => Response }).toResponse()
+            : Response.json(result ?? null)
+        const cookies = response.headers.getSetCookie()
+        if (cookies.length) res._res.setHeader('set-cookie', cookies)
+        return response
       }
       // the other routes of ctx.server (not the pages), then not found: an unknown path is not a method that is not allowed
       const response = await next()
@@ -344,6 +390,9 @@ export function ApiRoutes(ctx: Context, config: ApiRoutes.Config) {
       return Response.json({ error: 'not found' }, { status: 404 })
     })
   })
+
+  await load()
+  if (disposed) await unload()
 }
 
 export namespace ApiRoutes {

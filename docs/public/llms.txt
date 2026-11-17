@@ -1,0 +1,47 @@
+# Cormi
+
+> Cormi is an AI-native full-stack web framework built on Cordis 4. Every capability (bundler, UI framework, router, server, database, cache, storage, session, auth, AI) is a Cordis plugin configured in a single declarative `cormi.yml` plugin tree and exposed as a typed service on `ctx`.
+
+## Quick Mental Model
+
+- **Plugin tree (`cormi.yml`)**: Declares the app's stack and services (`@cormijs/preset`, `@cormijs/vite` or `@cormijs/rsbuild`, `@cormijs/react` or `@cormijs/vue`, `@cormijs/database`, `@cormijs/cache`, `@cormijs/storage`, `@cormijs/plugin-session`, `@cormijs/plugin-auth`, `@cormijs/ai`).
+- **Two Sides (`src/` vs `server/`)**:
+  - `src/`: Browser pages (`src/pages/**` routes, `src/layouts/index.{tsx,vue}` layout, `src/app.{ts,tsx}` browser plugin).
+  - `server/`: Node server (`server/index.ts` server plugin, `server/models/*.ts` database tables, `server/api/**` HTTP API routes, `server/env.d.ts` service type references).
+  - **Boundary rule**: `src/` never imports runtime values from `server/`. They meet only via:
+    1. Typed HTTP / RPC (`import { api } from '@cormijs/cormi/client'` or `fetch('/api/...')`).
+    2. Server `loader` (`export async function loader({ context }: LoaderFunctionArgs<LoaderContext>)` reading `context.ctx` and `context.state`).
+    3. Type-only imports (`import type { Todo } from '../../server/models/todo'`).
+- **Services & `inject`**: Any plugin or `server/api` module using `ctx.<service>` MUST declare `export const inject = ['database']` (or `['model', 'database']`, `['cache']`, `['storage']`, `['auth']`, `['ai']`).
+- **Verification**:
+  - `cormi info --json`: Inspect app kind, stack, routes, plugins, and services in one JSON output.
+  - `cormi check`: Structured diagnostics (types, cross-boundary imports, plugin status, config validation, and `server/env.d.ts` declaration merging) with error codes and fix instructions.
+  - `createApp()` & `app.fetch(request)`: Test API routes and middlewares in-process without starting a server or binding a port.
+  - `cormi mcp`: Connect AI agents to the live dev server console via Model Context Protocol (MCP).
+
+## Documentation
+
+- [Full LLM Reference & Recipes](https://cormi.js.org/llms-full.txt): Single-file complete reference (English API reference, architecture, CLI, typed RPC, services, and step-by-step recipes).
+- [English API Reference](https://cormi.js.org/reference/api-en): Complete English reference for all key Cormi APIs.
+- [Task Recipes (加接口 / 加表 / 加登录 / AI)](https://cormi.js.org/guide/recipes): Step-by-step task guides for adding API routes, database tables, authentication, and AI.
+- [AI Native & @cormijs/ai](https://cormi.js.org/guide/ai): `cormi mcp`, `cormi check`, `cormi info`, typed RPC `api`, `createApp()`, and `@cormijs/ai` (`ctx.ai`).
+
+## Core Guide
+
+- [Introduction](https://cormi.js.org/guide/): Overview of Cormi and Cordis principles.
+- [Getting Started](https://cormi.js.org/guide/getting-started): Scaffolding with `pnpm create @cormijs`.
+- [Pages vs Server](https://cormi.js.org/guide/sides): The boundary between `src/` and `server/`.
+- [Directory & Conventions](https://cormi.js.org/guide/conventions): File conventions in `src/` and `public/`.
+- [Routing, Data & SSR](https://cormi.js.org/guide/routing): File-based routing, `loader`, `clientLoader`, and SSR.
+- [Bundlers & UI Frameworks](https://cormi.js.org/guide/stack): Switching between Vite/Rsbuild and React/Vue.
+- [Server Code & API Routes](https://cormi.js.org/guide/server): `server/api`, `inject`, `server/env.d.ts`, and typed RPC.
+- [Middlewares & Proxy](https://cormi.js.org/guide/middleware): `ctx.middleware.use()` and request `state`.
+- [Database](https://cormi.js.org/guide/database): `@cormijs/database` (`ctx.model`, `ctx.database` powered by Minato).
+- [Cache](https://cormi.js.org/guide/cache): `@cormijs/cache`, `@cormijs/cache-redis`, `@cormijs/cache-database` (`ctx.cache`).
+- [File Storage](https://cormi.js.org/guide/storage): `@cormijs/storage`, `@cormijs/storage-s3` (`ctx.storage`).
+- [Sessions, Auth & Security](https://cormi.js.org/guide/auth): `@cormijs/plugin-session`, `@cormijs/plugin-auth`, `-cors`, `-security`, `-rate-limit`.
+- [cormi.yml Configuration](https://cormi.js.org/guide/config): Managing the plugin tree.
+- [CLI Commands](https://cormi.js.org/guide/cli): `dev`, `build`, `start`, `setup`, `info`, `check`, `mcp`, `generate`, `config`.
+- [Console & Workspace](https://cormi.js.org/guide/console): `/__cormi/` dev console and `plugins/*` workspace packages.
+- [Plugin Development](https://cormi.js.org/plugin/): Authoring Node, browser, and console plugins.
+- [Architecture](https://cormi.js.org/architecture): Deep dive into Cormi's internals.

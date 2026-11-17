@@ -59,7 +59,7 @@ function ConsolePage(ctx: Context) {
   const primaryOf = (table: string) => [ctx.model.tables[table].primary].flat()
   // any table of the app: the typings know the declared ones only
   const database: any = ctx.database
-  const tables = ctx.console.data('database/tables', async () => {
+  const describe = () => {
     return Promise.all(Object.entries(ctx.model.tables).map(async ([name, model]): Promise<TableInfo> => {
       const primary = [model.primary].flat()
       const count = await database.eval(name, (row: any) => $.count(row[primary[0]])).catch(() => null)
@@ -79,7 +79,8 @@ function ConsolePage(ctx: Context) {
         count,
       }
     }))
-  })
+  }
+  const tables = ctx.console.data('database/tables', describe)
   ctx.on('minato/model', () => tables.refresh())
 
   // values come as JSON: the dates of a row are strings
@@ -113,6 +114,59 @@ function ConsolePage(ctx: Context) {
   ctx.console.method('database/remove', async (table: string, key: Record<string, any>) => {
     await database.remove(table, keyOf(table, key))
     tables.refresh()
+  })
+
+  // the same, for AI agents through `cormi mcp`
+  const checkTable = (table: string) => {
+    if (!ctx.model.tables[table]) throw new Error(`no table ${table}; the tables are ${Object.keys(ctx.model.tables).join(', ')}`)
+  }
+  ctx.console.tool('database_tables', {
+    description: 'The tables of the database (ctx.model): their fields with types, primary keys, unique keys, indexes and numbers of rows. Tables are declared in server/models.',
+    handler: describe,
+  })
+  ctx.console.tool('database_query', {
+    description: 'Rows of a table of the database, e.g. to check what an API route wrote. `where` is a query of minato, e.g. {"done": false} or {"id": {"$gt": 10}}.',
+    input: {
+      type: 'object',
+      properties: {
+        table: { type: 'string' },
+        where: { type: 'object', description: 'a query of minato; every row without it' },
+        sort: { type: 'object', additionalProperties: { enum: ['asc', 'desc'] }, description: 'e.g. {"createdAt": "desc"}; by the primary key without it' },
+        limit: { type: 'number', description: 'default 20, at most 200' },
+        offset: { type: 'number' },
+      },
+      required: ['table'],
+    },
+    handler: async ({ table, where = {}, sort, limit = 20, offset = 0 }: { table: string; where?: object; sort?: object; limit?: number; offset?: number }) => {
+      checkTable(table)
+      sort ??= Object.fromEntries(primaryOf(table).map(name => [name, 'asc']))
+      const rows = await database.get(table, revive(table, where as Record<string, any>), { sort, limit: Math.min(limit, 200), offset })
+      const total = await database.eval(table, (row: any) => $.count(row[primaryOf(table)[0]]), revive(table, where as Record<string, any>))
+      return { total, offset, rows }
+    },
+  })
+  ctx.console.tool('database_write', {
+    description: 'Create, update or remove a row of a table of the database, e.g. to set up data to try an API route with. Rows are found by their primary key.',
+    input: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['create', 'update', 'remove'] },
+        table: { type: 'string' },
+        key: { type: 'object', description: 'the primary key of the row, for update and remove, e.g. {"id": 1}' },
+        data: { type: 'object', description: 'the row to create, or the fields to update' },
+      },
+      required: ['action', 'table'],
+    },
+    handler: async ({ action, table, key, data }: { action: string; table: string; key?: Record<string, any>; data?: Record<string, any> }) => {
+      checkTable(table)
+      let result: unknown
+      if (action === 'create') result = await database.create(table, revive(table, data ?? {}))
+      else if (action === 'update') result = await database.set(table, keyOf(table, key ?? {}), revive(table, data ?? {}))
+      else if (action === 'remove') result = await database.remove(table, keyOf(table, key ?? {}))
+      else throw new Error('action is create, update or remove')
+      tables.refresh()
+      return result
+    },
   })
 }
 

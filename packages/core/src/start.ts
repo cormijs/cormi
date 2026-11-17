@@ -14,6 +14,18 @@ import { Workspace } from './workspace.ts'
 // `FiberState` is a const enum in cordis' typings
 const FAILED = 3
 
+let tsRegistered = false
+
+async function ensureTypeScript() {
+  if (tsRegistered) return
+  tsRegistered = true
+  try {
+    const specifier = 'tsx/esm/api'
+    const { register } = await import(specifier)
+    register()
+  } catch {}
+}
+
 export interface StartOptions extends Cormi.Options {
   /** the plugin tree, relative to `cwd` (default `cormi.yml`) */
   config?: string
@@ -39,6 +51,7 @@ export interface StartOptions extends Cormi.Options {
  * The returned context keeps running until `stop()` is called.
  */
 export async function start(options: StartOptions) {
+  if (options.mode !== 'start') await ensureTypeScript()
   const cwd = resolve(options.cwd)
   loadEnv({ cwd, envFile: '.env' })
   process.env.NODE_ENV ??= options.mode === 'dev' ? 'development' : 'production'

@@ -1,0 +1,353 @@
+# Cormi — Complete LLM Reference (`llms-full.txt`)
+
+> Cormi is an AI-native full-stack web framework built on Cordis 4. Every capability is a plugin in `cormi.yml` and every capability is exposed as a service on `ctx`.
+
+---
+
+## 1. Architecture & Mental Model
+
+### Project Structure
+
+```
+cormi.yml                  # Declarative plugin tree (stack, services, plugins)
+tsconfig.json              # Extends ./src/.cormi/tsconfig.json (includes src and server)
+src/                       # Pages side (bundled by Vite or Rsbuild for the browser & SSR)
+  app.tsx                  # Browser-side Cordis runtime plugin
+  global.css               # Global stylesheet imported before app startup
+  layouts/index.tsx        # Global layout wrapping all page routes
+  pages/                   # File-based page routes (index.tsx -> /, users/[id].tsx -> /users/:id)
+  .cormi/                  # Generated files (routes.ts, entry.tsx, api.d.ts, tsconfig.json)
+server/                    # Server side (executed by Node in dev, start, and test modes)
+  env.d.ts                 # TypeScript triple-slash references for server service plugins
+  index.ts                 # Server-side Cordis plugin (e.g. middlewares)
+  models/*.ts              # Database table definitions (ctx.model.extend)
+  api/**                   # File-based API routes (todos/[id].ts -> /api/todos/:id)
+plugins/*                  # Local workspace plugin packages (loaded from TypeScript source)
+```
+
+### Four Application Kinds
+
+1. **`web`**: Frontend only (`@cormijs/preset` + bundler + UI framework, no `server/`).
+2. **`api`**: Backend only (`@cormijs/preset` + `server/`, no bundler or UI framework).
+3. **`fullstack`**: Client-rendered pages (`src/`) + Node backend (`server/`).
+4. **`ssr`**: Server-rendered pages (`ssr: true` on `@cormijs/preset`) + Node backend (`server/`).
+
+### Boundary Between `src/` and `server/`
+
+Files in `src/` must **never** import runtime values from `server/`. Importing a runtime value across the boundary fails `cormi check` (`CORMI_BOUNDARY_IMPORT`) and the bundler build.
+The two sides meet in **three ways only**:
+1. **HTTP / Typed RPC (`api`)**: Pages call `server/api` routes via `api` (`import { api } from '@cormijs/cormi/client'`) or `fetch('/api/...')`. `src/.cormi/api.d.ts` automatically infers all route paths, methods, parameters, request bodies, and response types from `server/api/**`.
+2. **Server `loader` context**: Page `loader` functions run on the server and access services via `context.ctx` (`context.ctx.database`, `context.ctx.cache`, `context.ctx.ai`) and request state via `context.state` (`context.state.user`, `context.state.session`).
+3. **Types (`import type`)**: Pages import TypeScript types from `server/` using `import type { Todo } from '../../server/models/todo'`.
+
+---
+
+## 2. CLI Commands (`cormi`)
+
+```sh
+cormi dev                  # Start dev server (http://localhost:8000) & console (/__cormi/)
+cormi build                # Bundle pages (dist/) and compile server code (dist/node/)
+cormi start                # Run production server from dist/ (alias: preview)
+cormi setup                # Generate src/.cormi files (routes.ts, api.d.ts, tsconfig.json) and exit
+cormi info [--json]        # Output app kind, stack, page routes, API routes, plugins, and services
+cormi check [--json]       # Run structured diagnostics (types, boundary, plugins, config, declarations)
+cormi mcp [--url <url>]    # Run Model Context Protocol (MCP) server for AI agents
+cormi g <type> <name>      # Run generator: page, component, api, model, mock, plugin
+cormi config [name]        # List plugins in cormi.yml or print resolved config of matching plugins
+cormi plugin check         # Verify a plugin package against all bundlers & UI frameworks (--write, --json)
+```
+
+---
+
+## 3. Server API (`@cormijs/cormi`)
+
+### API Routes (`server/api/**`)
+
+File path to URL mapping (default prefix `/api`):
+- `server/api/todos/index.ts` -> `/api/todos`
+- `server/api/todos/[id].ts` -> `/api/todos/:id` (`params.id: string`)
+- `server/api/files/[...key].ts` -> `/api/files/*key` (`params.key: string[]`)
+
+Each module is a Cordis plugin:
+- Export `export const inject = ['database']` (or `['cache']`, `['storage']`, `['auth']`, `['ai']`) to declare required services.
+- Export `export const auth = true` (any signed-in user) or `export const auth = (user: User) => user.role === 'admin'` to require authentication (`401` if unauthenticated, `403` if check returns `false`).
+- Export HTTP method handlers (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`) or `default`.
+- Handler signature: `(request: Request | ApiRequest<Body>, { params, ctx, state, ip }: ApiContext<Params, Body>) => unknown`.
+- Returning a plain value sends it as `200 application/json`. Returning `Response.json(data, { status: 201 })` or `json(data, 201)` sends that status while preserving the TypeScript return type `T` for the frontend RPC client. Returning `ctx.ai.stream(...)` streams `text/event-stream` SSE automatically.
+
+```ts
+// server/api/todos/index.ts
+import type { ApiContext, ApiRequest } from '@cormijs/cormi'
+
+export const inject = ['database']
+
+export async function GET(request: Request, { ctx }: ApiContext) {
+  return ctx.database.get('todo', {}, { sort: { id: 'asc' } })
+}
+
+export async function POST(request: ApiRequest<{ title: string }>, { ctx }: ApiContext) {
+  const { title } = await request.json()
+  if (typeof title !== 'string' || !title.trim()) {
+    return Response.json({ error: 'title is required' }, { status: 400 })
+  }
+  const todo = await ctx.database.create('todo', {
+    title: title.trim(),
+    done: false,
+    createdAt: new Date(),
+  })
+  return Response.json(todo, { status: 201 })
+}
+```
+
+### In-Process Testing (`createApp` & `app.fetch`)
+
+Test API routes, middlewares, sessions, and databases in-process without starting Vite or binding a TCP port:
+
+```ts
+import { createApiClient, createApp } from '@cormijs/cormi'
+
+const app = await createApp({ cwd: process.cwd() })
+
+// Direct fetch
+const res = await app.fetch('/api/todos', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ title: 'Write tests' }),
+})
+const created = await res.json()
+
+// Or with the typed RPC client bound to app.fetch
+const client = createApiClient({ fetch: app.fetch })
+const todos = await client.get('/api/todos')
+
+await app.close()
+```
+
+### Middlewares (`ctx.middleware`)
+
+```ts
+// server/index.ts
+import type { Context } from '@cormijs/cormi'
+
+declare module '@cormijs/cormi' {
+  interface State {
+    requestId: string
+  }
+}
+
+export const inject = ['middleware']
+
+export function apply(ctx: Context) {
+  ctx.middleware.use(async (request, { state, ip }, next) => {
+    state.requestId = crypto.randomUUID()
+    const response = await next()
+    response.headers.set('x-request-id', state.requestId)
+    return response
+  }, { order: -100, path: '/api' })
+}
+```
+
+---
+
+## 4. End-to-End Typed Client (`@cormijs/cormi/client`)
+
+`src/.cormi/api.d.ts` augments `ApiRoutes` automatically from `server/api/**`. Import `api` (or `createApiClient`) from `@cormijs/cormi/client`, `@cormijs/react/client`, or `@cormijs/vue/client`:
+
+```ts
+import { api } from '@cormijs/cormi/client'
+
+// 1. Path-based calls (types inferred from server/api/**)
+const todos = await api.get('/api/todos')
+const created = await api.post('/api/todos', { title: 'Learn Cormi' })
+const updated = await api.patch(`/api/todos/${created.id}`, { done: true })
+await api.delete('/api/todos/:id', { params: { id: created.id } })
+
+// 2. Hono-style RPC property chains
+const res = await api.todos.$get()
+const list = await res.json() // typed as Todo[]
+const item = await api.todos.post({ title: 'RPC' }) // typed as Todo
+const patched = await api.todos[':id'].patch({ done: true }, { param: { id: item.id } })
+```
+
+---
+
+## 5. Server Services
+
+Whenever adding a service plugin to `cormi.yml`, reference its types in `server/env.d.ts`:
+
+```ts
+// server/env.d.ts
+/// <reference types="@cormijs/database" />
+/// <reference types="@cormijs/cache" />
+/// <reference types="@cormijs/storage" />
+/// <reference types="@cormijs/plugin-session" />
+/// <reference types="@cormijs/plugin-auth" />
+/// <reference types="@cormijs/ai" />
+```
+
+### Database (`@cormijs/database` + `@minatojs/driver-*`)
+
+- `ctx.model.extend(tableName, fields, options)`: Define or migrate a table (`'unsigned'`, `'integer'`, `'float'`, `'double'`, `'decimal'`, `'char'`, `'string'`, `'text'`, `'boolean'`, `'date'`, `'time'`, `'timestamp'`, `'json'`, `'list'`, `'array'`).
+- `ctx.database.get(table, query, { sort, limit, offset, fields })`: Query rows.
+- `ctx.database.create(table, row)`: Insert a row and return it.
+- `ctx.database.set(table, query, update)`: Update matching rows (`{ matched, modified }`).
+- `ctx.database.upsert(table, rows, keys)`: Insert or update rows.
+- `ctx.database.remove(table, query)`: Delete matching rows (`{ matched, removed }`).
+- `ctx.database.eval(table, expr, query)`: Aggregate queries with `$` from `@cormijs/database` (e.g. `$.count(row.id)`).
+
+### Cache (`@cormijs/cache`, `@cormijs/cache-redis`, `@cormijs/cache-database`)
+
+- `ctx.cache.get(table, key)`: Read value or `undefined`.
+- `ctx.cache.set(table, key, value, maxAgeMs?)`: Write value with optional TTL in ms.
+- `ctx.cache.getOrSet(table, key, factory, maxAgeMs?)`: Read or compute and cache.
+- `ctx.cache.increment(table, key, delta?, maxAgeMs?)`: Atomic counter increment.
+- `ctx.cache.delete(table, key)` / `ctx.cache.clear(table)` / `ctx.cache.keys(table)`.
+
+### File Storage (`@cormijs/storage`, `@cormijs/storage-s3`)
+
+- `ctx.storage.put(key, body, { contentType?, cacheControl? })`: Store `string | Blob | Uint8Array | ReadableStream`.
+- `ctx.storage.get(key)`: Returns `{ key, size, etag, contentType, lastModified, url, body }` or `undefined`.
+- `ctx.storage.head(key)` / `ctx.storage.delete(key)` / `ctx.storage.list(prefix?)` / `ctx.storage.url(key)`.
+- `ctx.storage.response(key, request?)`: Serve a file as a `Response` with `ETag` / `304 Not Modified` handling.
+
+### Session & Authentication (`@cormijs/plugin-session`, `@cormijs/plugin-auth`)
+
+- Requires `@cormijs/cache`, `@cormijs/plugin-session`, and `@cormijs/plugin-auth` in `cormi.yml`.
+- `ctx.auth.hash(password)` / `ctx.auth.verify(password, hash)`: `scrypt` password hashing and constant-time verification.
+- `ctx.auth.login(state, user)` / `ctx.auth.logout(state)`: Sign user in (rotates session ID) or out.
+- `state.user`: Available in middlewares, API routes, and page `loader`s.
+
+### AI & MCP (`@cormijs/ai`, `@cormijs/ai-openai`, `@cormijs/ai-anthropic`)
+
+- Replaceable implementations of `ctx.ai`: `@cormijs/ai` (default OpenAI-compatible or `provider: 'anthropic'`), `@cormijs/ai-openai`, `@cormijs/ai-anthropic`.
+- `await ctx.ai.chat(promptOrMessages, { system?, model?, temperature?, maxTokens?, tools? })`: Complete a conversation (`{ text, role, toolCalls, usage, finishReason, messages }`). Automatically executes tool handlers in a loop when `tools` (or `tools: true` for all app tools) have handlers.
+- `ctx.ai.stream(promptOrMessages, options)`: Returns a `ChatStream`:
+  - `for await (const chunk of ctx.ai.stream(...))` yields `{ type: 'text', text }`, `{ type: 'tool-call', toolCall }`, `{ type: 'done', usage }`.
+  - `.textStream`: `ReadableStream<string>`.
+  - `.text()`: `Promise<string>`.
+  - `.toResponse()`: SSE `Response` (`text/event-stream`).
+  - `.toTextResponse()`: Plain text streaming `Response`.
+  - Can be returned directly from any `server/api` route handler!
+- `ctx.ai.tool(name, { description, input, handler })`: Register a custom tool on `ctx.ai`.
+- **Automatic `server/api` -> MCP Exposure**:
+  - Every active route in `server/api/**` is automatically exposed as an MCP tool on `ctx.ai.tools()` and served over HTTP JSON-RPC 2.0 at `POST /mcp` (configurable via `mcp: '/mcp' | false`).
+  - Opt out a route module with `export const mcp = false`, or customize with `export const mcp = { GET: { name: 'list_todos', description: '...', input: { ... } } }`.
+
+---
+
+## 6. Step-by-Step Task Recipes
+
+### Recipe 1: Add an API Route (`server/api`)
+
+1. Create `server/api/posts/[id].ts` (or run `npx cormi g api posts/[id]`):
+   ```ts
+   import type { ApiContext, ApiRequest } from '@cormijs/cormi'
+
+   export const inject = ['database']
+
+   type Params = { id: string }
+
+   /** GET /api/posts/:id */
+   export async function GET(request: Request, { params, ctx }: ApiContext<Params>) {
+     const [post] = await ctx.database.get('post', { id: Number(params.id) })
+     return post ?? Response.json({ error: 'not found' }, { status: 404 })
+   }
+
+   /** PATCH /api/posts/:id */
+   export async function PATCH(request: ApiRequest<{ title?: string }>, { params, ctx }: ApiContext<Params>) {
+     const { title } = await request.json()
+     await ctx.database.set('post', { id: Number(params.id) }, { ...title && { title } })
+     const [post] = await ctx.database.get('post', { id: Number(params.id) })
+     return post
+   }
+   ```
+2. Call from `src/pages/**` with full type inference:
+   ```ts
+   import { api } from '@cormijs/cormi/client'
+   const post = await api.get(`/api/posts/${id}`)
+   ```
+3. Verify: `npx cormi check` and test with `createApp()` / `app.fetch('/api/posts/1')`.
+
+### Recipe 2: Add a Database Table (`server/models`)
+
+1. Ensure `@cormijs/database` and a driver (e.g. `@minatojs/driver-sqlite`) are in `cormi.yml`.
+2. Ensure `/// <reference types="@cormijs/database" />` is in `server/env.d.ts`.
+3. Create `server/models/post.ts` (or run `npx cormi g model post`):
+   ```ts
+   import type { Context } from '@cormijs/cormi'
+
+   export interface Post {
+     id: number
+     title: string
+     published: boolean
+     createdAt: Date
+   }
+
+   declare module '@cormijs/database' {
+     interface Tables {
+       post: Post
+     }
+   }
+
+   export const inject = ['model']
+
+   export function apply(ctx: Context) {
+     ctx.model.extend('post', {
+       id: 'unsigned',
+       title: 'string',
+       published: 'boolean',
+       createdAt: 'timestamp',
+     }, { autoInc: true })
+   }
+   ```
+4. Verify: `npx cormi check`.
+
+### Recipe 3: Add Authentication (`@cormijs/plugin-auth`)
+
+1. Add `@cormijs/cache`, `@cormijs/plugin-session`, and `@cormijs/plugin-auth` to `cormi.yml`:
+   ```yaml
+   - name: '@cormijs/cache'
+   - name: '@cormijs/plugin-session'
+   - name: '@cormijs/plugin-auth'
+   ```
+2. Add references and `User` declaration to `server/env.d.ts`:
+   ```ts
+   /// <reference types="@cormijs/cache" />
+   /// <reference types="@cormijs/plugin-session" />
+   /// <reference types="@cormijs/plugin-auth" />
+
+   declare module '@cormijs/plugin-auth' {
+     interface User {
+       id: number
+       name: string
+       role: 'admin' | 'member'
+     }
+   }
+   ```
+3. Create `server/api/login.ts` and `server/api/logout.ts` using `ctx.auth.verify(password, hash)`, `ctx.auth.login(state, user)`, and `ctx.auth.logout(state)`.
+4. Protect API routes by exporting `export const auth = true` or `export const auth = (user: User) => user.role === 'admin'`.
+5. Protect SSR pages in `loader` by checking `context.state.user`.
+
+---
+
+## 7. `cormi check` Diagnostic Codes
+
+| Code | Severity | Meaning & Fix |
+|---|---|---|
+| `CORMI_CONFIG_MISSING` | error | `cormi.yml` does not exist. Create `cormi.yml` or pass `--config`. |
+| `CORMI_PLUGIN_FAILED` | error | A plugin in `cormi.yml` threw during load. Fix the plugin code or config. |
+| `CORMI_PLUGIN_INCOMPATIBLE` | error | A plugin does not support the current bundler or UI framework. |
+| `CORMI_PLUGIN_PENDING` | error | A plugin waits for a missing service (e.g. `session` without `cache`, or `database` without a driver). Add the provider plugin to `cormi.yml`. |
+| `CORMI_CONFIG_INVALID` | error | A plugin's `config` in `cormi.yml` failed Schemastery validation. |
+| `CORMI_CONFIG_UNKNOWN` | warning | An unrecognized config key in `cormi.yml` is silently ignored. |
+| `CORMI_CONFIG_EMPTY` | warning | An empty array/object config value (e.g. `proxy: {}`, `metas: []`) has no effect. |
+| `CORMI_CONFIG_SILENT` | warning | A config option (e.g. `ssr: true` without pages) has no effect in the current stack. |
+| `CORMI_BOUNDARY_IMPORT` | error | A file in `src/` imports a runtime value from `server/`. Use `import type`, `api`/`fetch`, or `loader`. |
+| `CORMI_API_INVALID` | error/warning | An API route in `server/api` failed to load or exports no HTTP method handler. |
+| `CORMI_API_WAITING` | error | An API route injects a service that no active plugin in `cormi.yml` provides. |
+| `CORMI_API_INJECT_MISSING` | error | An API route uses `ctx.<service>` without listing `<service>` in `export const inject`. |
+| `CORMI_ENV_TYPES` | warning | `server/env.d.ts` is missing `/// <reference types="..." />` for an active server service used in `server/`. |
+| `CORMI_DECLARATION_UNLOADED` | warning | A file with `declare module` is excluded from `tsconfig.json` or targets an inactive plugin. |
+| `CORMI_DECLARATION_TARGET` | error | `interface Tables`, `User`, or `SessionData` is augmented on `@cormijs/cormi` instead of its owning package. |
+| `CORMI_CONVENTION_UNUSED` | warning | `src/api` exists instead of `server/api`. |
+| `CORMI_TS_ERROR` | error | TypeScript compiler diagnostic with Cormi-specific fix suggestions. |

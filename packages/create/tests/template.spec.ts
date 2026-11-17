@@ -70,6 +70,17 @@ describe('render', () => {
     expect(create({ kind: 'api', pm: 'pnpm' }).files['README.md']).toMatch(/pnpm start {2,}the app in production, from dist\//)
   })
 
+  it('writes AGENTS.md with conventions, commands and verification instructions', () => {
+    const { files } = create({ kind: 'fullstack', pm: 'pnpm' })
+    expect(files['AGENTS.md']).toContain('src/` vs `server/')
+    expect(files['AGENTS.md']).toContain('export const inject')
+    expect(files['AGENTS.md']).toContain('server/env.d.ts')
+    expect(files['AGENTS.md']).toContain('npx cormi check')
+    expect(files['AGENTS.md']).toContain('npx cormi info --json')
+    expect(files['AGENTS.md']).toContain('createApp')
+    expect(files['AGENTS.md']).toContain('app.fetch')
+  })
+
   it('imports nothing but types of server/ in the pages', () => {
     for (const kind of Object.keys(KINDS) as Kind[]) {
       for (const ui of Object.keys(UIS) as Options['ui'][]) {

@@ -69,9 +69,10 @@ export default (ctx: Context) => {
 | `entry(module, config?)` | 在控制台中挂载一个浏览器插件。与 `ctx.app.entry()` 相同，传入包名，`config` 序列化为 JSON |
 | `data(name, get)` | 提供数据。客户端连接时收到当前值；调用返回值的 `refresh()` 后再次推送，同一时刻的多次刷新合并为一次 |
 | `method(name, handler)` | 注册一个可被页面调用的方法，返回值发送回页面，抛出的错误以消息形式返回 |
+| `tool(name, { description, input?, handler })` | 注册一个供 AI Agent 通过 `cormi mcp` 调用的工具，`input` 为参数的 JSON Schema |
 | `broadcast(name, payload)` | 向所有页面发送一个事件 |
 
-三者都是 effect：插件卸载时，它的页面、数据与方法随之移除。
+注册方法均为 effect：插件卸载时，它的页面、数据、方法与工具随之移除。
 
 ## 浏览器端：ctx.$console
 

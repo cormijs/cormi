@@ -110,7 +110,7 @@ export function renderTsconfig(paths: Dict<string[]> = {}) {
         ...paths,
       },
     },
-    include: ['../**/*'],
+    include: ['../**/*', '../../server/**/*'],
   }, null, 2) + '\n'
 }
 

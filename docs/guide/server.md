@@ -80,6 +80,49 @@ declare module '@cormijs/cormi' {
 }
 ```
 
+## 前后端类型打通（Typed RPC）
+
+`cormi dev`、`cormi setup`、`cormi build` 与 `cormi check` 会自动根据 `server/api/**` 生成 `src/.cormi/api.d.ts`，将接口的路径、HTTP 方法、路径参数、请求体（可通过 `ApiRequest<Body>` 或 `ApiContext<Params, Body>` 标注）以及返回值类型推导到前端客户端，而不会把服务端代码打进前端 bundle。
+
+在页面中使用 `@cormijs/cormi/client`（或 `@cormijs/react/client`、`@cormijs/vue/client`）导出的 `api`，同时支持路径式调用与 Hono RPC 风格的链式调用：
+
+```ts
+import { api } from '@cormijs/cormi/client'
+
+// 路径式调用：自动校验路径与方法，并推导返回值类型
+const todos = await api.get('/api/todos')
+const created = await api.post('/api/todos', { title: 'Learn Cormi' })
+const updated = await api.patch(`/api/todos/${created.id}`, { done: true })
+
+// Hono RPC 风格链式调用：$get/$post 返回 TypedResponse<T>，get/post 直接返回解析后的数据
+const res = await api.todos.$get()
+const list = await res.json()
+const item = await api.todos[':id'].patch({ done: true }, { param: { id: created.id } })
+```
+
+如果服务端接口需要返回特定状态码（如 `201`）同时保留准确的返回值类型，可以使用 `Response.json(data, { status: 201 })` 或 `json(data, 201)`；返回错误状态（4xx/5xx）的 `Response.json(...)` 会自动从正常响应类型推导中排除。`@cormijs/plugin-request` 的 `request()` 同样会自动推导 `ApiRoutes` 中的路径与返回值类型。
+
+## 进程内测试（`createApp`）
+
+不需要启动开发服务器或绑定端口，可以直接在单元测试中用 `createApp()` 以 `test` 模式加载应用，并通过 `app.fetch(request)` 在进程内调用完整的中间件、鉴权与接口链路：
+
+```ts
+import { createApiClient, createApp } from '@cormijs/cormi'
+
+const app = await createApp()
+const res = await app.fetch('/api/todos', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ title: 'In-process test' }),
+})
+
+// 也可以将类型化客户端绑定到 app.fetch
+const client = createApiClient({ fetch: app.fetch })
+const todos = await client.get('/api/todos')
+
+await app.close()
+```
+
 ## 热重载
 
 在 `cormi dev` 下，`server/` 中的文件变化时，服务端代码整体重新加载：旧的插件先卸载，新的再加载，所以同一个服务不会被提供两次。`server/` 导入的应用内文件随之重新加载，`node_modules` 中的依赖保持不变。
